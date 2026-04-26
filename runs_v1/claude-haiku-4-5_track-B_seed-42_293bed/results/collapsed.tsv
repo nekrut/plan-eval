@@ -1,0 +1,9 @@
+sample	chrom	pos	ref	alt	af
+M117-bl	chrM	152	T	C	1
+M117-bl	chrM	16519	T	C	1
+M117-ch	chrM	152	T	C	1
+M117-ch	chrM	16519	T	C	1
+M117C1-bl	chrM	152	T	C	1
+M117C1-bl	chrM	16519	T	C	1
+M117C1-ch	chrM	152	T	C	0.5
+M117C1-ch	chrM	16519	T	C	1

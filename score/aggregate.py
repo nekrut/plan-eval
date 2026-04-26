@@ -14,8 +14,12 @@ from pathlib import Path
 from statistics import mean, stdev
 
 BENCH = Path(__file__).resolve().parent.parent
-RUNS = BENCH / "runs"
 OUT_CSV = BENCH / "results.csv"
+
+
+def runs_dirs() -> list[Path]:
+    """Pick up runs/ (current) and any preserved runs_v*/ siblings."""
+    return sorted(p for p in BENCH.iterdir() if p.is_dir() and p.name.startswith("runs"))
 
 
 def parse_run_id(rid: str) -> dict:
@@ -29,28 +33,32 @@ def parse_run_id(rid: str) -> dict:
 
 def main() -> int:
     rows = []
-    for d in sorted(RUNS.iterdir()):
-        sj = d / "score.json"
-        if not sj.exists():
-            continue
-        s = json.loads(sj.read_text())
-        meta_path = d / "meta.json"
-        meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
-        info = parse_run_id(d.name)
-        rows.append({
-            "run_id": d.name,
-            "model": info.get("model"),
-            "think": info.get("think") or "",
-            "track": info.get("track"),
-            "seed": int(info.get("seed", 0)),
-            "M1": s.get("m1_executes"),
-            "M2": s.get("m2_schema"),
-            "M3": round(s.get("m3_jaccard", 0), 4),
-            "M5": s.get("m5_quality"),
-            "cost_usd": s.get("m4", {}).get("cost_usd"),
-            "gen_seconds": round(meta.get("wall_seconds_generation") or 0, 1),
-            "exec_seconds": round(s.get("m4", {}).get("wall_seconds_execution") or 0, 1),
-        })
+    for runs_root in runs_dirs():
+        # plan_version: "runs" -> latest (v2 or current); "runs_v1" -> "v1"
+        plan_version = "current" if runs_root.name == "runs" else runs_root.name[len("runs_"):]
+        for d in sorted(runs_root.iterdir()):
+            sj = d / "score.json"
+            if not sj.exists():
+                continue
+            s = json.loads(sj.read_text())
+            meta_path = d / "meta.json"
+            meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+            info = parse_run_id(d.name)
+            rows.append({
+                "run_id": d.name,
+                "plan_version": plan_version,
+                "model": info.get("model"),
+                "think": info.get("think") or "",
+                "track": info.get("track"),
+                "seed": int(info.get("seed", 0)),
+                "M1": s.get("m1_executes"),
+                "M2": s.get("m2_schema"),
+                "M3": round(s.get("m3_jaccard", 0), 4),
+                "M5": s.get("m5_quality"),
+                "cost_usd": s.get("m4", {}).get("cost_usd"),
+                "gen_seconds": round(meta.get("wall_seconds_generation") or 0, 1),
+                "exec_seconds": round(s.get("m4", {}).get("wall_seconds_execution") or 0, 1),
+            })
 
     if not rows:
         print("no scored runs found", file=sys.stderr)
@@ -63,16 +71,16 @@ def main() -> int:
         w.writerows(rows)
     print(f"[aggregate] wrote {OUT_CSV} ({len(rows)} rows)", file=sys.stderr)
 
-    # Summary by (model, think, track)
+    # Summary by (plan_version, model, think, track)
     bucket = defaultdict(list)
     for r in rows:
-        key = (r["model"], r["think"], r["track"])
+        key = (r["plan_version"], r["model"], r["think"], r["track"])
         bucket[key].append(r)
 
-    fmt = "{:<28} {:<6} {:<5} {:>3} {:>6} {:>6} {:>6} {:>10} {:>8} {:>8}"
+    fmt = "{:<10} {:<28} {:<6} {:<5} {:>3} {:>6} {:>6} {:>13} {:>10} {:>7} {:>7}"
     print()
-    print(fmt.format("model", "think", "track", "n", "M1", "M2", "M3", "cost_usd", "gen_s", "exec_s"))
-    print("-" * 100)
+    print(fmt.format("plan_ver", "model", "think", "track", "n", "M1", "M2", "M3", "cost_usd", "gen_s", "exec_s"))
+    print("-" * 110)
     for key in sorted(bucket):
         rs = bucket[key]
         m3s = [r["M3"] for r in rs]
@@ -83,7 +91,7 @@ def main() -> int:
         gen_s = mean(r["gen_seconds"] for r in rs)
         exec_s = mean(r["exec_seconds"] for r in rs)
         print(fmt.format(
-            (key[0] or "")[:28], key[1] or "-", key[2] or "?",
+            key[0], (key[1] or "")[:28], key[2] or "-", key[3] or "?",
             len(rs), m1_str, m2_str, m3_str,
             f"{mean(costs):.4f}", f"{gen_s:.1f}", f"{exec_s:.1f}",
         ))

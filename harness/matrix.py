@@ -90,15 +90,20 @@ def main() -> int:
     ap.add_argument("--only-ollama", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--anthropic-concurrency", type=int, default=3)
+    ap.add_argument("--tracks", default="AB", help="Subset of tracks to run, e.g. 'A' or 'AB' (default)")
+    ap.add_argument("--no-think", action="store_true", help="For ollama: skip the /think condition")
     args = ap.parse_args()
+
+    tracks = [t for t in TRACKS if t in args.tracks.upper()]
+    think_modes = ["off"] if args.no_think else THINK_MODES
 
     cells_anth = [
         (m, t, s, None)
-        for m in ANTHROPIC for t in TRACKS for s in SEEDS
+        for m in ANTHROPIC for t in tracks for s in SEEDS
     ]
     cells_oll = [
         (m, t, s, th)
-        for m in OLLAMA for t in TRACKS for th in THINK_MODES for s in SEEDS
+        for m in OLLAMA for t in tracks for th in think_modes for s in SEEDS
     ]
 
     do_anth = not args.only_ollama
