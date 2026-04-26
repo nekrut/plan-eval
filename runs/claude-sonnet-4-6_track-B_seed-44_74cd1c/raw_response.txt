@@ -1,0 +1,24 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF=data/ref/chrM.fa
+RAWDIR=data/raw
+OUTDIR=results
+
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+
+mkdir -p "${OUTDIR}"
+
+# Index reference genome if not already done
+if [ ! -f "${REF}.bwt" ]; then
+    bwa index "${REF}"
+fi
+
+if [ ! -f "${REF}.fai" ]; then
+    samtools faidx "${REF}"
+fi
+
+for SAMPLE in "${SAMPLES[@]}"; do
+    BAM="${OUTDIR}/${

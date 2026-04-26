@@ -1,0 +1,10 @@
+{
+  "run_id": "claude-sonnet-4-6_track-B_seed-43_90d3bb",
+  "model": "claude-sonnet-4-6",
+  "track": "B",
+  "seed": 43,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 58.49319887161255,
+  "duration_ms_generation": 55745
+}

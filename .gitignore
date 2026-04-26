@@ -1,0 +1,30 @@
+# Raw data — already on Zenodo, do not redistribute
+data/raw/
+data/ref/
+
+# Re-derivable per-run artifacts (heavy)
+runs/*/data
+runs/*/results/
+ground_truth/results/*.bam
+ground_truth/results/*.bam.bai
+ground_truth/results/*.bwa.log
+ground_truth/results/*.lofreq.log
+
+# Reference indexes regenerable by `bwa index` / `samtools faidx`
+data/ref/chrM.fa.amb
+data/ref/chrM.fa.ann
+data/ref/chrM.fa.bwt
+data/ref/chrM.fa.fai
+data/ref/chrM.fa.pac
+data/ref/chrM.fa.sa
+
+# Symlink in ground_truth
+ground_truth/data
+
+# Python / OS noise
+__pycache__/
+*.pyc
+.DS_Store
+
+# Local matrix log (re-derivable)
+matrix_log.json

@@ -1,0 +1,23 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF_DIR="data/ref"
+RAW_DIR="data/raw"
+RESULTS_DIR="results"
+REF_FASTA="$REF_DIR/chrM.fa"
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p "$RESULTS_DIR"
+
+# Index reference genome
+if [ ! -f "$REF_FASTA.bwt" ]; then
+    bwa index "$REF_FASTA"
+fi
+
+if [ ! -f "$REF_FASTA.fai" ]; then
+    samtools faidx "$REF_FASTA"
+fi
+
+# Process ea

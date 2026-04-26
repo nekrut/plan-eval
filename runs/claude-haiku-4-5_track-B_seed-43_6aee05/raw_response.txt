@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF="data/ref/chrM.fa"
+RESULTS="results"
+
+mkdir -p "$RESULTS"
+
+# Index reference
+[[ -f "${REF}.bwt" ]] || bwa index "$REF"
+[[ -f "${REF}.fai" ]] || samtools faidx "$REF"
+
+# Process each sample
+for SAMPLE in M117-bl M117-ch M117C1-bl M117C1-ch; do
+    BAM="${RESULTS}/${SAMPLE}.bam"
+    VCF="${RESULTS}/${SAMPLE}.vcf"
+    VCF_GZ="${VCF}.gz"
+    
+    # 

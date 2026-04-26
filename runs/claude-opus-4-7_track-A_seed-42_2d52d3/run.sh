@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+REF="data/ref/chrM.fa"
+RESULTS="results"
+
+mkdir -p "$RESULTS"
+
+if [ ! -f "${REF}.fai" ]; then
+    samtools faidx "$REF"
+fi
+
+if [ ! -f "${REF}.bwt" ] || [ ! -f "${REF}.amb" ] || [ ! -f "${REF}.ann" ] || [ ! -f "${REF}.pac" ] || [ ! -f "${REF}.sa" ]; then
+    bwa index "$REF"
+fi
+
+for sample in "${SAMPLES[@]}"; do
+    fq1="data/raw/${sample}_1.fq.gz"
+    fq2="data/raw/${sample}_2.fq.gz"
+    bam="${RESULTS}/${sample}.bam"
+    bai="${RESULTS}/${sample}.bam.bai"
+    vcf="${RESULTS}/${sample}.vcf"
+    vcfgz="${RESULTS}/${sample}.vcf.gz"
+    tbi="${RESULTS}/${sample}.vcf.gz.tbi"
+
+    if [ ! -s "$bam" ] || [ "$fq1" -nt "$bam" ] || [ "$fq2" -nt "$bam" ]; then
+        bwa mem -t "$THREADS" \
+            -R "@RG\tID:${sample}\tSM:${sample}\tLB:${sample}\tPL:ILLUMINA" \
+            "$REF" "$fq1" "$fq2" \
+            | samtools sort -@ "$THREADS" -o "$bam" -
+    fi
+
+    if [ ! -s "$bai" ] || [ "$bam" -nt "$bai" ]; then
+        samtools index -@ "$THREADS" "$bam"
+    fi
+
+    if [ ! -s "$vcfgz" ] || [ "$bam" -nt "$vcfgz" ]; then
+        rm -f "$vcf" "$vcfgz" "$tbi"
+        lofreq call-parallel --pp-threads "$THREADS" -f "$REF" -o "$vcf" "$bam"
+        bgzip "$vcf"
+    fi
+
+    if [ ! -s "$tbi" ] || [ "$vcfgz" -nt "$tbi" ]; then
+        tabix -p vcf "$vcfgz"
+    fi
+done
+
+COLLAPSED="${RESULTS}/collapsed.tsv"
+needs_rebuild=0
+if [ ! -s "$COLLAPSED" ]; then
+    needs_rebuild=1
+else
+    for sample in "${SAMPLES[@]}"; do
+        if [ "${RESULTS}/${sample}.vcf.gz" -nt "$COLLAPSED" ]; then
+            needs_rebuild=1
+            break
+        fi
+    done
+fi
+
+if [ "$needs_rebuild" -eq 1 ]; then
+    tmp="${COLLAPSED}.tmp"
+    printf 'sample\tchrom\tpos\tref\talt\taf\n' > "$tmp"
+    for sample in "${SAMPLES[@]}"; do
+        bcftools query -f "${sample}\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n" "${RESULTS}/${sample}.vcf.gz" >> "$tmp"
+    done
+    mv "$tmp" "$COLLAPSED"
+fi

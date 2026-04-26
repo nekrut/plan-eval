@@ -1,0 +1,20 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF="data/ref/chrM.fa"
+RAW="data/raw"
+RESULTS="results"
+
+mkdir -p "${RESULTS}"
+
+# Index reference if needed
+[[ -f "${REF}.bwt" ]] || bwa index "${REF}"
+[[ -f "${REF}.fai" ]] || samtools faidx "${REF}"
+
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+for SAMPLE in "${SAMPLES[@]}"; do
+    R1="${RAW}/${SAMPLE}_1.fq.gz"
+    R2="${RAW}/${S
