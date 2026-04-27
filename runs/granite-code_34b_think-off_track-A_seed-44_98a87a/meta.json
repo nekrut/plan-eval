@@ -1,0 +1,10 @@
+{
+  "run_id": "granite-code_34b_think-off_track-A_seed-44_98a87a",
+  "model": "granite-code:34b",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 175.95913410186768,
+  "duration_ms_generation": 175959
+}

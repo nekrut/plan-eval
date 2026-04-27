@@ -1,0 +1,10 @@
+{
+  "run_id": "mistral-small3.2_24b_think-off_track-A_seed-43_20dc38",
+  "model": "mistral-small3.2:24b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 155.07149171829224,
+  "duration_ms_generation": 155071
+}

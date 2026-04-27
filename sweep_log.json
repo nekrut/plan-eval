@@ -1,0 +1,222 @@
+[
+  {
+    "model": "qwen3-coder:30b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "qwen3-coder_30b_think-off_track-A_seed-42_159e0c",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 93.87725496292114
+      },
+      {
+        "seed": 43,
+        "run_id": "qwen3-coder_30b_think-off_track-A_seed-43_2f7bd3",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 67.01927161216736
+      },
+      {
+        "seed": 44,
+        "run_id": "qwen3-coder_30b_think-off_track-A_seed-44_c7e015",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 67.0612244606018
+      }
+    ]
+  },
+  {
+    "model": "devstral-small-2:24b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "devstral-small-2_24b_think-off_track-A_seed-42_364137",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 206.87644958496094
+      },
+      {
+        "seed": 43,
+        "run_id": "devstral-small-2_24b_think-off_track-A_seed-43_c3488e",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 162.1940677165985
+      },
+      {
+        "seed": 44,
+        "run_id": "devstral-small-2_24b_think-off_track-A_seed-44_67a724",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 162.11178636550903
+      }
+    ]
+  },
+  {
+    "model": "deepseek-coder-v2:16b",
+    "skipped": true,
+    "completed_seeds": 3
+  },
+  {
+    "model": "granite-code:34b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "granite-code_34b_think-off_track-A_seed-42_d30785",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 255.40562677383423
+      },
+      {
+        "seed": 43,
+        "run_id": "granite-code_34b_think-off_track-A_seed-43_a13dca",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 205.41102528572083
+      },
+      {
+        "seed": 44,
+        "run_id": "granite-code_34b_think-off_track-A_seed-44_98a87a",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 189.9978425502777
+      }
+    ]
+  },
+  {
+    "model": "glm-4.7-flash",
+    "seeds": []
+  },
+  {
+    "model": "gpt-oss:20b",
+    "seeds": [
+      {
+        "seed": 43,
+        "run_id": "gpt-oss_20b_think-off_track-A_seed-43_9edc61",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 569.322368144989
+      }
+    ]
+  },
+  {
+    "model": "gemma3:27b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "gemma3_27b_think-off_track-A_seed-42_5bb157",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 284.1745376586914
+      },
+      {
+        "seed": 43,
+        "run_id": "gemma3_27b_think-off_track-A_seed-43_0f4ff3",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 267.3427610397339
+      },
+      {
+        "seed": 44,
+        "run_id": "gemma3_27b_think-off_track-A_seed-44_f089d0",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 268.3856601715088
+      }
+    ]
+  },
+  {
+    "model": "mistral-small3.2:24b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "mistral-small3.2_24b_think-off_track-A_seed-42_a6e2b4",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 213.4974946975708
+      },
+      {
+        "seed": 43,
+        "run_id": "mistral-small3.2_24b_think-off_track-A_seed-43_20dc38",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 168.90993928909302
+      },
+      {
+        "seed": 44,
+        "run_id": "mistral-small3.2_24b_think-off_track-A_seed-44_65ed91",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 168.95327830314636
+      }
+    ]
+  },
+  {
+    "model": "qwen3:32b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "qwen3_32b_think-off_track-A_seed-42_ec9335",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 340.424685716629
+      },
+      {
+        "seed": 43,
+        "run_id": "qwen3_32b_think-off_track-A_seed-43_023584",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 280.14488315582275
+      },
+      {
+        "seed": 44,
+        "run_id": "qwen3_32b_think-off_track-A_seed-44_0852c0",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 279.8860936164856
+      }
+    ]
+  },
+  {
+    "model": "olmo-3.1:32b",
+    "seeds": []
+  },
+  {
+    "model": "nemotron-3-nano",
+    "seeds": []
+  },
+  {
+    "model": "llama3.3:70b-instruct-q3_K_M",
+    "pull_failed": true,
+    "err": ":  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\u001b[?2026h\u001b[?25l\u001b[A\u001b[1Gpulling manifest \u001b[K\npulling dae4a55f7017:  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\u001b[?2026h\u001b[?25l\u001b[A\u001b[1Gpulling manifest \u001b[K\npulling dae4a55f7017:  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\u001b[?2026h\u001b[?25l\u001b[A\u001b[1Gpulling manifest \u001b[K\npulling dae4a55f7017:  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\u001b[?2026h\u001b[?25l\u001b[A\u001b[1Gpulling manifest \u001b[K\npulling dae4a55f7017:  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\u001b[?2026h\u001b[?25l\u001b[A\u001b[1Gpulling manifest \u001b[K\npulling dae4a55f7017:  50% \u2595\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588          \u258f  17 GB/ 34 GB                  \u001b[K\u001b[?25h\u001b[?2026l\nError: max retries exceeded: EOF\n"
+  },
+  {
+    "model": "glm4:9b",
+    "seeds": [
+      {
+        "seed": 42,
+        "run_id": "glm4_9b_think-off_track-A_seed-42_8717c7",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 78.42417526245117
+      },
+      {
+        "seed": 43,
+        "run_id": "glm4_9b_think-off_track-A_seed-43_a33dd2",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 63.99627614021301
+      },
+      {
+        "seed": 44,
+        "run_id": "glm4_9b_think-off_track-A_seed-44_63bb15",
+        "M1": 1,
+        "M3": 1.0,
+        "wall_s": 64.07585906982422
+      }
+    ]
+  },
+  {
+    "model": "granite4",
+    "seeds": []
+  }
+]

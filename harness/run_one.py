@@ -98,7 +98,9 @@ def call_claude(model: str, system_text: str, user_text: str) -> dict:
 
 
 def call_ollama(model: str, think: bool, system_text: str, user_text: str, seed: int) -> dict:
-    if not think:
+    # /no_think is a Qwen-family control token; other model families use the
+    # `think` payload field instead and treat the prefix as literal user text.
+    if not think and model.lower().startswith("qwen"):
         user_text = "/no_think\n" + user_text
     payload = {
         "model": model,

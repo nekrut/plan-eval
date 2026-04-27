@@ -1,0 +1,10 @@
+{
+  "run_id": "devstral-small-2_24b_think-off_track-A_seed-43_c3488e",
+  "model": "devstral-small-2:24b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 148.10220074653625,
+  "duration_ms_generation": 148102
+}
