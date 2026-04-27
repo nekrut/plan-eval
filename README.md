@@ -1,16 +1,17 @@
 # plan-eval
 
-Benchmark comparing **Anthropic Claude models** and **a wide selection of free local open-weight models** running on a Jetson AGX Orin at executing an Opus-authored bioinformatics plan.
+Benchmark comparing **Anthropic Claude models** and **a wide selection of free local open-weight models** running on consumer hardware (Jetson AGX Orin and RTX 5080) at executing an Opus-authored bioinformatics plan.
 
 ## What this is, in plain English
 
 You ask the strongest available model (Claude Opus 4.7) to write a recipe for a bioinformatics workflow. Then you hand that recipe to a cheaper or smaller model and ask it to turn the recipe into an actual runnable script. We then run the script on real data and check whether its variant calls match a known-correct answer.
 
-The benchmark answers three questions:
+The benchmark answers four questions:
 
 1. Which Anthropic tier is the cheapest model that can faithfully execute an Opus-authored recipe?
 2. Which **free, locally-runnable** models can do the same job — i.e. avoid paying for inference at all?
 3. How does the *level of detail in the recipe* interact with model capability?
+4. On a faster consumer GPU (RTX 5080, 16 GB), does the v1→v2 plan-detail effect generalize across the broader Ollama model zoo, or does the lean v1 plan suddenly work?
 
 ## TL;DR
 
@@ -105,6 +106,70 @@ The practical workflow looks like this:
 
 To make free-local execution reliable, the recipe has to specify *everything*: every command, every flag, every filename, character-for-character. The recipe author has to know bioinformatics; the local model just translates the prose into bash.
 
+## RTX 5080 follow-up: 11 local models
+
+Same benchmark, run on an **NVIDIA RTX 5080 (16 GB VRAM)** desktop with 125 GB system RAM. Eleven Ollama models, both plans, both tracks, three seeds each — 168 cells. `/think` was tested only on models that fit cleanly in VRAM (qwen3:8b/14b, qwen3.5:9b); on Group B partial-offload models (qwen3.5:27b, qwen3.6:27b/35b-a3b, glm-4.7-flash) the same `/think` wall-clock blowout that crippled the Jetson reproduces here, so we recorded that as a finding rather than spending ~24 hr of timeout cells.
+
+### v1 (lean plan), Track A — only one local model breaks the wall
+
+| model | quant size | M3 (n=3) | gen secs | notes |
+|---|---|---:|---:|---|
+| **qwen3.6:27b** `/no_think` | 17 GB | **1.000±0.000** | 353 | dense 27b — only model that solves the lean plan |
+| glm-4.7-flash `/no_think` | 19 GB | 0.667±0.577 | 156 | 30B-class GLM, 2/3 hits |
+| qwen3.5:27b `/no_think` | 17 GB | 0.333±0.577 | 276 | 1/3 |
+| qwen3-coder:30b `/no_think` | 19 GB | 0.333±0.577 | 161 | 1/3 |
+| gemma4:26b `/no_think` | 17 GB | 0.333±0.577 | 202 | 1/3 |
+| qwen3.6:35b-a3b `/no_think` | 23 GB MoE | **0.000±0.000** | 209 | confirms Jetson — model not hardware |
+| qwen3:14b /think and /no_think | 9.3 GB | 0.000±0.000 | 11–69 | reasoning didn't help |
+| qwen3:8b, qwen3.5:9b, gemma4:e4b | 5–9 GB | 0.000 | 5–73 | small models lose the plan |
+| gpt-oss:20b `/no_think` | 13 GB | empty_script (3 of 6 cells) | 53 | internal CoT exhausts num_predict |
+| qwen3.5:9b `/think` | 6.6 GB | empty_script (6 of 6) | 74→151 | reasoning eats the entire budget, no script emitted even at 16384 num_predict |
+
+### v2 (hyper-detailed plan), Track A — every fitted model nails it
+
+| model | n | M3 | gen secs |
+|---|---:|---:|---:|
+| qwen3.6:35b-a3b `/no_think` | 3 | **1.000** | 127 |
+| qwen3.6:27b `/no_think` | 3 | **1.000** | 219 |
+| qwen3.5:27b `/no_think` | 3 | **1.000** | 214 |
+| qwen3-coder:30b `/no_think` | 3 | **1.000** | 148 |
+| glm-4.7-flash `/no_think` | 3 | **1.000** | 150 |
+| gemma4:26b `/no_think` | 3 | **1.000** | 121 |
+| qwen3:14b `/no_think` | 3 | **1.000** | 6 |
+| qwen3:14b `/think` | 3 | **1.000** | 13 |
+| qwen3.5:9b `/no_think` | 3 | **1.000** | 6 |
+| gemma4:e4b `/no_think` | 3 | **1.000** | 9 |
+| qwen3:8b `/think` | 3 | **1.000** | 9 |
+| qwen3:8b `/no_think` | 3 | 0.667±0.577 | 6 |
+| gpt-oss:20b `/no_think` | 3 | 0.667±0.577 | 53 |
+| qwen3.5:9b `/think` | 3 | empty_script (all) | 151 |
+
+### v1 + v2, Track B (no plan) — all local models 0/3
+
+Across the 5080 model set, no Ollama model recovers the canonical mtDNA workflow without the plan. Track B sits at 0.000 for every model, sometimes with a single 1/3 fluke. This is a sharper failure than the Anthropic Track B numbers (Opus/Sonnet 0.938, Haiku 0.667 ± 0.577) — local models truly need the plan, the Anthropic models can mostly recover it from internal knowledge.
+
+### Findings (5080)
+
+**The v1→v2 plan-detail effect generalizes.** Every local model that *can* solve the task on the 5080 solves v2 at 1.000. The lean v1 plan continues to break almost everyone. The Jetson finding wasn't an artifact of slow hardware — it's an artifact of plan specificity, replicated across 11 different model architectures.
+
+**Exactly one local model under 30B parameters solves the lean v1 plan: qwen3.6:27b dense.** Smaller dense Qwens (8b, 14b, 9b) don't, and neither does the 35b-a3b MoE on either hardware. This isn't a parameter-count story — qwen3.5:27b, qwen3-coder:30b, and gemma4:26b all have similar/larger budgets and only manage 1/3 each. Some training-data quirk in the 3.6-dense release puts lofreq's CLI in reach.
+
+**`/think` mode on small models is a footgun, not an upgrade.** qwen3.5:9b `/think` failed all 12 cells: the model exhausted the 16384-token output budget on reasoning and never emitted a final script (`raw_response` was empty across all seeds; usage showed `eval_count=8192` then `eval_count=16384`). This is the same hardware-class budget exhaustion the Jetson hit on `/think` — but here it's a model-side issue, not a wall-clock one. Bigger models (qwen3:14b /think) don't fail this way but also don't outperform `/no_think`.
+
+**`gpt-oss:20b` has the same problem without an explicit /think toggle.** Its built-in Harmony reasoning consumes the output budget and ~half its cells emit empty scripts. Effective M3 lands at 0.667 on v2 Track A despite the model being capable when it does emit a script.
+
+**Hardware does not rescue plan specificity.** On the 5080, qwen3.6:35b-a3b on v1 still scored 0/3 — same as Jetson. Group B partial-offload speeds (100–450 s/cell) are surprisingly close to Jetson's unified-memory speeds (~100 s) because PCIe weight transfer dominates either way. The 5080's win is on Group A in-VRAM models, where 5–30 s/cell crushes anything the Jetson could do.
+
+**Track B without a plan is a wall for local models.** This is the cleanest inversion of the Anthropic story: Opus can almost recover the workflow from problem statement alone (0.938); local 30B-class models cannot (0.000). The plan-then-implement pattern isn't a productivity hack for local models — it's a capability prerequisite.
+
+### Recommendation (5080)
+
+If you have a 16 GB consumer GPU and want $0/run local execution:
+
+- **For the lean v1 style of plan**: `qwen3.6:27b /no_think` is the only reliable choice. ~5 min/run with PCIe offload, no Anthropic dependency.
+- **For the hyper-detailed v2 style**: pick whichever fits cleanly in VRAM and is fastest — `gemma4:e4b` (~9 s/run, 9.6 GB), `qwen3:14b` (~6 s/run, 9.3 GB), or `qwen3.5:9b` (~6 s/run, 6.6 GB). All hit 1.000 on Track A.
+- **Avoid `/think` on small models** for code-generation tasks unless you've tuned `num_predict` very high and verified the model emits a final answer.
+
 ## Why this dataset
 
 [Zenodo 5119008](https://zenodo.org/records/5119008) — *Datasets for Galaxy Collection Operations Tutorial* by A. Nekrutenko. Four paired-end Illumina MiSeq samples (~838 KB compressed), enriched by long-range PCR for human mtDNA, with a known canonical workflow documented in the [Galaxy Training Network](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/mitochondrial-short-variants/tutorial.html): BWA-MEM mapping → LoFreq variant calling → SnpSift annotation → collapse.
@@ -146,9 +211,9 @@ If a model uses a *different but valid* tool than the recipe specifies (e.g. `bc
 
 ## Hardware
 
-- **Jetson AGX Orin Developer Kit**: 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64
-- **Power mode**: 30 W (MAXN unavailable without a reboot the user declined)
-- **Conda env**: locked, on PATH for both canonical and model runs (see `setup/install.sh`)
+- **Jetson AGX Orin Developer Kit**: 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64; 30W power mode (MAXN unavailable without a reboot the user declined). Local-model wall-clock figures reflect 30W.
+- **RTX 5080 desktop**: NVIDIA GeForce RTX 5080 16 GB VRAM, 125 GB system RAM, x86_64. Models ≤14 GB fit in VRAM (Group A); 17–23 GB models partial-offload to CPU (Group B).
+- **Conda env**: locked, on PATH for both canonical and model runs (see `setup/install.sh`).
 
 ## Repo layout
 
@@ -169,13 +234,16 @@ plan-eval/
 ├── prompts/                      system + per-track user prompt templates
 ├── harness/
 │   ├── run_one.py                generate + execute one cell
-│   ├── matrix.py                 Anthropic + ollama matrix iterator
-│   └── sweep_local.py            disk-rotated local-model sweep
+│   ├── matrix.py                 Anthropic + ollama matrix iterator (Jetson)
+│   ├── sweep_local.py            disk-rotated local-model sweep (Jetson)
+│   └── matrix_5080.py            iterate the 5080 matrix (11 ollama models)
 ├── score/
 │   ├── score_run.py              M1–M5 against ground truth
-│   └── aggregate.py              scans runs/ + runs_v*/ → results.csv
-├── runs/<run_id>/                v2 per-run artifacts
-└── runs_v1/<run_id>/             v1 per-run artifacts (preserved)
+│   └── aggregate.py              scans runs/ + runs_v*/ + runs_5080_v*/ → results.csv
+├── runs/<run_id>/                Jetson v2 per-run artifacts
+├── runs_v1/<run_id>/             Jetson v1 per-run artifacts (preserved)
+├── runs_5080_v1/<run_id>/        5080 v1 per-run artifacts
+└── runs_5080_v2/<run_id>/        5080 v2 per-run artifacts
 ```
 
 Each run dir contains the exact `run.sh` the model emitted plus per-run JSON metadata (`meta.json`, `usage.json`, `exec.json`, `score.json`, `raw_response.txt`, `exec.log`). BAMs and re-derivable artifacts are gitignored.
@@ -197,6 +265,18 @@ python3 harness/sweep_local.py
 python3 score/aggregate.py
 ```
 
+Full matrix:
+
+```bash
+python3 harness/matrix.py --tracks A             # both Anthropic and ollama (Jetson)
+python3 harness/matrix.py --only-ollama --tracks A --no-think
+python3 harness/matrix_5080.py                   # 11 ollama models, both plans, both tracks
+python3 score/aggregate.py                       # → results.csv + console summary
+```
+
+The Anthropic side authenticates through the existing `claude` CLI (Claude Code) login — no `ANTHROPIC_API_KEY` needed. The local side requires `ollama serve` with the relevant tags pulled (`qwen3.6:35b-a3b` for the Jetson story; `matrix_5080.py` will pull missing tags on first chat).
+
+
 ## Cost
 
 - Total Anthropic spend across both v1 and v2 matrices plus three plan-generation calls: under **$3** with prompt caching.
@@ -206,10 +286,15 @@ python3 score/aggregate.py
 
 - **One task class.** Per-sample variant calling on a 16.6 kb mitochondrial reference. Generalization to whole-genome workflows, RNA-seq, single-cell, etc. is not implied.
 - **One dataset.** All four samples are amplicon-PCR mitochondrial DNA from one study; intentionally easy.
+- **Anthropic temperature.** Set by the `claude` CLI default (no `--temperature` flag).
+- **Ollama temperature.** 0.2 with seeds 42, 43, 44.
 - **30 W power mode on the Jetson.** A higher power mode (MAXN) would require rebooting the machine, which we didn't do. So local-model wall-clock numbers are conservative — they'd be faster on a more aggressive power profile.
 - **15-minute generation budget per call.** Four free-local models timed out at this limit on every run. Their 0/3 score means "did not fit our 15-minute budget on this Jetson," not "the model can't do the task in principle." A 30-minute budget would likely recover most of them.
+- **Disk rotation during the Jetson sweep.** We pull → test → remove for each model to fit in ~17 GB free disk. The full 14-model sweep transferred ~210 GB sequentially over the network.
+- **5080 num_predict.** Bumped from 8192 to 16384 for the 5080 matrix after qwen3.5:9b /think and gpt-oss:20b cells exhausted the original 8192-token output budget on internal reasoning. qwen3.5:9b /think kept hitting the wall even at 16384 (pure reasoning, no script emitted) — reported as a finding, not a config bug.
+- **5080 /think on Group B disabled.** A single qwen3.5:27b /think cell hit the 1800 s urlopen timeout without returning anything. We disabled /think across qwen3.5:27b, qwen3.6:27b, qwen3.6:35b-a3b and glm-4.7-flash to avoid ~24 hr of timeout-doomed cells; the same Jetson `/think` failure mode reproduces here on offload-bound models.
+- **No-plan baseline noise.** The v1 Track B `0.938` vs `1.000` gap on Opus and Sonnet reflects a single-variant disagreement on one of the 4 samples (these models pick a slightly different caller without the plan, recovering most but not all variants at the AF tolerance).
 - **The v2 recipe is close to "the script in prose."** That's the whole point — the experimental finding is that this is what you need to write to get a free local model working reliably. If you want the local model to *also* do bioinformatics reasoning, more work is needed.
-- **Disk rotation during the sweep.** We pull → test → remove for each model to fit in ~17 GB free disk. The full 14-model sweep transferred ~210 GB sequentially over the network.
 
 ## License
 

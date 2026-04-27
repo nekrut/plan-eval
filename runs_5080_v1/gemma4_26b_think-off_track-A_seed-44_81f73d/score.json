@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_26b_think-off_track-A_seed-44_81f73d",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 146.79795789718628,
+    "wall_seconds_execution": 0.31432199478149414,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1928,
+      "eval_count": 738,
+      "prompt_eval_duration_ns": 55788407,
+      "eval_duration_ns": 146309145888,
+      "total_duration_ns": 146790427563
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null
+  }
+}

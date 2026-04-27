@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-on_track-B_seed-43_c603a6",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 92.42804479598999,
+    "wall_seconds_execution": 0.36524033546447754,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 895,
+      "eval_count": 6121,
+      "prompt_eval_duration_ns": 218217981,
+      "eval_duration_ns": 74414385328,
+      "total_duration_ns": 92420093489
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3_14b_think-on_track-B_seed-43_c603a6/run.sh line 15:\n    tbi=\"results/${sample}.vcf.gz.tbi\"\n    ^-^ SC2034 (warning): tbi appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- tbi appears unused. Verify use (o...\n",
+    "idempotent": null
+  }
+}

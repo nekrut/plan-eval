@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+RESULTS_DIR="results"
+
+REF_FASTA="$REF_DIR/chrM.fa"
+THREADS=4
+
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p "$RESULTS_DIR"
+
+# Check if all outputs exist
+ALL_EXIST=true
+for sample in "${SAMPLES[@]}"; do
+    bam="$RESULTS_DIR/${sample}.bam"
+    bai="$RESULTS_DIR/${sample}.bam.bai"
+    vcf="$RESULTS_DIR/${

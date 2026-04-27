@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Directories
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+OUT_DIR="results"
+
+# Ensure output directory exists
+mkdir -p "$OUT_DIR"
+
+# Define samples
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Index reference if not already indexed
+if [ ! -f "$REF_DIR/chrM.fa.bai" ]; then
+    samtools index "$REF_DIR/chrM.fa"
+fi
+
+# Loop over samples
+for SAMPLE in "${SAM

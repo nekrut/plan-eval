@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-off_track-A_seed-44_e22042",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 3.583350419998169,
+    "wall_seconds_execution": 0.16473960876464844,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2362,
+      "eval_count": 459,
+      "prompt_eval_duration_ns": 8685135,
+      "eval_duration_ns": 3424682989,
+      "total_duration_ns": 3575520855
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3_8b_think-off_track-A_seed-44_e22042/run.sh line 15:\n    { bwa mem -t 4 -R \"@RG\\tID:${sample}\\tSM:${sample}\\tLB:${sample}\\tPL:ILLUMINA\" data/ref/chrM.fa data/raw/${sample}_1.fq.gz data/raw/${sample}_2.fq.gz | samtools sort -@ 4 -o results/${sample}.bam - } || true\n    ^-- SC1073 (error): Couldn't parse this brace group. Fix to allow more checks.\n                                                                                                                                                                                                          ^-",
+    "idempotent": null
+  }
+}

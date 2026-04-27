@@ -1,0 +1,10 @@
+{
+  "run_id": "gpt-oss_20b_think-off_track-A_seed-42_92a792",
+  "model": "gpt-oss:20b",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 46.962326765060425,
+  "duration_ms_generation": 46962
+}

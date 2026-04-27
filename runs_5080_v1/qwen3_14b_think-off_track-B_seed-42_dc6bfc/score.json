@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-off_track-B_seed-42_dc6bfc",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 9.370837450027466,
+    "wall_seconds_execution": 0.2640542984008789,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 905,
+      "eval_count": 786,
+      "prompt_eval_duration_ns": 26558713,
+      "eval_duration_ns": 9126776088,
+      "total_duration_ns": 9364417930
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_14b_think-off_track-B_seed-42_dc6bfc/run.sh line 21:\n  if [[ ! \" ${samples[@]} \" =~ \" $sample \" ]]; then\n          ^---------------^ SC2199 (error): Arrays implicitly concatenate in [[ ]]. Use a loop (or explicit * instead of @).\n                               ^---------^ SC2076 (warning): Remove quotes from right-hand side of =~ to match as a regex rather than literally.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2199 -- Arrays implicitly concatenate in ...\n  https://www.shellcheck.net/wiki/SC2076 -- Remove quotes from right-han",
+    "idempotent": null
+  }
+}

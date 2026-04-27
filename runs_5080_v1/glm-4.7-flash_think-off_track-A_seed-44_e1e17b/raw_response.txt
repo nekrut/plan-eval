@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF="data/ref/chrM.fa"
+
+mkdir -p results
+
+# 2. Reference indexing (once)
+if [[ ! -f data/ref/chrM.fa.fai ]]; then
+    samtools faidx "$REF"
+fi
+if [[ ! -f data/ref/chrM.fa.bwt ]]; then
+    bwa index "$REF"
+fi
+
+# 3. Per-sample alignment with bwa mem
+for sample in "${SAMPLES[@]}"; do
+    if [[ ! -f 

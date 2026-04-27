@@ -113,7 +113,7 @@ def call_ollama(model: str, think: bool, system_text: str, user_text: str, seed:
         "options": {
             "temperature": 0.2,
             "seed": seed,
-            "num_predict": 8192,
+            "num_predict": 16384,
             "num_ctx": 16384,
         },
     }
@@ -198,7 +198,8 @@ def main() -> int:
     runs_root = Path(args.runs_dir)
     plan_path = Path(args.plan)
 
-    is_ollama = ":" in args.model  # rough heuristic: "qwen3.6:35b"
+    # Anthropic model ids start with "claude-"; everything else is local (ollama).
+    is_ollama = not args.model.startswith("claude-")
     cell_tag = args.model.replace("/", "_").replace(":", "_")
     if is_ollama:
         cell_tag += f"_think-{args.think}"

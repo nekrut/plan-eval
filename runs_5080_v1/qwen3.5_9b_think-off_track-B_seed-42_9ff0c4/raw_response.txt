@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define paths relative to current working directory
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+RESULTS_DIR="results"
+
+# Create results directory if it doesn't exist
+mkdir -p "$RESULTS_DIR"
+
+# Define samples
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Function to process a single sample
+process_sample() {
+    local sample="$1"
+    local fq1="${RAW_DIR

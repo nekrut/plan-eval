@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ensure reference is indexed
+if [ ! -f data/ref/chrM.fa.fai ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+for sample in "${samples[@]}"; do
+    bam="results/${sample}.bam"
+    bai="results/${sample}.bam.bai"
+    vcf="results/${sample}.vcf.gz"
+    tbi="results/${sample}.vcf.gz.tbi"
+    filtered_vcf="res

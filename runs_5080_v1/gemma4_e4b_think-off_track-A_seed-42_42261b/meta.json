@@ -1,0 +1,10 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-42_42261b",
+  "model": "gemma4:e4b",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 33.02453541755676,
+  "duration_ms_generation": 33024
+}

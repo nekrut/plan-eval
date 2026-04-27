@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF_FA="data/ref/chrM.fa"
+RESULTS_DIR="results"
+THREADS=4
+
+mkdir -p "$RESULTS_DIR"
+
+# --- 1. Index Reference Genome ---
+if [ ! -f "${RESULTS_DIR}/chrM.fa.fai" ]; then
+    samtools faidx "$REF_FA"
+fi
+
+# --- 2. Alignment and Preprocessing ---
+for sample in "${SAMPLES[@]}"; do
+    echo "Processing sample: $sa

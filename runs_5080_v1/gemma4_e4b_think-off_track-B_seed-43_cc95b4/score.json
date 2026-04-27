@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-B_seed-43_cc95b4",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 13.007589101791382,
+    "wall_seconds_execution": 0.1645822525024414,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 959,
+      "eval_count": 1961,
+      "prompt_eval_duration_ns": 8633699,
+      "eval_duration_ns": 12071926154,
+      "total_duration_ns": 13000369134
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-B_seed-43_cc95b4/run.sh line 34:\n        samtools sort -@ $THREADS -o \"${RESULTS_DIR}/${sample}.sorted.bam\" -\n                                                                         ^-- SC1078 (warning): Did you forget to close this double quoted string?\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-B_seed-43_cc95b4/run.sh line 46:\nfor sample in \"${SAMPLES[@]}\"; do\n                            ^-- SC1078 (warning): Did you forget to close this double quoted string?\n\n\nIn /home/anton/git/plan-eval/runs",
+    "idempotent": null
+  }
+}

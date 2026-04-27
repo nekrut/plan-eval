@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_27b_think-off_track-B_seed-44_400dd4",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 459.6269211769104,
+    "wall_seconds_execution": 0.21604585647583008,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 935,
+      "eval_count": 1211,
+      "prompt_eval_duration_ns": 923147892,
+      "eval_duration_ns": 458111362079,
+      "total_duration_ns": 459619377617
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.5_27b_think-off_track-B_seed-44_400dd4/run.sh line 67:\nfor SAMPLE in \"${SAMPLES[@]}\"; do\n^-- SC1073 (error): Couldn't parse this for loop. Fix to allow more checks.\n                               ^-- SC1061 (error): Couldn't find 'done' for this 'do'.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.5_27b_think-off_track-B_seed-44_400dd4/run.sh line 89:\n                # Let's try to parse the full INFO field if AF is missing\n                     ^-- SC1011 (warning): This apostrophe terminated the single quoted string!\n\n\nIn /home/anton/git/pla",
+    "idempotent": null
+  }
+}

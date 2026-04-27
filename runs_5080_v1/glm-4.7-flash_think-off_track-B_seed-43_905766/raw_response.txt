@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+
+# Index reference
+if [ ! -f results/chrM.fa.bai ]; then
+    samtools faidx data/ref/chrM.fa -o results/chrM.fa.fai
+    samtools index data/ref/chrM.fa -o results/chrM.fa.bai
+fi
+
+# Function to process a sample
+process_sample() {
+    local sample=$1
+    local fq1="data/raw/${sample}_1.fq.gz"
+    local fq2="data/raw/${sample}_2.fq.gz"
+    local

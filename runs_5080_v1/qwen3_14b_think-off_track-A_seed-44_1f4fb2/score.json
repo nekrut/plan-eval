@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-off_track-A_seed-44_1f4fb2",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 9.422363758087158,
+    "wall_seconds_execution": 0.16413354873657227,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1809,
+      "eval_count": 776,
+      "prompt_eval_duration_ns": 13660436,
+      "eval_duration_ns": 9159755984,
+      "total_duration_ns": 9415773165
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_14b_think-off_track-A_seed-44_1f4fb2/run.sh line 51:\n  cat $(printf \"results/%s.vcf.gz\\n\" \"${SAMPLES[@]}\") | \\\n      ^-- SC2046 (warning): Quote this to prevent word splitting.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_14b_think-off_track-A_seed-44_1f4fb2/run.sh line 67:\n    cat $(printf \"results/%s.vcf.gz\\n\" \"${SAMPLES[@]}\") | \\\n        ^-- SC2046 (warning): Quote this to prevent word splitting.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2046 -- Quote this to prevent word splitt...\n",
+    "idempotent": null
+  }
+}

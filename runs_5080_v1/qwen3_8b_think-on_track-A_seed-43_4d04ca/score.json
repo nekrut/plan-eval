@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-on_track-A_seed-43_4d04ca",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 52.3276162147522,
+    "wall_seconds_execution": 0.16411161422729492,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1799,
+      "eval_count": 6541,
+      "prompt_eval_duration_ns": 8890091,
+      "eval_duration_ns": 50831610937,
+      "total_duration_ns": 52321107779
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_8b_think-on_track-A_seed-43_4d04ca/run.sh line 20:\n        bwa mem -t \"$THREADS\" -R \"@RG\\\\tID:$sample\\\\tSM:$sample\\\\tLB:$sample\\\\tPL:ILLUMINA\" data/raw/\"$sample\"_1.fq.gz data/raw/\"$sample\"_2.fq.gz | samtools sort -@ \"$THREAD\n                                                                                                                                                                     ^-- SC1078 (warning): Did you forget to close this double quoted string?\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_8b_think-on_track-A_seed-43_4d04ca/run",
+    "idempotent": null
+  }
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+samtools faidx data/ref/chrM.fa
+
+if [ ! -f results/collapsed.tsv ]; then
+    echo -e "sample\tchrom\tpos\tref\talt\taf" > results/collapsed.tsv
+fi
+
+for sample in M117-bl M117-ch M117C1-bl M117C1-ch; do
+    if [ -f results/${sample}.bam ]; then
+        echo "Skipping ${sample} as output already exists."
+        continue
+    fi
+    bwa mem data

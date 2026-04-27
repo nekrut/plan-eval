@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+
+if [ -f "results/collapsed.tsv" ]; then
+    exit 0
+fi
+
+if [ ! -f "data/ref/chrM.fa.fai" ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+if [ ! -f "data/ref/chrM.fa.bwt" ]; then
+    bwa index data/ref/chrM.fa
+fi
+
+for sample in M117-bl M117-ch M117C1-bl M117C1-ch; do
+    if [ -f "results/${sample}.bam" ] && [ -f "results/${sample}.bam.bai" ] &&

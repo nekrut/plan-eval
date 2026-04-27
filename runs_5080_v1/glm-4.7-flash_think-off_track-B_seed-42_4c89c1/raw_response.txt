@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Directory setup
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+OUT_DIR="results"
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUT_DIR"
+
+# Sample list
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Index reference genome
+if [ ! -f "$REF_DIR/chrM.fa.bai" ]; then
+    samtools index "$REF_DIR/chrM.fa"
+fi
+
+# Process each sample
+for SAMPLE in "${SAM

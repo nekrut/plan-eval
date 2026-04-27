@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.6_27b_think-off_track-B_seed-42_b3108c",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 514.408390045166,
+    "wall_seconds_execution": 0.31569981575012207,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 935,
+      "eval_count": 1406,
+      "prompt_eval_duration_ns": 830858709,
+      "eval_duration_ns": 512941145393,
+      "total_duration_ns": 514400538619
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.6_27b_think-off_track-B_seed-42_b3108c/run.sh line 26:\n    BAI=\"${OUT_DIR}/${SAMPLE}.bam.bai\"\n    ^-^ SC2034 (warning): BAI appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- BAI appears unused. Verify use (o...\n",
+    "idempotent": null
+  }
+}

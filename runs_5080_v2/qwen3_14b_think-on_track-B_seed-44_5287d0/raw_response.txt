@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ensure reference is indexed
+if [ ! -f data/ref/chrM.fa.fai ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+# List of samples
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Process each sample
+for sample in "${samples[@]}"; do
+    # Check if BAM and BAM.bai exist
+    if [ ! -f results/${sample}.bam ] || [ ! -f results/${sample}.bam.bai ]; then
+    

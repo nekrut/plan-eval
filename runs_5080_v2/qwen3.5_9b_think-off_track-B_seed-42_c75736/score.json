@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_9b_think-off_track-B_seed-42_c75736",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 72.93730759620667,
+    "wall_seconds_execution": 0.16474437713623047,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 935,
+      "eval_count": 8192,
+      "prompt_eval_duration_ns": 95505702,
+      "eval_duration_ns": 69940155278,
+      "total_duration_ns": 72928955853
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.5_9b_think-off_track-B_seed-42_c75736/run.sh line 16:\nprocess_sample() {\n                 ^-- SC1073 (error): Couldn't parse this brace group. Fix to allow more checks.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.5_9b_think-off_track-B_seed-42_c75736/run.sh line 816:\n        --min-qual\n                  ^-- SC1056 (error): Expected a '}'. If you have one, try a ; or \\n in front of it.\n                  ^-- SC1072 (error): Missing '}'. Fix any mentioned problems and try again.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC1056 ",
+    "idempotent": null
+  }
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define paths relative to current working directory
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+RES_DIR="results"
+REF_GENOME="${REF_DIR}/chrM.fa"
+
+# Create results directory if it doesn't exist
+mkdir -p "${RES_DIR}"
+
+# Function to check if a file exists and is not empty
+check_file() {
+    local file="$1"
+    if [[ ! -f "$file" ]]; then
+        echo "Error: Require

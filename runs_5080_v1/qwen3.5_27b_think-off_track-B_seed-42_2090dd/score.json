@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_27b_think-off_track-B_seed-42_2090dd",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 249.5079505443573,
+    "wall_seconds_execution": 0.4168729782104492,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 935,
+      "eval_count": 725,
+      "prompt_eval_duration_ns": 3344617875,
+      "eval_duration_ns": 245795318352,
+      "total_duration_ns": 249501179235
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3.5_27b_think-off_track-B_seed-42_2090dd/run.sh line 6:\nREF_IDX=\"${REF}.bwt\"\n^-----^ SC2034 (warning): REF_IDX appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- REF_IDX appears unused. Verify us...\n",
+    "idempotent": null
+  }
+}

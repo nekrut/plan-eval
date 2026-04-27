@@ -1,0 +1,54 @@
+{
+  "run_id": "qwen3_8b_think-off_track-B_seed-42_7b6566",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "missing": [
+      "M117-bl.bam",
+      "M117-ch.bam",
+      "M117C1-bl.bam",
+      "M117C1-ch.bam",
+      "M117-bl.bam.bai",
+      "M117-ch.bam.bai",
+      "M117C1-bl.bam.bai",
+      "M117C1-ch.bam.bai",
+      "M117-bl.vcf.gz",
+      "M117-ch.vcf.gz",
+      "M117C1-bl.vcf.gz",
+      "M117C1-ch.vcf.gz",
+      "M117-bl.vcf.gz.tbi",
+      "M117-ch.vcf.gz.tbi",
+      "M117C1-bl.vcf.gz.tbi",
+      "M117C1-ch.vcf.gz.tbi"
+    ]
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 3.418325662612915,
+    "wall_seconds_execution": 0.21420621871948242,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 905,
+      "eval_count": 458,
+      "prompt_eval_duration_ns": 17093927,
+      "eval_duration_ns": 3251911490,
+      "total_duration_ns": 3413244404
+    }
+  },
+  "m5_quality": 1,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

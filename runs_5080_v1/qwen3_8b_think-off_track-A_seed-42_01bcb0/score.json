@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-off_track-A_seed-42_01bcb0",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 5.4786741733551025,
+    "wall_seconds_execution": 0.16472601890563965,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1809,
+      "eval_count": 697,
+      "prompt_eval_duration_ns": 148763647,
+      "eval_duration_ns": 5098917366,
+      "total_duration_ns": 5472038907
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_8b_think-off_track-A_seed-42_01bcb0/run.sh line 53:\nif [ ! -f \"$output_collapsed\" ] || [ \"$output_collapsed\" -nt results/*.vcf.gz ]; then\n                                                             ^--------------^ SC2202 (warning): Globs don't work as operands in [ ]. Use a loop.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2202 -- Globs don't work as operands in [...\n",
+    "idempotent": null
+  }
+}

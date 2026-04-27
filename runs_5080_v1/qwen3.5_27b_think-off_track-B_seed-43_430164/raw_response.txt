@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configuration
+REF="data/ref/chrM.fa"
+REF_BAI="data/ref/chrM.fa.bai"
+RAW_DIR="data/raw"
+OUT_DIR="results"
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Create output directory
+mkdir -p "$OUT_DIR"
+
+# Index reference if not present
+if [[ ! -f "$REF_BAI" ]]; then
+    samtools faidx "$REF"
+fi
+
+# Process each sample
+for SAMPLE in "${SAMPLES[@

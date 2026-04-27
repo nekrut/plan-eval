@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+find data/raw/ -name "*.fq.gz" | while read -r fq1; do
+    fq2="${fq1}_2.fq.gz"
+    sample=$(basename "$fq1" .fq.gz)
+    if [[ ! -f "$fq2" ]]; then
+        continue
+    fi
+
+    if [[ -f results/"$sample".bam ]]; then
+        continue
+    fi
+
+    bwa mem data/ref/chrM.fa "$fq1" "$fq2" | samtools sort -@ 4 -o results/"$sample".bam
+    samtools 

@@ -1,0 +1,36 @@
+{
+  "run_id": "glm-4.7-flash_think-off_track-B_seed-43_905766",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 139.8928837776184,
+    "wall_seconds_execution": 0.2151196002960205,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 830,
+      "eval_count": 495,
+      "prompt_eval_duration_ns": 548202918,
+      "eval_duration_ns": 139113502755,
+      "total_duration_ns": 139884819891
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_9b_think-off_track-A_seed-42_9da7f2",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 12.40104866027832,
+    "wall_seconds_execution": 3.3887264728546143,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1872,
+      "eval_count": 787,
+      "prompt_eval_duration_ns": 410498686,
+      "eval_duration_ns": 6687600536,
+      "total_duration_ns": 12395789542
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3.5_9b_think-off_track-A_seed-42_9da7f2/run.sh line 22:\n    outtbi=\"${RESULTS}/${sample}.vcf.gz.tbi\"\n    ^----^ SC2034 (warning): outtbi appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- outtbi appears unused. Verify use...\n",
+    "idempotent": null
+  }
+}

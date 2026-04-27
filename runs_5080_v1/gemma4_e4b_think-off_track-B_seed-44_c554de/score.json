@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-B_seed-44_c554de",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 8.518847227096558,
+    "wall_seconds_execution": 0.26508188247680664,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 959,
+      "eval_count": 1270,
+      "prompt_eval_duration_ns": 8313848,
+      "eval_duration_ns": 7842987623,
+      "total_duration_ns": 8513043900
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-B_seed-44_c554de/run.sh line 70:\n        awk -v sample=\"$sample\" '{\n                                ^-- SC1078 (warning): Did you forget to close this single quoted string?\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-B_seed-44_c554de/run.sh line 74:\n            # and the sum of read depths (AD) as a proxy for 'af' if multiple are present.\n                                                                ^-- SC1078 (warning): Did you forget to close this single quoted string?\n\nFor more information:\n  ",
+    "idempotent": null
+  }
+}

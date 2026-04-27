@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3-coder_30b_think-off_track-A_seed-44_35cc32",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 133.957337141037,
+    "wall_seconds_execution": 1.0709092617034912,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1801,
+      "eval_count": 459,
+      "prompt_eval_duration_ns": 43501492,
+      "eval_duration_ns": 133707215418,
+      "total_duration_ns": 133948834398
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3-coder_30b_think-off_track-A_seed-44_35cc32/run.sh line 35:\nif [[ ! -f results/collapsed.tsv ]] || [[ results/collapsed.tsv -lt results/M117-bl.vcf.gz ]]; then\n                                          ^-------------------^ SC2309 (warning): -lt treats this as an arithmetic expression. Use < to compare as string (or expand explicitly with $((expr))).\n                                                                    ^--------------------^ SC2309 (warning): -lt treats this as an arithmetic expression. Use < to compare as string (or expand explici",
+    "idempotent": null
+  }
+}

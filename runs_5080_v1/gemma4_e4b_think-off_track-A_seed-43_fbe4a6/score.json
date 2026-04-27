@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-43_fbe4a6",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.845543384552002,
+    "wall_seconds_execution": 0.16440391540527344,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1924,
+      "eval_count": 1763,
+      "prompt_eval_duration_ns": 8397693,
+      "eval_duration_ns": 10969096339,
+      "total_duration_ns": 11837891135
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-A_seed-43_fbe4a6/run.sh line 45:\n    if [ ! -f \"${R1}\" ] || [ ! -f \"${R2}\" ]; then\n                                        ^-- SC1078 (warning): Did you forget to close this double quoted string?\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/gemma4_e4b_think-off_track-A_seed-43_fbe4a6/run.sh line 46:\n        echo \"Skipping ${sample}: Input FASTQ files not found.\" >&2\n                                                              ^-- SC1078 (warning): Did you forget to close this double quoted string?\n\n\nIn /home/anton/git/plan-e",
+    "idempotent": null
+  }
+}

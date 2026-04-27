@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
 RTX 5080 matrix: 11 ollama models x {v1,v2} plans x {A,B} tracks x 3 seeds,
-plus /think mode on think-capable models.
+plus /think mode on think-capable models that fit cleanly in VRAM.
 
 Models (group A: fits cleanly in 16 GB VRAM; group B: partial CPU offload):
     A: qwen3:8b, qwen3:14b, qwen3.5:9b, gemma4:e4b, gpt-oss:20b
     B: qwen3.5:27b, qwen3.6:27b, qwen3.6:35b-a3b, gemma4:26b,
        qwen3-coder:30b, glm-4.7-flash
 
-/think is enabled for the qwen3* family and glm-4.7-flash (which use
-the explicit /think|/no_think template tags). gpt-oss, gemma4 and
-qwen3-coder are run think-off only.
+/think is enabled ONLY for qwen3* family models that fit in VRAM
+(qwen3:8b, qwen3:14b, qwen3.5:9b). On group B models with partial
+CPU offload (qwen3.5:27b, qwen3.6:27b, qwen3.6:35b-a3b, glm-4.7-flash),
+empirically /think generation does not return within a 1800 s budget —
+the same hardware-class problem first observed on the Jetson AGX Orin.
+gpt-oss, gemma4 and qwen3-coder do not use the /think template.
 
 For /think cells the ollama HTTP timeout is bumped from 900 to 1800 s
-to accommodate longer reasoning streams (esp. on group B models).
+to accommodate longer reasoning streams.
 
 Outputs:
   runs_5080_v1/<run_id>/   (plan = plan/PLAN_v1.md)
@@ -40,19 +43,20 @@ SCORE = BENCH / "score" / "score_run.py"
 SEEDS = [42, 43, 44]
 TRACKS = ["A", "B"]
 
-# (model_id, supports_think)
+# (model_id, supports_think) — /think only on models that fit in VRAM.
+# Group B models with partial offload time out at 1800 s for /think cells.
 MODELS = [
     ("qwen3:8b",            True),
     ("qwen3:14b",           True),
     ("qwen3.5:9b",          True),
-    ("qwen3.5:27b",         True),
-    ("qwen3.6:27b",         True),
-    ("qwen3.6:35b-a3b",     True),
+    ("qwen3.5:27b",         False),
+    ("qwen3.6:27b",         False),
+    ("qwen3.6:35b-a3b",     False),
     ("gemma4:e4b",          False),
     ("gemma4:26b",          False),
     ("gpt-oss:20b",         False),
     ("qwen3-coder:30b",     False),
-    ("glm-4.7-flash",       True),
+    ("glm-4.7-flash",       False),
 ]
 
 PLAN_FILES = {

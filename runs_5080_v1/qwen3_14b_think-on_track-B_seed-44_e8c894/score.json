@@ -1,0 +1,40 @@
+{
+  "run_id": "qwen3_14b_think-on_track-B_seed-44_e8c894",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 52.684510231018066,
+    "wall_seconds_execution": 3.171750545501709,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 895,
+      "eval_count": 4327,
+      "prompt_eval_duration_ns": 13440082,
+      "eval_duration_ns": 51767299852,
+      "total_duration_ns": 52677629868
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_14b_think-on_track-B_seed-44_e8c894/run.sh line 14:\n    BAI=\"results/${sample}.bam.bai\"\n    ^-^ SC2034 (warning): BAI appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1/qwen3_14b_think-on_track-B_seed-44_e8c894/run.sh line 44:\n    > \"$COLLAPSED\"\n    ^------------^ SC2188 (warning): This redirection doesn't have a command. Move to its command (or use 'true' as no-op).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- BAI appears unused. Verify use (o...\n  https://www.shellcheck.",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

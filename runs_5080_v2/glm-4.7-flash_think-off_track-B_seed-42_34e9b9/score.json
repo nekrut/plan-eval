@@ -1,0 +1,36 @@
+{
+  "run_id": "glm-4.7-flash_think-off_track-B_seed-42_34e9b9",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 143.98212885856628,
+    "wall_seconds_execution": 0.21468830108642578,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 830,
+      "eval_count": 548,
+      "prompt_eval_duration_ns": 327879956,
+      "eval_duration_ns": 143413514176,
+      "total_duration_ns": 143975302444
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/glm-4.7-flash_think-off_track-B_seed-42_34e9b9/run.sh line 51:\njava -jar $(which SnpSift.jar) Filter -e \"AF > 0\" \"${OUT_DIR}/merged.vcf.gz\" | \\\n          ^------------------^ SC2046 (warning): Quote this to prevent word splitting.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v2/glm-4.7-flash_think-off_track-B_seed-42_34e9b9/run.sh line 52:\n    java -jar $(which SnpSift.jar) Tsv -e \"sample,chrom,pos,ref,alt,AF\" -o \"${OUT_DIR}/collapsed.tsv\"\n              ^------------------^ SC2046 (warning): Quote this to prevent word splitting.\n\nFor more information:\n  h",
+    "idempotent": null
+  }
+}

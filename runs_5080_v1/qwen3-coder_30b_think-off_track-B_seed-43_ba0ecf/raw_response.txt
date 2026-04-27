@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF=data/ref/chrM.fa
+RAW=data/raw/
+RESULTS=results
+
+mkdir -p "$RESULTS"
+
+# Index reference if not already indexed
+if [[ ! -f "$REF.bwt" ]]; then
+  bwa index "$REF"
+fi
+
+# Process each sample
+for sample in M117-bl M117-ch M117C1-bl M117C1-ch; do
+  bam="$RESULTS/${sample}.bam"
+  vcf="$RESULTS/${sample}.vcf.gz"
+  
+  # Skip if already processed
+  if [[ -

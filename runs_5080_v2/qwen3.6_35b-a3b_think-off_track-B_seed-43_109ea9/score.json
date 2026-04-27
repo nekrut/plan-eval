@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.6_35b-a3b_think-off_track-B_seed-43_109ea9",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 214.9733850955963,
+    "wall_seconds_execution": 0.31461429595947266,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 935,
+      "eval_count": 964,
+      "prompt_eval_duration_ns": 738671540,
+      "eval_duration_ns": 212791187357,
+      "total_duration_ns": 214966559700
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3.6_35b-a3b_think-off_track-B_seed-43_109ea9/run.sh line 31:\n    VCF_TBI=\"${VCF_GZ}.tbi\"\n    ^-----^ SC2034 (warning): VCF_TBI appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- VCF_TBI appears unused. Verify us...\n",
+    "idempotent": null
+  }
+}

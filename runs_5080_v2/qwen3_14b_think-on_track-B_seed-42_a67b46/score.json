@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-on_track-B_seed-42_a67b46",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 66.6658525466919,
+    "wall_seconds_execution": 0.3649568557739258,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 895,
+      "eval_count": 5429,
+      "prompt_eval_duration_ns": 23607699,
+      "eval_duration_ns": 65553633339,
+      "total_duration_ns": 66658930981
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3_14b_think-on_track-B_seed-42_a67b46/run.sh line 12:\n    bai=\"results/${sample}.bam.bai\"\n    ^-^ SC2034 (warning): bai appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3_14b_think-on_track-B_seed-42_a67b46/run.sh line 14:\n    tbi=\"results/${sample}.vcf.gz.tbi\"\n    ^-^ SC2034 (warning): tbi appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v2/qwen3_14b_think-on_track-B_seed-42_a67b46/run.sh line 31:\n    > results/collapsed.tsv\n    ^---------",
+    "idempotent": null
+  }
+}
