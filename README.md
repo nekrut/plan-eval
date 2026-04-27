@@ -2,21 +2,38 @@
 
 Benchmark comparing **Anthropic Claude models** and **a wide selection of free local open-weight models** running on a Jetson AGX Orin at executing an Opus-authored bioinformatics plan.
 
-The premise: *Opus 4.7 plans, a cheaper or local model implements.* The benchmark answers:
+## What this is, in plain English
 
-1. Which Anthropic tier is the cheapest model that can faithfully execute an Opus-authored plan?
-2. Which **free local open-weight models** can replace the cheap-tier Anthropic model on this Jetson?
-3. How does plan specificity interact with model capability?
+You ask the strongest available model (Claude Opus 4.7) to write a recipe for a bioinformatics workflow. Then you hand that recipe to a cheaper or smaller model and ask it to turn the recipe into an actual runnable script. We then run the script on real data and check whether its variant calls match a known-correct answer.
+
+The benchmark answers three questions:
+
+1. Which Anthropic tier is the cheapest model that can faithfully execute an Opus-authored recipe?
+2. Which **free, locally-runnable** models can do the same job — i.e. avoid paying for inference at all?
+3. How does the *level of detail in the recipe* interact with model capability?
 
 ## TL;DR
 
-**At least 9 free local open-weight models can implement an Opus-authored hyper-detailed plan on this Jetson with perfect ground-truth Jaccard.** All-Anthropic models score perfectly with the v2 plan. With the looser v1 plan, only Anthropic models worked — all open-weight models tested produced broken `lofreq` invocations.
+**At least 9 free local open-weight models can implement an Opus-authored hyper-detailed recipe on this Jetson with a perfect match against the known-correct variant set.** Anthropic models match on both the lean and the detailed recipe. Free local models only work when the recipe is hyper-detailed; with a lean recipe they all fail.
 
-The local-model success depends on plan specificity: hyper-detailed plans (every command and flag verbatim) work; lean plans don't.
+## Plain-English glossary
+
+A few terms used throughout this README and in the source files:
+
+- **Recipe / plan** — a Markdown document describing the workflow steps. We test two versions: **v1 (lean)** = numbered bullets naming the tools and key flags, leaving the implementer some judgment; **v2 (detailed)** = every command line spelled out verbatim.
+- **Implementer model** — the model under test. It receives the recipe and emits a single bash script (`run.sh`) that performs the workflow. We then *execute* the script on the data and *score* its outputs against ground truth.
+- **Track A vs Track B** — A = "with the recipe", B = "no recipe, problem statement only" (a control to measure what the recipe is worth).
+- **Seed** — a random number that controls the model's sampling. Same prompt + same seed ≈ same output. We run **three seeds (42, 43, 44)** for each cell so a one-off lucky or unlucky run doesn't dominate the result. *n=3* below means three runs.
+- **`/think` vs `/no_think`** — some recent open-weight models (notably Qwen3) can *think out loud* before answering — emit pages of internal reasoning before the actual answer. `/no_think` turns this off. Thinking mode helps quality but is much slower; on this Jetson it routinely doesn't finish in 15 minutes per call, so we run all local models in `/no_think` (or its equivalent for non-Qwen families: setting `think: false` in the Ollama API payload).
+- **MoE / A3B** — Mixture-of-Experts model with ~3B active parameters per token (vs. a "dense" model that activates all its parameters every token). MoEs are faster per token than a dense model with the same total parameter count; some of the strongest small/local options here are MoEs.
+- **Q4_K_M quantization** — model weights compressed to ~4 bits per parameter to fit in memory. Some quality loss, well-validated for these model classes.
+- **M3 (variant agreement)** — our primary score: across 4 samples, how many variants does the model's output share with the known-correct VCF, with a small allele-frequency tolerance. **1.000 = perfect**, 0.000 = no overlap. See "Scoring" below for the full rubric.
+- **Variant calling, BWA-MEM, LoFreq, BAM/VCF, chrM** — bioinformatics: the workflow aligns short DNA reads to a reference genome (`BWA-MEM`), produces an alignment file (`BAM`), then identifies the differences from the reference (`LoFreq` → `VCF`). `chrM` = the human mitochondrial chromosome (16 569 bp).
 
 ## Headline tables
 
-### Free local open-weight sweep (v2 detailed plan, /no_think where applicable, n=3 seeds)
+### Free local open-weight sweep
+*v2 (detailed) recipe, thinking turned off, three independent runs (seeds 42/43/44) per model.*
 
 | model | M3 | mean gen secs | result | notes |
 |---|---|---|---|---|
@@ -36,9 +53,9 @@ The local-model success depends on plan specificity: hyper-detailed plans (every
 | `granite4` (3 B) | — | — | 0/3 | gen timeout |
 | `llama3.3:70b-instruct-q3_K_M` | — | — | — | network failure mid-pull |
 
-### Anthropic (Track A, both plan versions)
+### Anthropic models with the recipe (Track A, both recipe versions)
 
-| plan | model | M3 | $/run | gen secs |
+| recipe | model | M3 | $/run | gen secs |
 |---|---|---|---|---|
 | v2 (detailed) | Claude Opus 4.7 | 1.000 | $0.144 | 11 |
 | v2 (detailed) | Claude Sonnet 4.6 | 1.000 | $0.064 | 11 |
@@ -47,38 +64,43 @@ The local-model success depends on plan specificity: hyper-detailed plans (every
 | v1 (lean) | Claude Sonnet 4.6 | 1.000 | $0.049 | 24 |
 | v1 (lean) | Claude Haiku 4.5 | 1.000 | $0.063 | 68 |
 
-### No-plan baseline (v1 only — Track B is plan-independent)
+### What happens with NO recipe (Track B, v1 only)
+*Each model is given only the problem statement and the list of available tools — no recipe.*
 
 | model | M3 | notes |
 |---|---|---|
-| Opus 4.7 | 0.938 | one-variant disagreement |
+| Opus 4.7 | 0.938 | one-variant disagreement (15 of 16 variants match) |
 | Sonnet 4.6 | 0.938 | same |
-| Haiku 4.5 | 0.667 ± 0.577 | one seed scored 0/16 — high variance without plan |
-| qwen3.6:35b /no_think (v1) | 0.000 | hallucinated lofreq three different ways across seeds |
+| Haiku 4.5 | 0.667 ± 0.577 | one of three runs found zero correct variants — unstable without the recipe |
+| qwen3.6:35b (free local) | 0.000 | invented three *different* invalid `lofreq` command lines across the three runs |
 
 ## Findings
 
-**Plan specificity is the dominant lever.** Going from v1 (lean, ~1 200 tokens) to v2 (~2 274 tokens, every command and flag verbatim):
+**The level of detail in the recipe is the dominant lever.** Going from v1 (lean, ~1 200 tokens) to v2 (~2 274 tokens, every command and flag verbatim):
 
-- Anthropic models: no change. 1.000 either way.
-- Local open-weight models: **0.000 → 1.000**. The v1 plan's "use lofreq with --pp-threads 4" left enough ambiguity that qwen3.6:35b hallucinated three different invalid invocations. The v2 plan supplies the literal `lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{sample}.vcf results/{sample}.bam`, and every working open-weight model emits the correct invocation.
+- Anthropic models: unchanged at 1.000. They have enough internal knowledge to fill in the v1 ambiguities themselves.
+- Free local models: **0.000 → 1.000**. With the lean recipe, free local models invent broken command lines for tools they don't know well (in particular `lofreq`). With the verbatim recipe, they have nothing to invent — they just transliterate prose into bash.
 
-**Model size is not the dividing line.** `glm4:9b` (5.5 GB on disk) and `qwen3-coder:30b` (18.6 GB) both score 1.000 with the v2 plan. The dividing line, with one exception, is whether the model finishes within the 900 s timeout — and that correlates with thinking/reasoning behavior, not parameter count.
+**Model size is not the dividing line.** `glm4:9b` (5.5 GB on disk) and `qwen3-coder:30b` (18.6 GB) both score 1.000 with the v2 recipe. What divides "works" from "didn't finish" is whether the model can produce its answer within the 15-minute-per-call generation budget our test harness allows.
 
-**The four 0/3 failures are reasoning-model timeouts, not capability gaps.** `glm-4.7-flash`, `olmo-3.1:32b`, `nemotron-3-nano`, and `granite4` all crashed `urllib.request.urlopen` at our 900 s generation budget. Combined with what we already knew about `qwen3.6:35b /think` (took >>900 s on a trivial pysam prompt), this is consistent with these models emitting long internal chain-of-thought before the answer despite `think:false` in the payload — these are likely models whose reasoning isn't fully gateable from Ollama. A 1 800 s budget would probably recover them, at the cost of 30 min/cell. We left this open.
+**The four 0/3 failures look like models that *want to think* but couldn't be turned off cleanly.** `glm-4.7-flash`, `olmo-3.1:32b`, `nemotron-3-nano`, and `granite4` all timed out at 15 minutes for every run. This is consistent with reasoning-style models that emit a long internal chain-of-thought before the actual answer — and don't fully respect Ollama's "no thinking" switch. A longer budget would likely recover them at ~30 min per call. We didn't retry; that's listed as a follow-up.
 
-**`gpt-oss:20b` behaves like a reasoning model too.** One seed completed at 569 s; two seeds exceeded the 900 s budget. So it's borderline — a longer budget would likely recover the rest.
+**`gpt-oss:20b` is borderline.** One run finished in ~9.5 minutes, two timed out at 15 — same family of issue.
 
 ## Recommendation
 
-For routine bioinformatics-plan execution where the plan author is Opus 4.7:
+If Opus 4.7 is your recipe author, here are the practical answers:
 
-- **Cheapest paid (with a moderately detailed plan)**: **Sonnet 4.6 + a v1-style plan** ($0.049/run, ~10 s gen, 1.000 on both v1 and v2).
-- **Cheapest free local on this Jetson (with a hyper-detailed plan)**: **`qwen3-coder:30b /no_think`** at $0/run, ~76 s gen, 1.000 across all seeds. Other comparably good free options: `glm4:9b` (faster but smaller), `deepseek-coder-v2:16b` (fast MoE), `devstral-small-2:24b`, `mistral-small3.2:24b`, `granite-code:34b`, `gemma3:27b`, `qwen3:32b`, `qwen3.6:35b`.
+- **Cheapest paid path** (recipe doesn't have to be elaborate): **Sonnet 4.6 + a lean recipe**. ~$0.05 per implementation, ~10 seconds, perfect score on every run.
+- **Cheapest free path on this Jetson** (recipe must be hyper-detailed): **`qwen3-coder:30b`** in `/no_think` mode. $0 per implementation, ~75 seconds on this hardware, perfect score on every run. Alternatives that work equally well: `glm4:9b` (smaller and faster), `deepseek-coder-v2:16b` (fast Mixture-of-Experts), `devstral-small-2:24b`, `mistral-small3.2:24b`, `granite-code:34b`, `gemma3:27b`, `qwen3:32b`, `qwen3.6:35b`.
 
-For free-local execution to be reliable, the plan must be **hyper-detailed**: every command line, every flag, every filename verbatim. The plan author has to do the bioinformatics knowing; the local model does the bash transliteration.
+The practical workflow looks like this:
 
-The practical workflow: **spend $0.14 once on an Opus-authored hyper-detailed plan, then implement for free locally** at ~1–5 minutes per cell on this Jetson at 30 W.
+> Spend roughly **$0.14 once** on an Opus-authored hyper-detailed recipe.
+> Then run that recipe through a free local model on this Jetson at $0 per execution.
+> Wall-clock: 1 – 5 minutes per implementation depending on model size.
+
+To make free-local execution reliable, the recipe has to specify *everything*: every command, every flag, every filename, character-for-character. The recipe author has to know bioinformatics; the local model just translates the prose into bash.
 
 ## Why this dataset
 
@@ -88,35 +110,36 @@ Tutorial-grade, the dataset author defined the canonical answer.
 
 ## Method
 
-**Plan-then-implement, single-shot.** Opus 4.7 generates one structured plan once; that plan is frozen. Each model under test receives the plan plus a problem statement and the locked tool inventory, and must emit a single self-contained `bash run.sh`. Each script runs in an identical fresh sandbox; outputs are scored against a frozen canonical run.
+**Recipe-then-implement, one shot per run.** Opus 4.7 writes one recipe; that recipe is then frozen and shown to every implementer model. Each implementer must reply with a single self-contained `bash run.sh` script. The script is then executed in a fresh sandbox directory, and its outputs are compared to a known-correct reference (the "ground truth" — produced once by hand using the same locked toolchain).
 
-Two plan versions:
-- **v1 (lean)**: numbered list of bullet-pointed steps with named tools and key flags but no command-by-command syntax. ~1 200 output tokens. See `plan/PLAN_v1.md`.
-- **v2 (detailed)**: every step gives the exact command line as a code block with all flags and arguments. ~2 274 output tokens. See `plan/PLAN.md`.
+Two recipe versions, written by Opus 4.7 from two different planner prompts:
+- **v1 (lean)**: numbered bullets naming the tools and key flags, but no full command lines. ~1 200 output tokens. See `plan/PLAN_v1.md`.
+- **v2 (detailed)**: every step gives the exact command line, flags and all, in a code fence. ~2 274 output tokens. See `plan/PLAN.md`.
 
 Two tracks:
-- **Track A** (with plan): the model gets the plan as authoritative. The local-model sweep is Track A only.
-- **Track B** (no plan): the model gets only the problem statement and tool inventory. Run for v1 Anthropic only.
+- **Track A** (with recipe): the model gets the recipe as authoritative. The local-model sweep is Track A only.
+- **Track B** (no recipe): the model gets only the problem statement and the available-tools list — a control to measure what the recipe is worth. Run for v1 Anthropic only.
 
 Local-model sweep procedure (`harness/sweep_local.py`):
-1. `ollama pull <model>`
-2. For seed in {42, 43, 44}: `run_one.py --model <model> --track A --think off`. The 900 s `urlopen` budget for the generation step is hard-coded in `run_one.py`; models that exceed it appear here as "0/3 timeout."
-3. Score each run.
-4. `ollama rm <model>` — free disk before the next model.
+1. `ollama pull <model>` — download.
+2. Run the model three times, once per seed (42, 43, 44). Each run is a separate API call, completely independent — same prompt, different random sampling, so we get a sense of variance rather than a single lucky/unlucky data point.
+3. Each call has a 15-minute generation budget. Models that don't reply within that time count as a 0/3 failure (we report those as "timed out" rather than guessing they would have been correct given more time).
+4. Score each run against ground truth.
+5. `ollama rm <model>` to free disk before pulling the next model. (We have ~17 GB free; the larger models are 30+ GB on disk, so we have to rotate.)
 
 ## Scoring
 
-Five metrics per run; M3 is primary.
+Five metrics computed per run. **M3 (variant agreement) is the primary one — that's what the headline tables report.**
 
-| metric | computation | type |
+| metric | what it measures | how it's computed |
 |---|---|---|
-| **M1** Executes | `bash run.sh` exits 0 within 600 s | binary; gates M2–M3 |
-| **M2** Schema | All expected output paths present + `bcftools` header parses | binary |
-| **M3** Variant agreement | Per-sample tolerant Jaccard on `(CHROM, POS, REF, ALT)` PASS records, AF tolerance ±0.02; macro-mean across the 4 samples | continuous |
-| **M4** Cost / latency | Tokens, USD, gen secs, exec secs | continuous |
-| **M5** Code quality | `shellcheck` clean + `set -euo pipefail` + no hardcoded `/home/...` + idempotency check (re-run on populated dir exits 0) | binary |
+| **M1 — Does it run?** | The script ran end-to-end without crashing within 10 minutes. | `bash run.sh` exits 0 within 600 s. Pass/fail. M1 must pass for M2 and M3 to be computed. |
+| **M2 — Did it produce the expected files?** | The output structure matches the spec (right files in the right places, valid VCF headers). | Filesystem check + `bcftools view -h` succeeds on each VCF. Pass/fail. |
+| **M3 — Are the variant calls right?** | For each of the 4 samples, what fraction of the variants in the model's VCF *also* appear in the known-correct VCF, allowing a small allele-frequency tolerance. Averaged across samples. **1.000 = perfect, 0.000 = no overlap.** | Per-sample Jaccard on `(chromosome, position, reference allele, alternate allele)` tuples among PASS records, with allele-frequency tolerance ±0.02; macro-mean across the 4 samples. |
+| **M4 — Cost and time** | What it cost and how long it took. | Tokens, USD (Anthropic), generation seconds, execution seconds. |
+| **M5 — Is the script clean?** | The script is well-formed bash and re-runnable. | `shellcheck` clean + `set -euo pipefail` present + no hardcoded user paths + re-running on a populated output dir exits 0 with no work performed. Pass/fail. |
 
-Tool substitution is handled by construction: M3 compares variant tuples, not pipelines.
+If a model uses a *different but valid* tool than the recipe specifies (e.g. `bcftools mpileup` instead of `lofreq`), M3 still scores it correctly — the metric compares variant calls, not the pipeline that produced them.
 
 ## Hardware
 
@@ -178,12 +201,12 @@ python3 score/aggregate.py
 
 ## Caveats
 
-- **One task class.** Per-sample variant calling on a 16.6 kb mitochondrial reference. Generalization to whole-genome workflows, RNA-seq, single-cell, etc., not implied.
-- **One dataset.** All four samples are amplicon-PCR mtDNA from one study; intentionally easy.
-- **30 W on Jetson.** MAXN power mode requires a reboot we did not perform.
-- **Generation timeout 900 s** in the harness. Four open-weight models hit this on every seed; we did not retry with a higher budget. Their score of 0/3 is a "doesn't fit our 15-minute-per-cell budget" finding, not necessarily a "model can't do the task" finding.
-- **The v2 plan is close to a script in prose.** This is the *whole point* — the experimental finding is that this is what you need to drop into to get a free local model working.
-- **Disk pressure during the sweep.** We pull → test → `ollama rm` to keep ~17 GB free. The full 14-model sweep transferred ~210 GB sequentially.
+- **One task class.** Per-sample variant calling on a 16.6 kb mitochondrial reference. Generalization to whole-genome workflows, RNA-seq, single-cell, etc. is not implied.
+- **One dataset.** All four samples are amplicon-PCR mitochondrial DNA from one study; intentionally easy.
+- **30 W power mode on the Jetson.** A higher power mode (MAXN) would require rebooting the machine, which we didn't do. So local-model wall-clock numbers are conservative — they'd be faster on a more aggressive power profile.
+- **15-minute generation budget per call.** Four free-local models timed out at this limit on every run. Their 0/3 score means "did not fit our 15-minute budget on this Jetson," not "the model can't do the task in principle." A 30-minute budget would likely recover most of them.
+- **The v2 recipe is close to "the script in prose."** That's the whole point — the experimental finding is that this is what you need to write to get a free local model working reliably. If you want the local model to *also* do bioinformatics reasoning, more work is needed.
+- **Disk rotation during the sweep.** We pull → test → remove for each model to fit in ~17 GB free disk. The full 14-model sweep transferred ~210 GB sequentially over the network.
 
 ## License
 
