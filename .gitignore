@@ -5,6 +5,10 @@ data/ref/
 # Re-derivable per-run artifacts (heavy)
 runs/*/data
 runs/*/results/
+runs_5080_v1/*/data
+runs_5080_v1/*/results/
+runs_5080_v2/*/data
+runs_5080_v2/*/results/
 ground_truth/results/*.bam
 ground_truth/results/*.bam.bai
 ground_truth/results/*.bwa.log
@@ -28,3 +32,5 @@ __pycache__/
 
 # Local matrix log (re-derivable)
 matrix_log.json
+matrix_5080.log
+matrix_5080_log.json

@@ -6,8 +6,9 @@ set -euo pipefail
 
 MINIFORGE_DIR="$HOME/miniforge3"
 ENV_NAME="bench"
-INSTALLER="/tmp/Miniforge3-Linux-aarch64.sh"
-URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh"
+ARCH="$(uname -m)"
+INSTALLER="/tmp/Miniforge3-Linux-${ARCH}.sh"
+URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-${ARCH}.sh"
 
 if [[ ! -d "$MINIFORGE_DIR" ]]; then
   echo "[install] downloading miniforge..."

@@ -49,12 +49,12 @@ def tool_inventory() -> str:
     return m.group(0).rsplit("\n", 1)[0]  # drop trailing "OK"
 
 
-def build_user_message(track: str) -> str:
+def build_user_message(track: str, plan_path: Path) -> str:
     tmpl = (PROMPTS / f"track_{track.lower()}_user.tmpl").read_text()
     inv = tool_inventory()
     out = tmpl.replace("{TOOL_INVENTORY}", inv)
     if "{PLAN}" in out:
-        out = out.replace("{PLAN}", PLAN_FILE.read_text())
+        out = out.replace("{PLAN}", plan_path.read_text())
     return out
 
 
@@ -97,7 +97,7 @@ def call_claude(model: str, system_text: str, user_text: str) -> dict:
     }
 
 
-def call_ollama(model: str, think: bool, system_text: str, user_text: str, seed: int) -> dict:
+def call_ollama(model: str, think: bool, system_text: str, user_text: str, seed: int, gen_timeout: int = 900) -> dict:
     # /no_think is a Qwen-family control token; other model families use the
     # `think` payload field instead and treat the prefix as literal user text.
     if not think and model.lower().startswith("qwen"):
@@ -123,7 +123,7 @@ def call_ollama(model: str, think: bool, system_text: str, user_text: str, seed:
         headers={"Content-Type": "application/json"},
     )
     t0 = time.time()
-    with urllib.request.urlopen(req, timeout=900) as r:
+    with urllib.request.urlopen(req, timeout=gen_timeout) as r:
         d = json.loads(r.read())
     elapsed = time.time() - t0
     content = d.get("message", {}).get("content", "")
@@ -185,27 +185,36 @@ def main() -> int:
     ap.add_argument("--track", choices=["A", "B"], required=True)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--think", choices=["on", "off"], default="on",
-                    help="Only meaningful for qwen3.6 ollama models")
+                    help="Only meaningful for ollama models")
     ap.add_argument("--run-id", default=None)
+    ap.add_argument("--plan", default=str(PLAN_FILE),
+                    help="Path to PLAN.md (defaults to plan/PLAN.md)")
+    ap.add_argument("--runs-dir", default=str(RUNS),
+                    help="Directory to write run output (default runs/)")
+    ap.add_argument("--gen-timeout", type=int, default=900,
+                    help="Ollama HTTP timeout in seconds (default 900)")
     args = ap.parse_args()
+
+    runs_root = Path(args.runs_dir)
+    plan_path = Path(args.plan)
 
     is_ollama = ":" in args.model  # rough heuristic: "qwen3.6:35b"
     cell_tag = args.model.replace("/", "_").replace(":", "_")
     if is_ollama:
         cell_tag += f"_think-{args.think}"
     run_id = args.run_id or f"{cell_tag}_track-{args.track}_seed-{args.seed}_{uuid.uuid4().hex[:6]}"
-    run_dir = RUNS / run_id
+    run_dir = runs_root / run_id
 
     if run_dir.exists():
         print(f"[run_one] {run_dir} exists — removing for clean run", file=sys.stderr)
         shutil.rmtree(run_dir)
 
     system_text = (PROMPTS / "system.txt").read_text()
-    user_text = build_user_message(args.track)
+    user_text = build_user_message(args.track, plan_path)
 
     print(f"[run_one] generating script via {args.model} (track {args.track}, seed {args.seed})", file=sys.stderr)
     if is_ollama:
-        gen = call_ollama(args.model, args.think == "on", system_text, user_text, args.seed)
+        gen = call_ollama(args.model, args.think == "on", system_text, user_text, args.seed, gen_timeout=args.gen_timeout)
     else:
         gen = call_claude(args.model, system_text, user_text)
 
