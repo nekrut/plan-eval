@@ -1,0 +1,40 @@
+{
+  "run_id": "qwen3-coder_30b_think-off_track-A_seed-42_ea2661",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 143.10031747817993,
+    "wall_seconds_execution": 3.536720037460327,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1360,
+      "eval_count": 411,
+      "prompt_eval_duration_ns": 1154402562,
+      "eval_duration_ns": 137254594930,
+      "total_duration_ns": 143093343618
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p5/qwen3-coder_30b_think-off_track-A_seed-42_ea2661/run.sh line 3:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- THREADS appears unused. Verify us...\n",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

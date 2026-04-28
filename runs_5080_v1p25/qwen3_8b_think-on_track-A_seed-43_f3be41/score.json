@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-on_track-A_seed-43_f3be41",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 10.136852264404297,
+    "wall_seconds_execution": 0.31520509719848633,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1786,
+      "eval_count": 1179,
+      "prompt_eval_duration_ns": 235011587,
+      "eval_duration_ns": 9589319875,
+      "total_duration_ns": 10129550475
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3_8b_think-on_track-A_seed-43_f3be41/run.sh line 25:\n    if [[ -f \"$vcf_tbi\" && -nt \"$vcf_tbi\" \"$bam_file\" ]]; then\n       ^-- SC1073 (error): Couldn't parse this test expression. Fix to allow more checks.\n                                          ^-- SC1072 (error): Expected test to end here (don't wrap commands in []/[[]]). Fix any mentioned problems and try again.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC1072 -- Expected test to end here (don't ...\n  https://www.shellcheck.net/wiki/SC1073 -- Couldn't parse this test express",
+    "idempotent": null
+  }
+}

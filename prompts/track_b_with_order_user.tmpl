@@ -1,0 +1,41 @@
+TASK
+====
+Per-sample variant calling on 4 paired-end MiSeq amplicon samples mapped to the human mitochondrial reference (chrM, 16,569 bp). Final outputs (per sample, plus one collapsed table):
+
+  results/{sample}.bam
+  results/{sample}.bam.bai
+  results/{sample}.vcf.gz
+  results/{sample}.vcf.gz.tbi
+  results/collapsed.tsv
+
+The collapsed.tsv must have columns (tab-separated, with header):
+  sample  chrom  pos  ref  alt  af
+
+DATASET (already present under data/raw/ and data/ref/)
+======================================================
+Samples:
+  M117-bl   (paired)
+  M117-ch   (paired)
+  M117C1-bl (paired)
+  M117C1-ch (paired)
+
+Files in data/raw/:
+  M117-bl_1.fq.gz   M117-bl_2.fq.gz
+  M117-ch_1.fq.gz   M117-ch_2.fq.gz
+  M117C1-bl_1.fq.gz M117C1-bl_2.fq.gz
+  M117C1-ch_1.fq.gz M117C1-ch_2.fq.gz
+
+File in data/ref/:
+  chrM.fa            (decompressed; not yet indexed)
+
+TOOL_INVENTORY (only these are on PATH; pinned versions in conda env 'bench')
+============================================================================
+{TOOL_INVENTORY}
+
+PLAN
+====
+No detailed plan provided. Recommended tool sequence: bwa → samtools → lofreq → bcftools → awk (for the final collapse). Design and implement the workflow yourself, using only the tools above.
+
+OUTPUT FORMAT
+=============
+A single bash script. No markdown fences, no commentary. Just the script.

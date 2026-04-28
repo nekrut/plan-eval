@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ensure results directory exists
+mkdir -p results
+
+# Index reference if not already done
+if [ ! -f results/chrM.fa.bwt ]; then
+    bwa index data/ref/chrM.fa
+    samtools faidx data/ref/chrM.fa
+    tabix -p fa data/ref/chrM.fa
+fi
+
+# Define samples
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Loop through samples
+for sample in "${samples[@]}"; do

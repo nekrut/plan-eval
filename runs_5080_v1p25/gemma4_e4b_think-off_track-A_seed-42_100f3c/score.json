@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-42_100f3c",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 17.35479736328125,
+    "wall_seconds_execution": 0.31471896171569824,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1908,
+      "eval_count": 1488,
+      "prompt_eval_duration_ns": 186783126,
+      "eval_duration_ns": 9248494881,
+      "total_duration_ns": 17349599591
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_e4b_think-off_track-A_seed-42_100f3c/run.sh line 46:\n    R2=\"${data/raw/${sample}_2.fq.gz\"\n        ^-- SC2154 (warning): data is referenced but not assigned.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_e4b_think-off_track-A_seed-42_100f3c/run.sh line 49:\n    if [[ ! -f \"${R1}\" || ! -f \"${R2}\" ]]; then\n                ^---^ SC2027 (warning): The surrounding quotes actually unquote this. Remove or escape them.\n                                ^---^ SC2027 (warning): The surrounding quotes actually unquote this. Remove or escape them.\n",
+    "idempotent": null
+  }
+}

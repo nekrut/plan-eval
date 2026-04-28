@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3-coder_30b_think-off_track-B_seed-43_546ce9",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 198.60870003700256,
+    "wall_seconds_execution": 0.6159241199493408,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 923,
+      "eval_count": 516,
+      "prompt_eval_duration_ns": 63812152,
+      "eval_duration_ns": 198320939786,
+      "total_duration_ns": 198602533476
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null
+  }
+}

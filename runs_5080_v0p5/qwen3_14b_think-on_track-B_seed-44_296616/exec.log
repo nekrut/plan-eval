@@ -1,0 +1,68 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.065 CPU sec, 0.065 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: bwa mem data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.086 sec; CPU: 0.070 sec
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.074 CPU sec, 0.074 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: bwa mem data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.097 sec; CPU: 0.079 sec
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.066 CPU sec, 0.066 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: bwa mem data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.087 sec; CPU: 0.072 sec
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.069 CPU sec, 0.069 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: bwa mem data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.091 sec; CPU: 0.074 sec
+Number of substitution tests performed: 768
+Number of indel tests performed: 0

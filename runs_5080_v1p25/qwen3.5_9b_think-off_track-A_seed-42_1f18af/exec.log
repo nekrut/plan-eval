@@ -1,0 +1,37 @@
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-27 21:16:18,592]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-bl.bam
+
+INFO [2026-04-27 21:16:18,601]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+INFO [2026-04-27 21:16:19,301]: Executing lofreq filter -i /tmp/lofreq2_call_parallelx6_v1lvd/concat.vcf.gz -o results/M117-bl.vcf --snvqual-thresh 48 --indelqual-thresh 20
+
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-27 21:16:19,414]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-ch.bam
+
+INFO [2026-04-27 21:16:19,423]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+INFO [2026-04-27 21:16:20,190]: Executing lofreq filter -i /tmp/lofreq2_call_parallelofgialng/concat.vcf.gz -o results/M117-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-27 21:16:20,293]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-bl.bam
+
+INFO [2026-04-27 21:16:20,302]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+INFO [2026-04-27 21:16:20,868]: Executing lofreq filter -i /tmp/lofreq2_call_parallel6d8bwr9t/concat.vcf.gz -o results/M117C1-bl.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-27 21:16:20,979]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-ch.bam
+
+INFO [2026-04-27 21:16:20,991]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 768
+Number of indel tests performed: 0
+INFO [2026-04-27 21:16:21,589]: Executing lofreq filter -i /tmp/lofreq2_call_parallelvu65gzs9/concat.vcf.gz -o results/M117C1-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+Error: no such tag defined in the VCF header: INFO/sample

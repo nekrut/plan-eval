@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# --- Configuration ---
+DATA_RAW_DIR="data/raw"
+DATA_REF_DIR="data/ref"
+RESULTS_DIR="results"
+REF_FA="chrM.fa"
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+THREADS=4
+
+# --- Setup and Idempotency Check ---
+
+mkdir -p "$RESULTS_DIR"
+
+# Check if reference index exists (bwa index)
+if [ ! -f "${DATA_REF_DIR}/${REF_FA}.bwt" ]; then
+    bwa index "${DATA_REF

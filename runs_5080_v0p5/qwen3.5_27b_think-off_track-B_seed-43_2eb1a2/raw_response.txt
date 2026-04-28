@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Configuration
+REF="data/ref/chrM.fa"
+REF_BASENAME="chrM"
+RAW_DIR="data/raw"
+OUT_DIR="results"
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUT_DIR"
+
+# Index reference if not already indexed
+if [[ ! -f "${REF}.fai" ]]; then
+    samtools faidx "$REF"
+fi
+
+# Build BWA index if not alre

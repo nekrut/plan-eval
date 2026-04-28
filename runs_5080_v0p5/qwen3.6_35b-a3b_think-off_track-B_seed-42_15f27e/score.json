@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.6_35b-a3b_think-off_track-B_seed-42_15f27e",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 247.1277678012848,
+    "wall_seconds_execution": 0.4660532474517822,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 961,
+      "eval_count": 945,
+      "prompt_eval_duration_ns": 1522497513,
+      "eval_duration_ns": 235369146770,
+      "total_duration_ns": 247122729168
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.6_35b-a3b_think-off_track-B_seed-42_15f27e/run.sh line 10:\nREF_PAC=\"${REF}.pac\"\n^-----^ SC2034 (warning): REF_PAC appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.6_35b-a3b_think-off_track-B_seed-42_15f27e/run.sh line 11:\nREF_ANI=\"${REF}.ann\"\n^-----^ SC2034 (warning): REF_ANI appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.6_35b-a3b_think-off_track-B_seed-42_15f27e/run.sh line 12:\nREF_AMB=\"${REF}.amb\"\n^-----^ SC2034 (war",
+    "idempotent": null
+  }
+}

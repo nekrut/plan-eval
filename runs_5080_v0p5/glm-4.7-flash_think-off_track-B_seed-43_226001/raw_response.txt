@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+mkdir -p results
+
+# Index reference
+if [ ! -f data/ref/chrM.fa.bwt ]; then
+    bwa index data/ref/chrM.fa
+fi
+
+# Function to process a sample
+process_sample() {
+    local sample=$1
+    local fq1="data/raw/${sample}_1.fq.gz"
+    local fq2="data/raw/${sample}_2.fq.gz"
+    local bam="results/${sample}.bam"
+    local vcf="results/${sample}.vcf.gz"
+
+    #

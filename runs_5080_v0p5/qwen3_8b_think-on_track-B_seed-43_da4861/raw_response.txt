@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Index reference if not already indexed
+if [ ! -f data/ref/chrM.fa.bai ]; then
+    samtools index data/ref/chrM.fa
+fi
+
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Align and sort BAM
+for sample in "${samples[@]}"; do
+    if [ -f results/${sample}.bam ]; then
+        echo "Skipping alignment for ${sample}"
+        continue
+    fi
+    bwa mem data/

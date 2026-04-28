@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+
+if [ ! -f data/ref/chrM.fa.fai ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+for sample in "${samples[@]}"; do
+    bam_file="results/${sample}.bam"
+    bai_file="results/${sample}.bam.bai"
+    vcf_file="results/${sample}.vcf.gz"
+    tbi_file="results/${sample}.vcf.gz.tbi"
+
+    if [ ! -

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p results
+
+# Reference indexing
+if [ ! -f data/ref/chrM.fa.bwt ]; then
+    bwa index data/ref/chrM.fa
+fi
+
+if [ ! -f data/ref/chrM.fa.fai ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+# Check if all outputs already exist
+all_exist=true
+for sample in "${SAMPLES[@]}"; do
+    bam=results/${

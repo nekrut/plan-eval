@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-on_track-A_seed-44_543597",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 68.75588726997375,
+    "wall_seconds_execution": 0.31484341621398926,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1786,
+      "eval_count": 7740,
+      "prompt_eval_duration_ns": 8374272,
+      "eval_duration_ns": 67126513122,
+      "total_duration_ns": 68748626504
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3_8b_think-on_track-A_seed-44_543597/run.sh line 47:\n    if [ \"$collapsed_tsv\" -nt results/*.vcf.gz ]; then\n                              ^--------------^ SC2202 (warning): Globs don't work as operands in [ ]. Use a loop.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2202 -- Globs don't work as operands in [...\n",
+    "idempotent": null
+  }
+}

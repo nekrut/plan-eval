@@ -1,0 +1,10 @@
+{
+  "run_id": "claude-haiku-4-5_track-A_seed-42_0f7d78",
+  "model": "claude-haiku-4-5",
+  "track": "A",
+  "seed": 42,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 33.67216110229492,
+  "duration_ms_generation": 30999
+}

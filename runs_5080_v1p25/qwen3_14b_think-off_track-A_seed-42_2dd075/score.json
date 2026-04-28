@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-off_track-A_seed-42_2dd075",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.527254343032837,
+    "wall_seconds_execution": 0.3152320384979248,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1796,
+      "eval_count": 675,
+      "prompt_eval_duration_ns": 437205766,
+      "eval_duration_ns": 8129988204,
+      "total_duration_ns": 11521936178
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3_14b_think-off_track-A_seed-42_2dd075/run.sh line 58:\n  > \"$COLLAPSED\"\n  ^------------^ SC2188 (warning): This redirection doesn't have a command. Move to its command (or use 'true' as no-op).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2188 -- This redirection doesn't have a c...\n",
+    "idempotent": null
+  }
+}

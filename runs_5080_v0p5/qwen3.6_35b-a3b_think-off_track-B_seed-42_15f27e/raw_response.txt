@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Create output directory
+mkdir -p results
+
+# Reference files
+REF=data/ref/chrM.fa
+REF_BWT="${REF}.bwt"
+REF_PAC="${REF}.pac"
+REF_ANI="${REF}.ann"
+REF_AMB="${REF}.amb"
+REF_SA="${REF}.sa"
+REF_FAI="${REF}.fai"
+
+# Index reference if not present
+if [ ! -f "$REF_BWT" ]; then
+    bwa index "$REF"
+fi
+
+# List of samples
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1

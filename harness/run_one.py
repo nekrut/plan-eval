@@ -49,8 +49,9 @@ def tool_inventory() -> str:
     return m.group(0).rsplit("\n", 1)[0]  # drop trailing "OK"
 
 
-def build_user_message(track: str, plan_path: Path) -> str:
-    tmpl = (PROMPTS / f"track_{track.lower()}_user.tmpl").read_text()
+def build_user_message(track: str, plan_path: Path, track_template: str | None = None) -> str:
+    tmpl_name = track_template or f"track_{track.lower()}_user"
+    tmpl = (PROMPTS / f"{tmpl_name}.tmpl").read_text()
     inv = tool_inventory()
     out = tmpl.replace("{TOOL_INVENTORY}", inv)
     if "{PLAN}" in out:
@@ -193,6 +194,9 @@ def main() -> int:
                     help="Directory to write run output (default runs/)")
     ap.add_argument("--gen-timeout", type=int, default=900,
                     help="Ollama HTTP timeout in seconds (default 900)")
+    ap.add_argument("--track-template", default=None,
+                    help="Override template stem (default: track_<a|b>_user). "
+                         "E.g. 'track_b_with_order_user' for the v0.5 condition.")
     args = ap.parse_args()
 
     runs_root = Path(args.runs_dir)
@@ -211,7 +215,7 @@ def main() -> int:
         shutil.rmtree(run_dir)
 
     system_text = (PROMPTS / "system.txt").read_text()
-    user_text = build_user_message(args.track, plan_path)
+    user_text = build_user_message(args.track, plan_path, args.track_template)
 
     print(f"[run_one] generating script via {args.model} (track {args.track}, seed {args.seed})", file=sys.stderr)
     if is_ollama:

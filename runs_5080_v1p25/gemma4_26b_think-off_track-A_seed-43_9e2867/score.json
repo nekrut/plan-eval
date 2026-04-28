@@ -1,0 +1,40 @@
+{
+  "run_id": "gemma4_26b_think-off_track-A_seed-43_9e2867",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 143.1171703338623,
+    "wall_seconds_execution": 3.537682056427002,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1912,
+      "eval_count": 701,
+      "prompt_eval_duration_ns": 63099941,
+      "eval_duration_ns": 142629050423,
+      "total_duration_ns": 143109827543
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_26b_think-off_track-A_seed-43_9e2867/run.sh line 23:\n    BAI=\"$OUT_DIR/${SAMPLE}.bam.bai\"\n    ^-^ SC2034 (warning): BAI appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- BAI appears unused. Verify use (o...\n",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

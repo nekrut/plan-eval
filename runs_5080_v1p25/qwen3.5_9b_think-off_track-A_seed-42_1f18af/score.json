@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_9b_think-off_track-A_seed-42_1f18af",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 9.756247282028198,
+    "wall_seconds_execution": 3.431854248046875,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1860,
+      "eval_count": 614,
+      "prompt_eval_duration_ns": 404976770,
+      "eval_duration_ns": 5470824477,
+      "total_duration_ns": 9749499141
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3.5_9b_think-off_track-A_seed-42_1f18af/run.sh line 21:\n    BAI=\"${RESULTS}/${sample}.bam.bai\"\n    ^-^ SC2034 (warning): BAI appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3.5_9b_think-off_track-A_seed-42_1f18af/run.sh line 22:\n    VCF=\"${RESULTS}/${sample}.vcf.gz\"\n    ^-^ SC2034 (warning): VCF appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- BAI appears unused. Verify use (o...\n",
+    "idempotent": null
+  }
+}

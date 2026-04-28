@@ -1,0 +1,10 @@
+{
+  "run_id": "claude-opus-4-7_track-B_seed-44_028053",
+  "model": "claude-opus-4-7",
+  "track": "B",
+  "seed": 44,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 21.849294662475586,
+  "duration_ms_generation": 19083
+}

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF_SRC="data/ref/chrM.fa"
+RAW_DIR="data/raw"
+OUT_DIR="results"
+REF_DIR="${OUT_DIR}/ref"
+REF="${REF_DIR}/chrM.fa"
+
+mkdir -p "${OUT_DIR}" "${REF_DIR}"
+
+if [ ! -s "${REF}" ]; then
+    cp "${REF_SRC}" "${REF}"
+fi
+
+if [ ! -s "${REF}.bwt" ]; then
+    bwa index "${REF}"
+fi
+
+if [ ! -s "${REF}.fai" ]; then
+    samtools faidx "${REF}"
+fi
+
+SAMPLES=("M117-bl" 

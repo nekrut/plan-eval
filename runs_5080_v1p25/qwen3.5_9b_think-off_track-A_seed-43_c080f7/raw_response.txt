@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+THREADS=4
+SAMPLES="M117-bl M117-ch M117C1-bl M117C1-ch"
+mkdir -p results
+REF=data/ref/chrM.fa
+REF_IDX=chrM.fa.fai
+BWA_IDX=data/ref/chrM.fa.amb
+REF_INDEXED=1
+if [[ ! -f "$REF_IDX" ]]; then
+    samtools faidx "$REF"
+    REF_INDEXED=0
+fi
+if [[ ! -f "$BWA_IDX" ]]; then
+    bwa index "$REF"
+    REF_INDEXED=0
+fi
+for SAMPLE in $SAMPLES; do
+    F1="data/raw/${SAMPLE}_

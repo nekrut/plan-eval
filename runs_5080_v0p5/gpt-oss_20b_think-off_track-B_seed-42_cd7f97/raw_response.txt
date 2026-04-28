@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF=data/ref/chrM.fa
+RESULTS=results
+
+# Create results directory if it doesn't exist
+mkdir -p "$RESULTS"
+
+# Index reference if not already indexed
+if ! [[ -f "${REF}.bwt" && -f "${REF}.pac" && -f "${REF}.ann" && -f "${REF}.amb" && -f "${REF}.sa" ]]; then
+    bwa index -p "${REF}" "$REF"
+fi
+if ! [[ -f "${REF}.fai" ]]; then
+    samtools faidx "$REF"
+f

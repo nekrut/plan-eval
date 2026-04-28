@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define paths relative to current working directory
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+RES_DIR="results"
+
+# Create results directory if it doesn't exist
+mkdir -p "$RES_DIR"
+
+# Define sample names and their paired-end files
+declare -A SAMPLES
+SAMPLES["M117-bl"]="M117-bl"
+SAMPLES["M117-ch"]="M117-ch"
+SAMPLES["M117C1-bl"]="M117C1-bl"
+SAMPLES["M117C1-ch"]="M1

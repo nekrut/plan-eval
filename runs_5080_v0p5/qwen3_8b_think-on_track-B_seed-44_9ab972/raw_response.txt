@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+
+if [ ! -f data/ref/chrM.fa.bai ]; then
+    samtools index data/ref/chrM.fa
+fi
+
+for sample in M117-bl M117-ch M117C1-bl M117C1-ch; do
+    if [ -f results/${sample}.bam ]; then
+        continue
+    fi
+
+    bwa mem data/ref/chrM.fa data/raw/${sample}_1.fq.gz data/raw/${sample}_2.fq.gz | \
+        samtools sort -o results/${sample}.bam
+
+    if [

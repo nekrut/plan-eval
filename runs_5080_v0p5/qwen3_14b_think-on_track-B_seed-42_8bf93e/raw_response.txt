@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Index reference
+if [ ! -f data/ref/chrM.fa.fai ]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+# Process each sample
+for sample in M117-bl M117-ch M117C1-bl M117C1-ch; do
+    # Alignment and sorting
+    if [ ! -f results/${sample}.bam ]; then
+        mkdir -p results
+        bwa mem data/ref/chrM.fa data/raw/${sample}_1.fq.gz data/raw/${sample}_2.fq.gz | \

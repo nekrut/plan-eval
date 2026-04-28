@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Create output directory
+mkdir -p results
+
+# Reference file
+REF="data/ref/chrM.fa"
+
+# Check if reference is indexed, if not index it
+if [ ! -f "${REF}.fai" ]; then
+    samtools faidx "${REF}"
+fi
+
+# List of samples
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Process each sample
+for SAMPLE in "${SAMPLES[@]}"; do
+    R1="data/raw/${SAMPLE}_1.fq.gz"

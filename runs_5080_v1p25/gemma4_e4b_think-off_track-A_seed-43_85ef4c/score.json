@@ -1,0 +1,40 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-43_85ef4c",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 11.799313068389893,
+    "wall_seconds_execution": 3.490333318710327,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1908,
+      "eval_count": 1756,
+      "prompt_eval_duration_ns": 8301055,
+      "eval_duration_ns": 10936081144,
+      "total_duration_ns": 11794467941
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_e4b_think-off_track-A_seed-43_85ef4c/run.sh line 38:\nBWA_INDEX_FILES=(\"${RES_DIR}/chrM.fa.amb\" \"${RES_DIR}/chrM.fa.ann\" \"${RES_DIR}/chrM.fa.bwt\" \"${RES_DIR}/chrM.fa.pac\" \"${RES_DIR}/chrM.fa.sa\")\n^-------------^ SC2034 (warning): BWA_INDEX_FILES appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_e4b_think-off_track-A_seed-43_85ef4c/run.sh line 77:\n    VCF_OUT=\"${RES_DIR}/${sample}.vcf\"\n    ^-----^ SC2034 (warning): VCF_OUT appears unused. Verify use (or export if used externally).\n",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-off_track-B_seed-42_0bf6b8",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 4.607244491577148,
+    "wall_seconds_execution": 1.0179507732391357,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 931,
+      "eval_count": 384,
+      "prompt_eval_duration_ns": 133561627,
+      "eval_duration_ns": 2760714494,
+      "total_duration_ns": 4601094171
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null
+  }
+}

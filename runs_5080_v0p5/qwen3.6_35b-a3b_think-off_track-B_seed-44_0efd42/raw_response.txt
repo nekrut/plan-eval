@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Create output directory
+mkdir -p results
+
+# Reference file
+REF="data/ref/chrM.fa"
+
+# Check if reference index exists, if not create it
+if [ ! -f "${REF}.amb" ]; then
+    bwa index "${REF}"
+fi
+
+# List of samples
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Process each sample
+for SAMPLE in "${SAMPLES[@]}"; do
+    R1="data/raw/${SAMPLE}_1.fq.gz"
+ 

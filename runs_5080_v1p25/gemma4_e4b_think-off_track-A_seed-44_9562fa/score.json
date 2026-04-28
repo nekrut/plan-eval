@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-44_9562fa",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.497943639755249,
+    "wall_seconds_execution": 0.41521430015563965,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1908,
+      "eval_count": 1717,
+      "prompt_eval_duration_ns": 7925539,
+      "eval_duration_ns": 10679369504,
+      "total_duration_ns": 11491083468
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/gemma4_e4b_think-off_track-A_seed-44_9562fa/run.sh line 126:\n    if [ -f \"${RESULTS_DIR}/${sample}.vcf.gz\" ] && [ ! -f \"${COLLAPSED_FILE}\" ] || [ \"$(stat -c %Y \"${RESULTS_DIR}/${sample}.vcf.gz}\")\" -gt \"$(stat -c %Y \"${COLLAPSED_FILE}\")\" 2>/dev/null || [ ! -f \"${COLLAPSED_FILE}\" ]; then\n                                                                                   ^-- SC1073 (error): Couldn't parse this test expression. Fix to allow more checks.\n                                                                                                     ",
+    "idempotent": null
+  }
+}

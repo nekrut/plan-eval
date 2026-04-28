@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-off_track-A_seed-44_74eced",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 6.83092737197876,
+    "wall_seconds_execution": 0.3153374195098877,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1796,
+      "eval_count": 564,
+      "prompt_eval_duration_ns": 13244382,
+      "eval_duration_ns": 6655694672,
+      "total_duration_ns": 6825747217
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1p25/qwen3_14b_think-off_track-A_seed-44_74eced/run.sh line 47:\n  cat $(printf \"results/%s.vcf.gz\\n\" \"${SAMPLES[@]}\") | \\\n      ^-- SC2046 (warning): Quote this to prevent word splitting.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2046 -- Quote this to prevent word splitt...\n",
+    "idempotent": null
+  }
+}

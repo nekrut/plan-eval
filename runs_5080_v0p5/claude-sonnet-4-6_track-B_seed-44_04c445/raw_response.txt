@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF="data/ref/chrM.fa"
+RAW="data/raw"
+RESULTS="results"
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+
+mkdir -p "${RESULTS}"
+
+# ── Reference indexing ────────────────────────────────────────────────────────
+[[ -f "${REF}.bwt" ]] || bwa index "${REF}"
+[[ -f "${REF}.fai" ]] || samtools faidx "${REF}"
+
+# ── Per-sample pipeline ─────────────────────────

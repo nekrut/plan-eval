@@ -59,22 +59,56 @@ MODELS = [
     ("glm-4.7-flash",       False),
 ]
 
+# Anthropic models (no /think axis; provider routed by claude-* prefix in run_one.py).
+ANTHROPIC_MODELS = [
+    "claude-haiku-4-5",
+    "claude-sonnet-4-6",
+    "claude-opus-4-7",
+]
+
 PLAN_FILES = {
-    "v1": BENCH / "plan" / "PLAN_v1.md",
-    "v2": BENCH / "plan" / "PLAN.md",
+    "v1":    BENCH / "plan" / "PLAN_v1.md",
+    "v2":    BENCH / "plan" / "PLAN.md",
+    "v1p25": BENCH / "plan" / "PLAN_v1p25.md",
+    "v1p5":  BENCH / "plan" / "PLAN_v1p5.md",
+    "v1p75": BENCH / "plan" / "PLAN_v1p75.md",
+    # v0p5: no plan file (Track B template variant); use any path, ignored.
+    "v0p5":  BENCH / "plan" / "PLAN_v1.md",
 }
 RUNS_DIRS = {
-    "v1": BENCH / "runs_5080_v1",
-    "v2": BENCH / "runs_5080_v2",
+    k: BENCH / f"runs_5080_{k}" for k in PLAN_FILES
+}
+
+# Per-experiment track restrictions:
+#   v1, v2          → both tracks (existing behaviour)
+#   v1p25/p5/p75    → Track A only (the cliff lives on Track A)
+#   v0p5            → Track B only (it's a Track B template variant)
+TRACKS_BY_EXP = {
+    "v1":    ["A", "B"],
+    "v2":    ["A", "B"],
+    "v1p25": ["A"],
+    "v1p5":  ["A"],
+    "v1p75": ["A"],
+    "v0p5":  ["B"],
+}
+
+# Template overrides (only v0p5 swaps the Track B prompt template).
+TRACK_TEMPLATE = {
+    "v0p5": "track_b_with_order_user",
 }
 
 GEN_TIMEOUT_NO_THINK = 900
 GEN_TIMEOUT_THINK = 1800
 
 
+def is_anthropic(model: str) -> bool:
+    return model.startswith("claude-")
+
+
 def cell_id(model: str, think: str, track: str, seed: int) -> str:
     tag = model.replace("/", "_").replace(":", "_")
-    tag += f"_think-{think}"
+    if not is_anthropic(model):
+        tag += f"_think-{think}"
     return f"{tag}_track-{track}_seed-{seed}"
 
 
@@ -106,11 +140,14 @@ def run_cell(model: str, think: str, track: str, seed: int, plan: str) -> dict:
         "--model", model,
         "--track", track,
         "--seed", str(seed),
-        "--think", think,
         "--plan", str(plan_path),
         "--runs-dir", str(runs_dir),
         "--gen-timeout", str(timeout),
     ]
+    if not is_anthropic(model):
+        cmd += ["--think", think]
+    if plan in TRACK_TEMPLATE:
+        cmd += ["--track-template", TRACK_TEMPLATE[plan]]
 
     t0 = time.time()
     p = subprocess.run(cmd, capture_output=True, text=True)
@@ -133,17 +170,49 @@ def run_cell(model: str, think: str, track: str, seed: int, plan: str) -> dict:
             "score": score, "gen_secs": gen_secs}
 
 
+def parse_plans_arg(s: str) -> list[str]:
+    """Accept either comma-separated ('v1,v2,v1p25') or legacy concatenation
+    ('v1v2'). Unknown tokens raise."""
+    if "," in s:
+        toks = [t.strip() for t in s.split(",") if t.strip()]
+    elif s in PLAN_FILES:
+        toks = [s]
+    else:
+        # Legacy: 'v1', 'v2', or 'v1v2'.
+        toks = []
+        rest = s
+        for k in ("v1", "v2"):
+            if rest.startswith(k):
+                toks.append(k)
+                rest = rest[len(k):]
+        if rest:
+            toks.append(rest)  # let the validity check below catch it
+    bad = [t for t in toks if t not in PLAN_FILES]
+    if bad:
+        raise SystemExit(f"unknown plan(s): {bad}; valid: {sorted(PLAN_FILES)}")
+    return toks
+
+
 def build_cells(args) -> list[tuple[str, str, str, int, str]]:
-    plans = [p for p in ("v1", "v2") if p in args.plans]
-    tracks = [t for t in TRACKS if t in args.tracks.upper()]
+    plans = parse_plans_arg(args.plans)
+    requested_tracks = set(args.tracks.upper())
     cells = []
     for plan in plans:
-        for model, supports_think in MODELS:
-            think_modes = ["off", "on"] if (supports_think and not args.no_think) else ["off"]
-            for think in think_modes:
-                for track in tracks:
+        allowed_tracks = [t for t in TRACKS_BY_EXP[plan] if t in requested_tracks]
+        # Local ollama models
+        if not args.only_anthropic:
+            for model, supports_think in MODELS:
+                think_modes = ["off", "on"] if (supports_think and not args.no_think) else ["off"]
+                for think in think_modes:
+                    for track in allowed_tracks:
+                        for seed in SEEDS:
+                            cells.append((model, think, track, seed, plan))
+        # Anthropic models (no think axis)
+        if args.include_anthropic or args.only_anthropic:
+            for model in ANTHROPIC_MODELS:
+                for track in allowed_tracks:
                     for seed in SEEDS:
-                        cells.append((model, think, track, seed, plan))
+                        cells.append((model, "off", track, seed, plan))
     return cells
 
 
@@ -156,6 +225,10 @@ def main() -> int:
                     help="Subset, e.g. 'A' or 'AB' (default both)")
     ap.add_argument("--no-think", action="store_true",
                     help="Skip /think condition entirely")
+    ap.add_argument("--include-anthropic", action="store_true",
+                    help="Also iterate Anthropic models (claude-haiku/sonnet/opus)")
+    ap.add_argument("--only-anthropic", action="store_true",
+                    help="Only iterate Anthropic models, skip local ollama")
     ap.add_argument("--models", default="",
                     help="Comma-separated subset of model ids; default = all")
     args = ap.parse_args()

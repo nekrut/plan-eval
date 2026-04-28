@@ -170,7 +170,85 @@ If you have a 16 GB consumer GPU and want $0/run local execution:
 - **For the hyper-detailed v2 style**: pick whichever fits cleanly in VRAM and is fastest — `gemma4:e4b` (~9 s/run, 9.6 GB), `qwen3:14b` (~6 s/run, 9.3 GB), or `qwen3.5:9b` (~6 s/run, 6.6 GB). All hit 1.000 on Track A.
 - **Avoid `/think` on small models** for code-generation tasks unless you've tuned `num_predict` very high and verified the model emits a final answer.
 
-## Why this dataset
+## What part of v2 is doing the work? — three intermediates
+
+v1 → v2 is a >2× token bump and ~1.000 score jump across the board. To isolate *which* part of v2 carries the load we ran three intermediate plan/track conditions on the same 11 local + 3 Anthropic models, three seeds each, Track A unless noted (153 cells, ~5 h on the 5080, $0).
+
+| condition | what it adds to the previous step | tests |
+|---|---|---|
+| **v1.25** | v1 plus the literal `lofreq call-parallel` command (one code-fenced line) | does the lofreq positional-arg surprise *alone* explain the cliff? |
+| **v1.5** | v2 stripped of every prose paragraph and "Gotchas" block — pure command lines | are the prose warnings load-bearing, or decorative? |
+| **v0.5** | Track B (no plan) plus a single tool-name sequence line (`bwa → samtools → lofreq → bcftools → awk`) | does sequencing alone move the needle from a zero baseline? |
+
+### v1.25 — one literal lofreq command unlocks 5 of 11 local models
+
+| model | v1 | **v1.25** | v2 |
+|---|---:|---:|---:|
+| qwen3.6:27b dense | 1.000 | 1.000 | 1.000 |
+| qwen3.5:27b dense | 0.333 | **1.000** | 1.000 |
+| qwen3.6:35b-a3b MoE | **0.000** | **1.000** | 1.000 |
+| gemma4:26b | 0.333 | **1.000** | 1.000 |
+| qwen3-coder:30b | 0.333 | **1.000** | 1.000 |
+| glm-4.7-flash | 0.667 | 0.333 | 1.000 |
+| gpt-oss:20b | 0/6 (CoT) | 1/3 ok | 0.667 |
+| qwen3:14b /no_think | 0.000 | 0.000 | 1.000 |
+| qwen3.5:9b /no_think | 0.000 | 0.000 | 1.000 |
+| qwen3:8b /no_think | 0.000 | 0.000 | 0.667 |
+| gemma4:e4b | 0.000 | 0.333 | 1.000 |
+
+Adding **one** code-fenced line — the exact `lofreq call-parallel` invocation with the BAM as a positional argument — flips four medium-large models from broken to perfect. The qwen3.6:35b-a3b MoE result is the cleanest: 0/3 on v1 → 3/3 with one extra line. The cliff for these models was a single command-syntax surprise: `lofreq` takes the BAM as a positional argument, not behind `-i`/`-b`/`-bam`, and v1's "Input: `results/{sample}.bam`" prose didn't disambiguate. Smaller models (≤14B dense) still score 0 — they need more than one fix.
+
+### v1.5 — stripping all prose from v2 leaves M3 essentially unchanged
+
+| model | v1.25 | **v1.5 (commands-only)** | v2 |
+|---|---:|---:|---:|
+| qwen3:8b /no_think | 0.000 | **1.000** | 0.667 |
+| qwen3:14b /no_think | 0.000 | **1.000** | 1.000 |
+| qwen3.5:9b /no_think | 0.000 | **1.000** | 1.000 |
+| qwen3.5:27b | 1.000 | 1.000 | 1.000 |
+| qwen3.6:27b | 1.000 | 1.000 | 1.000 |
+| qwen3.6:35b-a3b | 1.000 | 1.000 | 1.000 |
+| gemma4:26b | 1.000 | 1.000 | 1.000 |
+| qwen3-coder:30b | 1.000 | 1.000 | 1.000 |
+| glm-4.7-flash | 0.333 | **1.000** | 1.000 |
+| gpt-oss:20b | 1/3 ok | 0.500 (1/2 ok, 1 err) | 0.667 |
+| gemma4:e4b (4 B) | 0.333 | 0.000 | 1.000 |
+
+v1.5 is `PLAN.md` (v2) with **every** explanatory paragraph and every "Gotchas" subsection deleted — only the numbered headings and the code-fenced commands remain. Result: 9 of 11 local models hit 1.000, including the small models that v1.25 couldn't unlock. The prose warnings ("Do NOT use `printf`/`echo -e`/`$'\t'`", "bgzip operates in place", "`%INFO/AF`, not `%AF`") that read like the load-bearing wisdom of v2 turn out to be **decorative** for this task — the verbatim commands convey the same constraints implicitly.
+
+The two non-1.000 outliers tell their own stories: gemma4:e4b (4 B) is just too small (0/3 on both v1.5 *and* v1.25, but 1.000 on v2 — more context tokens seem to help it cohere); gpt-oss:20b's Harmony chain-of-thought continues to eat the output budget on roughly half its cells regardless of how the plan is written.
+
+### v0.5 — tool-name ordering doesn't help (controls confirm the zero baseline)
+
+| model | Track B (v1) | **v0.5 (B + tool order)** |
+|---|---:|---:|
+| 11 local models, average | 0.000 | 0.000 (one fluke each at gemma4:26b, qwen3.6:27b, gpt-oss:20b) |
+| Claude Haiku 4.5 | 0.667±0.577 | **1.000** |
+| Claude Sonnet 4.6 | 0.938±0.000 | 0.938±0.000 |
+| Claude Opus 4.7 | 0.938±0.000 | 0.667±0.577 |
+
+Telling local models the *order* of tools to call (without flags or commands) does nothing. The Anthropic numbers are noisy at this n=3 — they hover around the same place as plain Track B; the apparent Opus regression is a single seed-42 zero-score that lands inside the variance band. The substantive control conclusion: **sequencing alone is not what local models need**. They need every command, character-for-character. The plan's job is not to tell the model *what to do in what order* — local models can guess that. The plan's job is to literalize the syntax of every tool the model doesn't already know.
+
+### Findings (intermediates)
+
+**The cliff between v1 and v2 has two distinct rungs.**
+
+1. **For ≥27 B dense local models, the cliff is a single command.** v1.25 — v1 with one extra code-fenced `lofreq call-parallel` line — hits 1.000 across all of them (qwen3.5:27b, qwen3.6:27b, qwen3.6:35b-a3b, gemma4:26b, qwen3-coder:30b). Adding any other v2 detail does nothing for them. They had already inferred BWA, samtools, bgzip, tabix and the bcftools format string from v1; the *one* tool whose CLI they couldn't reconstruct from prose was lofreq, specifically because the BAM is positional and v1 didn't say so.
+2. **For ≤14 B local models, every command needs to be literalized**, but the prose around the commands does not. v1.5 (v2 minus prose) brings qwen3:8b, qwen3:14b, and qwen3.5:9b to 1.000 — same as v2 — without any of the gotchas, escape-character warnings, or guard-clause boilerplate. Smaller models have less internal CLI knowledge across the board, so every step needs the exact incantation; but they *don't* benefit from explanations of why.
+
+**The prose in v2 is for human readers, not for local models.** This was the most surprising result: stripping every paragraph from v2, including the read-group `\t` warning that we'd considered load-bearing, leaves the score unchanged. Models read code blocks as code; the text between them is mostly ignored.
+
+**Sequencing without syntax is worthless.** Telling a local model "call these tools in this order" without specifying how is operationally identical to giving it nothing. The information that matters is per-tool CLI specifics, not workflow shape.
+
+### Recommendation (intermediates)
+
+For future plans aimed at local-model implementers:
+
+- **Always show the full command line for any tool with non-obvious CLI conventions** — positional arguments, format-string syntax, in-place behavior, escape rules. For this workflow, `lofreq call-parallel` was the single such tool.
+- **Skip the prose explanations.** They cost tokens, take time to write, and don't change scores for code-emitting open-weight models.
+- **Don't bother sequencing without syntax.** "Use bwa → lofreq → bcftools" is no more useful than "no plan."
+- **For ≥27 B dense models, v1.25 is enough.** If you want one plan for both small and large models, write v1.5 (commands-only).
+
 
 [Zenodo 5119008](https://zenodo.org/records/5119008) — *Datasets for Galaxy Collection Operations Tutorial* by A. Nekrutenko. Four paired-end Illumina MiSeq samples (~838 KB compressed), enriched by long-range PCR for human mtDNA, with a known canonical workflow documented in the [Galaxy Training Network](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/mitochondrial-short-variants/tutorial.html): BWA-MEM mapping → LoFreq variant calling → SnpSift annotation → collapse.
 
@@ -230,20 +308,26 @@ plan-eval/
 │   ├── PLANNER_PROMPT.md         v1 planner prompt
 │   ├── PLANNER_PROMPT_v2.md      v2 planner prompt (hyper-detailed)
 │   ├── PLAN.md                   current frozen plan (v2)
-│   └── PLAN_v1.md                preserved v1 plan
+│   ├── PLAN_v1.md                preserved v1 plan
+│   ├── PLAN_v1p25.md             v1 + literal lofreq command (intermediate)
+│   └── PLAN_v1p5.md              v2 stripped to commands only (intermediate)
 ├── prompts/                      system + per-track user prompt templates
+│   └── track_b_with_order_user.tmpl   Track B + tool sequence (v0.5 control)
 ├── harness/
 │   ├── run_one.py                generate + execute one cell
 │   ├── matrix.py                 Anthropic + ollama matrix iterator (Jetson)
 │   ├── sweep_local.py            disk-rotated local-model sweep (Jetson)
-│   └── matrix_5080.py            iterate the 5080 matrix (11 ollama models)
+│   └── matrix_5080.py            iterate the 5080 matrix (11 ollama + 3 Anthropic)
 ├── score/
 │   ├── score_run.py              M1–M5 against ground truth
 │   └── aggregate.py              scans runs/ + runs_v*/ + runs_5080_v*/ → results.csv
 ├── runs/<run_id>/                Jetson v2 per-run artifacts
 ├── runs_v1/<run_id>/             Jetson v1 per-run artifacts (preserved)
 ├── runs_5080_v1/<run_id>/        5080 v1 per-run artifacts
-└── runs_5080_v2/<run_id>/        5080 v2 per-run artifacts
+├── runs_5080_v2/<run_id>/        5080 v2 per-run artifacts
+├── runs_5080_v1p25/<run_id>/     5080 v1.25 (v1 + lofreq cmd) per-run artifacts
+├── runs_5080_v1p5/<run_id>/      5080 v1.5 (v2 minus prose) per-run artifacts
+└── runs_5080_v0p5/<run_id>/      5080 v0.5 (Track B + tool order) per-run artifacts
 ```
 
 Each run dir contains the exact `run.sh` the model emitted plus per-run JSON metadata (`meta.json`, `usage.json`, `exec.json`, `score.json`, `raw_response.txt`, `exec.log`). BAMs and re-derivable artifacts are gitignored.
@@ -270,7 +354,8 @@ Full matrix:
 ```bash
 python3 harness/matrix.py --tracks A             # both Anthropic and ollama (Jetson)
 python3 harness/matrix.py --only-ollama --tracks A --no-think
-python3 harness/matrix_5080.py                   # 11 ollama models, both plans, both tracks
+python3 harness/matrix_5080.py                   # 11 ollama models, v1+v2, both tracks
+python3 harness/matrix_5080.py --plans v1p25,v1p5,v0p5 --include-anthropic
 python3 score/aggregate.py                       # → results.csv + console summary
 ```
 

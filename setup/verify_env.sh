@@ -6,8 +6,13 @@ set -euo pipefail
 # Exits non-zero if any tool is missing or version mismatches.
 
 # shellcheck disable=SC1091
+# `set +u` around conda activate: some other conda envs ship deactivate hooks
+# that reference unbound BACKUP_* vars (e.g. miniconda3's gxx_linux-64) and
+# would abort under -u. Re-enable nounset after activation.
+set +u
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda activate bench
+set -u
 
 fail=0
 report() {

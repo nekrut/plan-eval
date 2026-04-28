@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_9b_think-off_track-B_seed-44_da4616",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 9.724605798721313,
+    "wall_seconds_execution": 0.4152517318725586,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 961,
+      "eval_count": 1086,
+      "prompt_eval_duration_ns": 104895544,
+      "eval_duration_ns": 9128518527,
+      "total_duration_ns": 9718359316
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.5_9b_think-off_track-B_seed-44_da4616/run.sh line 34:\n    local bai=\"${sample_dir}/${sample_name}.bam.bai\"\n          ^-^ SC2034 (warning): bai appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.5_9b_think-off_track-B_seed-44_da4616/run.sh line 36:\n    local vcf_tbi=\"${sample_dir}/${sample_name}.vcf.gz.tbi\"\n          ^-----^ SC2034 (warning): vcf_tbi appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v0p5/qwen3.5_9b_think-off_track-B_see",
+    "idempotent": null
+  }
+}

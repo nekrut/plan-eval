@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define paths relative to current working directory
+RAW_DIR="data/raw"
+REF_DIR="data/ref"
+RES_DIR="results"
+
+# Create results directory if it doesn't exist
+mkdir -p "$RES_DIR"
+
+# Define reference genome path
+REF_FAI="${REF_DIR}/chrM.fa.fai"
+REF_IDX="${REF_DIR}/chrM.fa.fai"
+REF_FASTA="${REF_DIR}/chrM.fa"
+
+# Create index for reference if not present
+if [[ ! -f

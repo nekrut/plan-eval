@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+
+# Ensure results directory exists
+mkdir -p results
+
+# Reference index
+REF=data/ref/chrM.fa
+if ! [[ -f ${REF}.bwt && -f ${REF}.pac && -f ${REF}.ann && -f ${REF}.amb && -f ${REF}.sa ]]; then
+    bwa index -p ${REF} ${REF}
+fi
+
+# Sample list
+samples=(M117-bl M117-ch M117C1-bl M117C1-ch)
+
+for sample in "${samples[@]}"; do
+    bam=results/${sample}.bam
+ 

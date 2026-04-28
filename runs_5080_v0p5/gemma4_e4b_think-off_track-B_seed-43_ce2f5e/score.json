@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-B_seed-43_ce2f5e",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 12.108120918273926,
+    "wall_seconds_execution": 0.419907808303833,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 980,
+      "eval_count": 1714,
+      "prompt_eval_duration_ns": 9666639,
+      "eval_duration_ns": 11227486120,
+      "total_duration_ns": 12099322707
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v0p5/gemma4_e4b_think-off_track-B_seed-43_ce2f5e/run.sh line 122:\n    while IFS=$'\\t' read -r chrom pos ref alt sample_allele; do\n    ^-- SC1073 (error): Couldn't parse this while loop. Fix to allow more checks.\n                                                             ^-- SC1061 (error): Couldn't find 'done' for this 'do'.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v0p5/gemma4_e4b_think-off_track-B_seed-43_ce2f5e/run.sh line 141:\n            alt = $4; # ALT field is usually complex, assuming it's the first one for simplicity\n                           ",
+    "idempotent": null
+  }
+}
