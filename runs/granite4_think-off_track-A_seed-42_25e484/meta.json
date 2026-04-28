@@ -1,0 +1,10 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_25e484",
+  "model": "granite4",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 20.047505140304565,
+  "duration_ms_generation": 20047
+}

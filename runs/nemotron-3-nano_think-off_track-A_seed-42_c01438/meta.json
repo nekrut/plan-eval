@@ -1,0 +1,10 @@
+{
+  "run_id": "nemotron-3-nano_think-off_track-A_seed-42_c01438",
+  "model": "nemotron-3-nano",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 31.712740659713745,
+  "duration_ms_generation": 31712
+}

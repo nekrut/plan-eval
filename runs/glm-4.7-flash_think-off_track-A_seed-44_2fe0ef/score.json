@@ -1,0 +1,40 @@
+{
+  "run_id": "glm-4.7-flash_think-off_track-A_seed-44_2fe0ef",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 23.965678215026855,
+    "wall_seconds_execution": 8.750956535339355,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2264,
+      "eval_count": 504,
+      "prompt_eval_duration_ns": 225572475,
+      "eval_duration_ns": 23073137239,
+      "total_duration_ns": 23959691925
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs/glm-4.7-flash_think-off_track-A_seed-44_2fe0ef/run.sh line 16:\n    [[ -f results/{sample}.bam ]] || {\n                  ^-- SC1083 (warning): This { is literal. Check expression (missing ;/\\n?) or quote it.\n                         ^-- SC1083 (warning): This } is literal. Check expression (missing ;/\\n?) or quote it.\n\n\nIn /home/anton/bench/runs/glm-4.7-flash_think-off_track-A_seed-44_2fe0ef/run.sh line 21:\n    [[ -f results/{sample}.bam.bai ]] || samtools index -@ \"$THREADS\" \"results/${sample}.bam\"\n                  ^-- SC1083 (warning): This { is literal. Check expr",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

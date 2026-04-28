@@ -1,0 +1,36 @@
+{
+  "run_id": "nemotron-3-nano_think-off_track-A_seed-43_8c7a57",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 17.151099681854248,
+    "wall_seconds_execution": 8.295576572418213,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2411,
+      "eval_count": 444,
+      "prompt_eval_duration_ns": 3480860522,
+      "eval_duration_ns": 12903869668,
+      "total_duration_ns": 17145878868
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs/nemotron-3-nano_think-off_track-A_seed-43_8c7a57/run.sh line 3:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- THREADS appears unused. Verify us...\n",
+    "idempotent": null
+  }
+}

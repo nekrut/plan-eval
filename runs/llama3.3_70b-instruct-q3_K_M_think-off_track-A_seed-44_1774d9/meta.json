@@ -1,0 +1,10 @@
+{
+  "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-44_1774d9",
+  "model": "llama3.3:70b-instruct-q3_K_M",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 201.33831238746643,
+  "duration_ms_generation": 201338
+}

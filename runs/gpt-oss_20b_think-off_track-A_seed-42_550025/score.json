@@ -1,0 +1,40 @@
+{
+  "run_id": "gpt-oss_20b_think-off_track-A_seed-42_550025",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 171.62963914871216,
+    "wall_seconds_execution": 8.293703079223633,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2343,
+      "eval_count": 3766,
+      "prompt_eval_duration_ns": 2928653083,
+      "eval_duration_ns": 151116598854,
+      "total_duration_ns": 171620033800
+    }
+  },
+  "m5_quality": 1,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": true,
+    "idempotent_stderr": ""
+  }
+}

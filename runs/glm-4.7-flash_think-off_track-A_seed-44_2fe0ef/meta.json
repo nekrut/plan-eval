@@ -1,0 +1,10 @@
+{
+  "run_id": "glm-4.7-flash_think-off_track-A_seed-44_2fe0ef",
+  "model": "glm-4.7-flash",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 23.965678215026855,
+  "duration_ms_generation": 23965
+}

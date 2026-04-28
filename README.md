@@ -15,7 +15,7 @@ The benchmark answers four questions:
 
 ## TL;DR
 
-**At least 9 free local open-weight models can implement an Opus-authored hyper-detailed recipe on this Jetson with a perfect match against the known-correct variant set.** Anthropic models match on both the lean and the detailed recipe. Free local models only work when the recipe is hyper-detailed; with a lean recipe they all fail.
+**13 of 14 free local open-weight models implement an Opus-authored hyper-detailed recipe on this Jetson with a perfect match against the known-correct variant set.** Anthropic models match on both the lean and the detailed recipe. Free local models only work when the recipe is hyper-detailed; with a lean recipe they all fail.
 
 ## Plain-English glossary
 
@@ -37,25 +37,25 @@ A few terms used throughout this README and in the source files:
 ## Headline tables
 
 ### Free local open-weight sweep
-*v2 (detailed) recipe, thinking turned off, three independent runs (seeds 42/43/44) per model.*
+*v2 (detailed) recipe, thinking turned off, three independent runs (seeds 42/43/44) per model. Sorted by mean generation time. Rows marked **†** were retested at MAXN power mode after a harness routing-bug fix; everything else was tested at 30 W (the original sweep — not re-run).*
 
 | model | M3 | mean gen secs | result | notes |
-|---|---|---|---|---|
-| `qwen3-coder:30b` | **1.000** | 76 | 3/3 | Qwen3 MoE A3B coder — fastest perfect |
-| `glm4:9b` | **1.000** | 69 | 3/3 | small/fast Z.ai control |
-| `deepseek-coder-v2:16b` | **1.000** | 108 | 3/3 | MoE A2.4B |
+|---|---|---:|---|---|
+| `granite4` (3 B) † | **1.000** | 15 | 3/3 | small/fast IBM — fastest in lineup |
+| `glm-4.7-flash` † | **1.000** | 30 | 3/3 | 30 B-class GLM |
+| `glm4:9b` | **1.000** | 55 | 3/3 | small/fast Z.ai control |
+| `qwen3-coder:30b` | **1.000** | 62 | 3/3 | Qwen3 MoE A3B coder |
+| `deepseek-coder-v2:16b` | **1.000** | 94 | 3/3 | MoE A2.4B |
 | `qwen3.6:35b /no_think` | **1.000** | 100 | 3/3 | (v2 baseline) |
-| `devstral-small-2:24b` | **1.000** | 177 | 3/3 | Mistral coder |
-| `mistral-small3.2:24b` | **1.000** | 184 | 3/3 | Mistral generalist |
-| `granite-code:34b` | **1.000** | 217 | 3/3 | IBM coder |
-| `gemma3:27b` | **1.000** | 273 | 3/3 | Google generalist |
-| `qwen3:32b` | **1.000** | 300 | 3/3 | dense Qwen3 (vs MoE qwen3.6) |
-| `gpt-oss:20b` | 1.000 | 556 | 1/3 | 2 seeds hit 900 s gen timeout |
-| `glm-4.7-flash` | — | — | 0/3 | gen timeout (looks like reasoning model) |
-| `olmo-3.1:32b` | — | — | 0/3 | gen timeout |
-| `nemotron-3-nano` (24 B) | — | — | 0/3 | gen timeout |
-| `granite4` (3 B) | — | — | 0/3 | gen timeout |
-| `llama3.3:70b-instruct-q3_K_M` | — | — | — | network failure mid-pull |
+| `devstral-small-2:24b` | **1.000** | 163 | 3/3 | Mistral coder |
+| `mistral-small3.2:24b` | **1.000** | 170 | 3/3 | Mistral generalist |
+| `granite-code:34b` | **1.000** | 203 | 3/3 | IBM coder |
+| `gpt-oss:20b` † | **1.000** | 220 | 3/3 | recovered: was 1/3 with two 900 s timeouts at 30 W |
+| `llama3.3:70b-instruct-q3_K_M` † | **1.000** | 255 | 3/3 | original pull failed mid-download; clean second pull |
+| `gemma3:27b` | **1.000** | 259 | 3/3 | Google generalist |
+| `qwen3:32b` | **1.000** | 286 | 3/3 | dense Qwen3 (vs MoE qwen3.6) |
+| `nemotron-3-nano` (24 B) † | 0.000 | 22 | 0/3 | script-correctness bug (see findings) |
+| `olmo-3.1:32b` † | — | — | 0/3 | real reasoning timeout — 900 s/seed at MAXN |
 
 ### Anthropic models with the recipe (Track A, both recipe versions)
 
@@ -85,18 +85,25 @@ A few terms used throughout this README and in the source files:
 - Anthropic models: unchanged at 1.000. They have enough internal knowledge to fill in the v1 ambiguities themselves.
 - Free local models: **0.000 → 1.000**. With the lean recipe, free local models invent broken command lines for tools they don't know well (in particular `lofreq`). With the verbatim recipe, they have nothing to invent — they just transliterate prose into bash.
 
-**Model size is not the dividing line.** `glm4:9b` (5.5 GB on disk) and `qwen3-coder:30b` (18.6 GB) both score 1.000 with the v2 recipe. What divides "works" from "didn't finish" is whether the model can produce its answer within the 15-minute-per-call generation budget our test harness allows.
+**Model size is not the dividing line.** `granite4` (2.1 GB on disk) and `qwen3:32b` (20 GB) both score 1.000 with the v2 recipe. The smallest perfect model in the lineup runs in 15 s/seed; the largest runs in ~5 min. Capability tracks with whether the model can emit a complete answer within the 15-minute-per-call generation budget — not with parameter count.
 
-**The four 0/3 failures look like models that *want to think* but couldn't be turned off cleanly.** `glm-4.7-flash`, `olmo-3.1:32b`, `nemotron-3-nano`, and `granite4` all timed out at 15 minutes for every run. This is consistent with reasoning-style models that emit a long internal chain-of-thought before the actual answer — and don't fully respect Ollama's "no thinking" switch. A longer budget would likely recover them at ~30 min per call. We didn't retry; that's listed as a follow-up.
+**Routing bug + MAXN retry: 5 of the 5 originally-failed entries re-classified.** The original sweep listed 5 models as failing — 4 "timeouts" and 1 network-failed pull. Two things were going on:
 
-**`gpt-oss:20b` is borderline.** One run finished in ~9.5 minutes, two timed out at 15 — same family of issue.
+1. A **harness routing bug**: any model whose tag did not contain a `:` was misrouted to the Anthropic CLI rather than Ollama and failed instantly. This affected `glm-4.7-flash`, `nemotron-3-nano`, and `granite4`.
+2. **30 W power mode** capped per-call generation, pushing some models past the 15-min budget.
+
+After fixing routing and retesting at MAXN with the same 15-min budget:
+
+- 4 of the 5 entries now score 1.000 (`glm-4.7-flash`, `gpt-oss:20b`, `granite4`, `llama3.3:70b-instruct-q3_K_M`). `glm-4.7-flash` and `granite4` were not reasoning models at all — just misroutes. `gpt-oss:20b` was genuinely budget-bound at 30 W and clears comfortably at MAXN.
+- **`olmo-3.1:32b`** is the only confirmed reasoning-mode timeout: 902 s × 3 at MAXN, identical to its 30 W behaviour. Wouldn't be hard to recover with a longer budget or a model-side think-off knob that actually takes effect.
+- **`nemotron-3-nano`** is a different failure category: it produces a script in 22 s, but the script has a command-ordering bug — it tries to `bgzip results/${sample}.vcf` *before* `lofreq` has produced the file, exits 255 in 8 s. Not a budget issue — the model emitted bash, just buggy bash.
 
 ## Recommendation
 
 If Opus 4.7 is your recipe author, here are the practical answers:
 
 - **Cheapest paid path** (recipe doesn't have to be elaborate): **Sonnet 4.6 + a lean recipe**. ~$0.05 per implementation, ~10 seconds, perfect score on every run.
-- **Cheapest free path on this Jetson** (recipe must be hyper-detailed): **`qwen3-coder:30b`** in `/no_think` mode. $0 per implementation, ~75 seconds on this hardware, perfect score on every run. Alternatives that work equally well: `glm4:9b` (smaller and faster), `deepseek-coder-v2:16b` (fast Mixture-of-Experts), `devstral-small-2:24b`, `mistral-small3.2:24b`, `granite-code:34b`, `gemma3:27b`, `qwen3:32b`, `qwen3.6:35b`.
+- **Cheapest free path on this Jetson** (recipe must be hyper-detailed): **`granite4`** at MAXN — 2.1 GB on disk, 15 s/seed, 1.000 across 3 seeds. Not the most capable open-weight model on Earth; just the most efficient one for transliterating a hyper-detailed plan into bash. Other models that hit 1.000 in under a minute: `glm-4.7-flash` (30 s, MAXN), `glm4:9b` (55 s), `qwen3-coder:30b` (62 s). All 13 perfect models are interchangeable for this task; pick whichever fits your disk and latency budget.
 
 The practical workflow looks like this:
 
@@ -325,7 +332,7 @@ If a model uses a *different but valid* tool than the recipe specifies (e.g. `bc
 
 ## Hardware
 
-- **Jetson AGX Orin Developer Kit**: 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64; 30W power mode (MAXN unavailable without a reboot the user declined). Local-model wall-clock figures reflect 30W.
+- **Jetson AGX Orin Developer Kit**: 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64. The original 9-of-14 sweep ran at **30 W** power mode; the post-routing-fix retry of the originally-failing 5 ran at **MAXN**. The Jetson sweep table marks MAXN-tested rows with **†**; everything else is 30 W.
 - **RTX 5080 desktop**: NVIDIA GeForce RTX 5080 16 GB VRAM, 125 GB system RAM, x86_64. Models ≤14 GB fit in VRAM (Group A); 17–23 GB models partial-offload to CPU (Group B).
 - **Conda env**: locked, on PATH for both canonical and model runs (see `setup/install.sh`).
 
@@ -413,8 +420,8 @@ The Anthropic side authenticates through the existing `claude` CLI (Claude Code)
 - **One dataset.** All four samples are amplicon-PCR mitochondrial DNA from one study; intentionally easy.
 - **Anthropic temperature.** Set by the `claude` CLI default (no `--temperature` flag).
 - **Ollama temperature.** 0.2 with seeds 42, 43, 44.
-- **30 W power mode on the Jetson.** A higher power mode (MAXN) would require rebooting the machine, which we didn't do. So local-model wall-clock numbers are conservative — they'd be faster on a more aggressive power profile.
-- **15-minute generation budget per call.** Four free-local models timed out at this limit on every run. Their 0/3 score means "did not fit our 15-minute budget on this Jetson," not "the model can't do the task in principle." A 30-minute budget would likely recover most of them.
+- **Mixed power profile across the Jetson sweep.** The 9 originally-perfect models were tested at 30 W and not re-tested at MAXN; the 5 originally-failing models were retested at MAXN after a routing-bug fix. Their wall-clock numbers in the sweep table are therefore not directly comparable to one another (MAXN rows are marked **†**). Re-testing the 30 W rows at MAXN would close the gap; we didn't, since none of them needed it to hit 1.000.
+- **15-minute generation budget per call.** After the routing fix and the MAXN retry, only **`olmo-3.1:32b`** genuinely exceeds the 15-min budget — 902 s × 3 seeds at MAXN, consistent with a reasoning-style model that doesn't respect Ollama's `/no_think`. A longer budget plus a working think-off switch would likely recover it.
 - **Disk rotation during the Jetson sweep.** We pull → test → remove for each model to fit in ~17 GB free disk. The full 14-model sweep transferred ~210 GB sequentially over the network.
 - **5080 num_predict.** Bumped from 8192 to 16384 for the 5080 matrix after qwen3.5:9b /think and gpt-oss:20b cells exhausted the original 8192-token output budget on internal reasoning. qwen3.5:9b /think kept hitting the wall even at 16384 (pure reasoning, no script emitted) — reported as a finding, not a config bug.
 - **5080 /think on Group B disabled.** A single qwen3.5:27b /think cell hit the 1800 s urlopen timeout without returning anything. We disabled /think across qwen3.5:27b, qwen3.6:27b, qwen3.6:35b-a3b and glm-4.7-flash to avoid ~24 hr of timeout-doomed cells; the same Jetson `/think` failure mode reproduces here on offload-bound models.
