@@ -15,6 +15,8 @@ runs_5080_v1p5/*/data
 runs_5080_v1p5/*/results/
 runs_5080_v0p5/*/data
 runs_5080_v0p5/*/results/
+runs_5080_v1g/*/data
+runs_5080_v1g/*/results/
 ground_truth/results/*.bam
 ground_truth/results/*.bam.bai
 ground_truth/results/*.bwa.log
@@ -43,3 +45,4 @@ matrix_5080_log.json
 
 # Intermediate-conditions matrix log
 matrix_intermediates.log
+matrix_v1g.log

@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-on_track-A_seed-42_545c12",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.80361032485962,
+    "wall_seconds_execution": 0.31545352935791016,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2119,
+      "eval_count": 1542,
+      "prompt_eval_duration_ns": 242425236,
+      "eval_duration_ns": 11200711670,
+      "total_duration_ns": 11797098619
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null
+  }
+}

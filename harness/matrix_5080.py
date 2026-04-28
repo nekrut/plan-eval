@@ -72,6 +72,7 @@ PLAN_FILES = {
     "v1p25": BENCH / "plan" / "PLAN_v1p25.md",
     "v1p5":  BENCH / "plan" / "PLAN_v1p5.md",
     "v1p75": BENCH / "plan" / "PLAN_v1p75.md",
+    "v1g":   BENCH / "plan" / "PLAN_v1g.md",
     # v0p5: no plan file (Track B template variant); use any path, ignored.
     "v0p5":  BENCH / "plan" / "PLAN_v1.md",
 }
@@ -89,6 +90,7 @@ TRACKS_BY_EXP = {
     "v1p25": ["A"],
     "v1p5":  ["A"],
     "v1p75": ["A"],
+    "v1g":   ["A"],
     "v0p5":  ["B"],
 }
 

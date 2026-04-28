@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+THREADS=4
+SAMPLES="M117-bl M117-ch M117C1-bl M117C1-ch"
+REF="data/ref/chrM.fa"
+RAW="data/raw"
+RES="results"
+
+mkdir -p "$RES"
+
+# 2. Reference indexing (once)
+if [[ ! -f "${REF}.fai" ]] || [[ ! -f "${REF}.amb" ]]; then
+    samtools faidx "$REF"
+    bwa index "$REF"
+fi
+
+# 3-5. Per-sample alignment and BAM indexing
+for sample in $SAMPLES; do
+    f1="${RAW}/${sampl

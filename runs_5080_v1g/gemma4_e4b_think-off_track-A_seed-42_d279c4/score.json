@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-42_d279c4",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 19.370267152786255,
+    "wall_seconds_execution": 0.3153517246246338,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2252,
+      "eval_count": 1692,
+      "prompt_eval_duration_ns": 226122178,
+      "eval_duration_ns": 11193712529,
+      "total_duration_ns": 19363415440
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/gemma4_e4b_think-off_track-A_seed-42_d279c4/run.sh line 52:\n       [[ $(stat -c %Y \"${RESULTS_DIR}/${SAMPLE_PREFIX}.bam\") -gt $(stat -c %Y \"${RAW_DIR}/${sample}_1.fq.gz\") ) ]]; then\n       ^-- SC1073 (error): Couldn't parse this test expression. Fix to allow more checks.\n                                                                                                               ^-- SC1072 (error): Expected test to end here (don't wrap commands in []/[[]]). Fix any mentioned problems and try again.\n\nFor more information:\n  https://www.shellcheck.net",
+    "idempotent": null
+  }
+}

@@ -1,0 +1,19 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Step 1: Set globals and prepare results directory
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+mkdir -p results
+
+# Step 2: Reference indexing (once, in data/ref/)
+if [[ ! -f data/ref/chrM.fa.fai ]]; then
+    samtools faidx data/ref/chrM.fa
+fi
+
+if [[ ! -f data/ref/chrM.fa.amb ]]; then
+    bwa index data/ref/chrM.fa
+fi
+
+# Step 3-5: 

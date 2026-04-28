@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3-coder_30b_think-off_track-A_seed-44_c66590",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 180.9620771408081,
+    "wall_seconds_execution": 0.46596312522888184,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2121,
+      "eval_count": 654,
+      "prompt_eval_duration_ns": 1541044518,
+      "eval_duration_ns": 179151844279,
+      "total_duration_ns": 180955659839
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3-coder_30b_think-off_track-A_seed-44_c66590/run.sh line 21:\n    BAI=\"results/${sample}.bam.bai\"\n    ^-^ SC2034 (warning): BAI appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3-coder_30b_think-off_track-A_seed-44_c66590/run.sh line 50:\nif [[ ! -f results/collapsed.tsv ]] || [[ results/collapsed.tsv -nt results/*.vcf.gz ]]; then\n                                                                    ^--------------^ SC2203 (error): Globs are ignored in [[ ]] except right of =/!=. Use a loop.\n",
+    "idempotent": null
+  }
+}

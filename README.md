@@ -249,6 +249,42 @@ For future plans aimed at local-model implementers:
 - **Don't bother sequencing without syntax.** "Use bwa → lofreq → bcftools" is no more useful than "no plan."
 - **For ≥27 B dense models, v1.25 is enough.** If you want one plan for both small and large models, write v1.5 (commands-only).
 
+## Can a tool registry replace human plan authorship? — v1g
+
+The v1.25 result raises a follow-up: if the cliff is one literal `lofreq` command line, does that command have to be authored by a human/Opus? **Galaxy's IUC tool collection** (`galaxyproject/tools-iuc`) is a community-curated registry of XML wrappers, one per bioinformatics tool, with `<command><![CDATA[...]]></command>` blocks that — after Cheetah templating substitution at Galaxy runtime — produce the exact CLI invocation the tool expects. lofreq's IUC wrapper has the BAM as a positional argument; samtools_sort's specifies `-@ N`; bcftools_query's records the `-f` format-string convention. If we could pull these and embed them mechanically, plan authorship would reduce to a registry lookup.
+
+We tried this. v1g = v1 + Galaxy-IUC-derived CLI snippet for lofreq, mechanically extracted by `scripts/galaxy_to_snippet.py` from `tools-iuc` commit `39e7456` (2026-04-27).
+
+| model | v1.25 (hand) | **v1g (IUC)** | what happened |
+|---|---:|---:|---|
+| Claude Opus 4.7 | 1.000 | 1.000 | self-corrected the noisy snippet |
+| Claude Sonnet 4.6 | 1.000 | 1.000 | self-corrected |
+| qwen3.5:27b dense | 1.000 | 1.000 | self-corrected |
+| qwen3.6:27b dense | 1.000 | 1.000 | self-corrected |
+| **Claude Haiku 4.5** | 1.000 | **0.000** | copied snippet literally → tool crash |
+| qwen3.6:35b-a3b MoE | 1.000 | **0.000** | copied snippet literally |
+| gemma4:26b | 1.000 | **0.000** | copied snippet literally |
+| qwen3-coder:30b | 1.000 | 0.333 | one seed self-corrected |
+| glm-4.7-flash | 0.333 | 0.000 | regressed |
+| gpt-oss:20b | 1/3 ok | 0/3 (CoT issues persist) | — |
+| Gemini-class small (≤14 B) | 0.000 | 0.000 | unchanged |
+
+**The bug**: Galaxy's lofreq XML emits `--sig $value` and `--bonf $value` where `$value` is a Galaxy-runtime parameter. Cheetah strips the variables; the bare flags `--sig` and `--bonf` survive and end up in the snippet on adjacent lines. lofreq's argument parser then reads `--sig --bonf` as `--sig=--bonf`, attempts `float("--bonf")`, and dies with a Python traceback:
+```
+ValueError: could not convert string to float: '--bonf'
+```
+
+Sonnet, Opus, qwen3.5/3.6:27b dense, and the strongest local models recognized the bare-flag pattern as malformed and dropped both flags before emitting the script. Haiku, the MoE, and the smaller models copied the snippet character-for-character — **including the broken bare flags** — and shipped a script that lofreq refuses to parse. **Haiku regressed from 3/3 perfect on v1.25 to 0/3 on v1g** purely from snippet noise.
+
+### Findings (Galaxy IUC as a registry)
+
+**Galaxy IUC wrappers are not self-contained CLIs.** They are *Galaxy-runtime templates* — Cheetah scripts whose flag values are bound at execution time from XML `<param>` definitions and Galaxy's parameter-collection UI. Mechanically stripping the templating leaves bare flags that look correct at the textual level but break the underlying tool. Without Galaxy's runtime to bind values, the extracted commands are syntactically incomplete in a way that's invisible to a deterministic transpiler.
+
+**Coverage is also worse than hoped.** Of the 8 tool steps in this workflow, only **lofreq** has a clean unconditional command core in IUC. The bwa wrappers are heavily macro-ized (most logic in `bwa_macros.xml` and `read_group_macros.xml`). samtools_faidx's command block is entirely conditional — extraction yields an empty string. bcftools_query's load-bearing `-f` format string is itself a Cheetah variable. samtools_index, bgzip, and tabix have no IUC wrappers at all (Galaxy auto-handles indexing for uploaded BAMs).
+
+**Plan authorship via tool registry doesn't replace human authorship for this generation of models.** The strongest models can repair noisy registry output; cheaper models will faithfully emit broken commands and crash. Practically, you either need (a) a more sophisticated extractor that supplies sensible defaults for runtime-bound flags, or (b) human review of the extracted snippet before shipping it into the plan. v1.25 (hand-written) is one such "human review" pass; v1g without it loses Haiku, the 35b-a3b MoE, and gemma4:26b.
+
+A follow-up that would change the picture: implement a per-tool default-value table in the extractor (e.g. `--sig` defaults to `0.01`, `--bonf` defaults to `dynamic`), then re-run the matrix. We've left this as a future direction — the experimental result with mechanical extraction alone is the main finding.
 
 [Zenodo 5119008](https://zenodo.org/records/5119008) — *Datasets for Galaxy Collection Operations Tutorial* by A. Nekrutenko. Four paired-end Illumina MiSeq samples (~838 KB compressed), enriched by long-range PCR for human mtDNA, with a known canonical workflow documented in the [Galaxy Training Network](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/mitochondrial-short-variants/tutorial.html): BWA-MEM mapping → LoFreq variant calling → SnpSift annotation → collapse.
 
@@ -310,7 +346,10 @@ plan-eval/
 │   ├── PLAN.md                   current frozen plan (v2)
 │   ├── PLAN_v1.md                preserved v1 plan
 │   ├── PLAN_v1p25.md             v1 + literal lofreq command (intermediate)
-│   └── PLAN_v1p5.md              v2 stripped to commands only (intermediate)
+│   ├── PLAN_v1p5.md              v2 stripped to commands only (intermediate)
+│   └── PLAN_v1g.md               v1 + Galaxy-IUC-derived lofreq snippet (registry test)
+├── scripts/
+│   └── galaxy_to_snippet.py      Cheetah-XML → bash snippet extractor for IUC wrappers
 ├── prompts/                      system + per-track user prompt templates
 │   └── track_b_with_order_user.tmpl   Track B + tool sequence (v0.5 control)
 ├── harness/
@@ -327,7 +366,8 @@ plan-eval/
 ├── runs_5080_v2/<run_id>/        5080 v2 per-run artifacts
 ├── runs_5080_v1p25/<run_id>/     5080 v1.25 (v1 + lofreq cmd) per-run artifacts
 ├── runs_5080_v1p5/<run_id>/      5080 v1.5 (v2 minus prose) per-run artifacts
-└── runs_5080_v0p5/<run_id>/      5080 v0.5 (Track B + tool order) per-run artifacts
+├── runs_5080_v0p5/<run_id>/      5080 v0.5 (Track B + tool order) per-run artifacts
+└── runs_5080_v1g/<run_id>/       5080 v1g (Galaxy IUC registry) per-run artifacts
 ```
 
 Each run dir contains the exact `run.sh` the model emitted plus per-run JSON metadata (`meta.json`, `usage.json`, `exec.json`, `score.json`, `raw_response.txt`, `exec.log`). BAMs and re-derivable artifacts are gitignored.

@@ -1,0 +1,40 @@
+{
+  "run_id": "qwen3-coder_30b_think-off_track-A_seed-42_1e63ce",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 247.56160140037537,
+    "wall_seconds_execution": 3.542463779449463,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2121,
+      "eval_count": 659,
+      "prompt_eval_duration_ns": 1792884145,
+      "eval_duration_ns": 241001759822,
+      "total_duration_ns": 247554411682
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3-coder_30b_think-off_track-A_seed-42_1e63ce/run.sh line 18:\n  bai=\"results/${sample}.bam.bai\"\n  ^-^ SC2034 (warning): bai appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3-coder_30b_think-off_track-A_seed-42_1e63ce/run.sh line 53:\nif [[ ! -f results/collapsed.tsv ]] || [[ results/collapsed.tsv -lt results/M117-bl.vcf.gz.tbi ]] || [[ results/collapsed.tsv -lt results/M117-ch.vcf.gz.tbi ]] || [[ results/collapsed.tsv -lt results/M117C1-bl.vcf.gz.tbi ]] || [[ results/collapsed.tsv -lt resu",
+    "idempotent": false,
+    "idempotent_stderr": "run.sh: line 53: results: unbound variable\n"
+  }
+}

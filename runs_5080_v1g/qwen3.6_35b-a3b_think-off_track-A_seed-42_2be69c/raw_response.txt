@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+REF="data/ref/chrM.fa"
+REF_IDX="data/ref/chrM.fa.fai"
+REF_BWA="data/ref/chrM.fa"
+
+mkdir -p results
+
+# Step 2: Reference indexing (idempotent)
+if [ ! -f "$REF_IDX" ]; then
+    samtools faidx "$REF"
+fi
+if [ ! -f "${REF_BWA}.amb" ]; then
+    bwa index "$REF"
+fi
+
+# Step 3-7: Per-sample processing
+for sample 

@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3.5_9b_think-off_track-A_seed-42_f0eb12",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 10.40895676612854,
+    "wall_seconds_execution": 3.5383777618408203,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2198,
+      "eval_count": 673,
+      "prompt_eval_duration_ns": 484141368,
+      "eval_duration_ns": 6002824240,
+      "total_duration_ns": 10403764197
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3.5_9b_think-off_track-A_seed-42_f0eb12/run.sh line 15:\n    REF_INDEXED=1\n    ^---------^ SC2034 (warning): REF_INDEXED appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- REF_INDEXED appears unused. Verif...\n",
+    "idempotent": null
+  }
+}

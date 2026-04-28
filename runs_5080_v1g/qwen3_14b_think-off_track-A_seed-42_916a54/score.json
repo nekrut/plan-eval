@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-off_track-A_seed-42_916a54",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 10.154860496520996,
+    "wall_seconds_execution": 0.31491637229919434,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2129,
+      "eval_count": 554,
+      "prompt_eval_duration_ns": 520841134,
+      "eval_duration_ns": 6707905136,
+      "total_duration_ns": 10148225521
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3_14b_think-off_track-A_seed-42_916a54/run.sh line 48:\n  cat $(printf \"results/%s.vcf.gz\\n\" \"${SAMPLES[@]}\" | xargs -I{} bcftools query -f '{sample}\\t%CHROM\\t%POS\\t%REF\\t%ALT\\t%INFO/AF\\n' {}) | \\\n      ^-- SC2046 (warning): Quote this to prevent word splitting.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2046 -- Quote this to prevent word splitt...\n",
+    "idempotent": null
+  }
+}

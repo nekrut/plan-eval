@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+REF=data/ref/chrM.fa
+
+mkdir -p results
+
+if [ ! -f "${REF}.fai" ]; then
+    samtools faidx "${REF}"
+fi
+
+if [ ! -f "${REF}.bwt" ]; then
+    bwa index "${REF}"
+fi
+
+for sample in "${SAMPLES[@]}"; do
+    bam="results/${sample}.bam"
+    bai="results/${sample}.bam.bai"
+    vcf="results/${sample}.vcf"
+    vcfgz="results/${sample}.vcf.gz"
+    tbi="results/${sample}.vcf.gz.tbi"
+    fq1="data/raw/${sample}_1.fq.gz"
+    fq2="data/raw/${sample}_2.fq.gz"
+
+    if [ ! -f "${bam}" ] || [ "${fq1}" -nt "${bam}" ] || [ "${fq2}" -nt "${bam}" ]; then
+        bwa mem -t "${THREADS}" \
+            -R "@RG\tID:${sample}\tSM:${sample}\tLB:${sample}\tPL:ILLUMINA" \
+            "${REF}" "${fq1}" "${fq2}" \
+            | samtools sort -@ "${THREADS}" -o "${bam}"
+    fi
+
+    if [ ! -f "${bai}" ] || [ "${bam}" -nt "${bai}" ]; then
+        samtools index -@ "${THREADS}" "${bam}"
+    fi
+
+    if [ ! -f "${vcfgz}" ] || [ "${bam}" -nt "${vcfgz}" ]; then
+        lofreq call-parallel --pp-threads "${THREADS}" --verbose \
+            --ref "${REF}" --out "${vcf}" \
+            "${bam}"
+        bgzip -f "${vcf}"
+    fi
+
+    if [ ! -f "${tbi}" ] || [ "${vcfgz}" -nt "${tbi}" ]; then
+        tabix -f -p vcf "${vcfgz}"
+    fi
+done
+
+collapsed="results/collapsed.tsv"
+need_rebuild=0
+if [ ! -f "${collapsed}" ]; then
+    need_rebuild=1
+else
+    for sample in "${SAMPLES[@]}"; do
+        if [ "results/${sample}.vcf.gz" -nt "${collapsed}" ]; then
+            need_rebuild=1
+            break
+        fi
+    done
+fi
+
+if [ "${need_rebuild}" -eq 1 ]; then
+    tmp="${collapsed}.tmp"
+    printf 'sample\tchrom\tpos\tref\talt\taf\n' > "${tmp}"
+    for sample in "${SAMPLES[@]}"; do
+        bcftools query \
+            -f "${sample}\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n" \
+            "results/${sample}.vcf.gz" >> "${tmp}"
+    done
+    mv "${tmp}" "${collapsed}"
+fi

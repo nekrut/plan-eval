@@ -1,0 +1,36 @@
+{
+  "run_id": "gemma4_e4b_think-off_track-A_seed-43_69e91c",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 12.646292924880981,
+    "wall_seconds_execution": 0.6155228614807129,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2252,
+      "eval_count": 1770,
+      "prompt_eval_duration_ns": 9666277,
+      "eval_duration_ns": 11749490005,
+      "total_duration_ns": 12638827556
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/gemma4_e4b_think-off_track-A_seed-43_69e91c/run.sh line 48:\n    if [ -f \"${BAM_OUT}\" ] && [ $(stat -c %Y \"${BAM_OUT}\") -gt 0 ]; then\n                                ^------------------------^ SC2046 (warning): Quote this to prevent word splitting.\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1g/gemma4_e4b_think-off_track-A_seed-43_69e91c/run.sh line 143:\nif [ -f \"${COLLAPSED_FILE}\" ] && [ $(stat -c %Y \"${COLLAPSED_FILE}\") -gt 0 ]; then\n                                   ^-- SC2046 (warning): Quote this to prevent word splitting.\n\n\nIn /home/anton/git/pla",
+    "idempotent": null
+  }
+}

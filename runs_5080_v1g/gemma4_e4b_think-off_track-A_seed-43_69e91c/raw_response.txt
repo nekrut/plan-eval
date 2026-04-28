@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF_FA="data/ref/chrM.fa"
+RAW_DIR="data/raw"
+RESULTS_DIR="results"
+COLLAPSED_FILE="${RESULTS_DIR}/collapsed.tsv"
+
+# --- 1. Setup and Idempotency Check ---
+
+mkdir -p "${RESULTS_DIR}"
+
+# Check if all required outputs exist to determine if work needs to be done.
+# If the final collapsed file exists,

@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_14b_think-on_track-A_seed-43_46a40f",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 16.627112865447998,
+    "wall_seconds_execution": 0.31534385681152344,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2119,
+      "eval_count": 1371,
+      "prompt_eval_duration_ns": 13168948,
+      "eval_duration_ns": 16306354924,
+      "total_duration_ns": 16619094713
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3_14b_think-on_track-A_seed-43_46a40f/run.sh line 24:\n  VTBI=\"$RESULTS/${sample}.vcf.gz.tbi\"\n  ^--^ SC2034 (warning): VTBI appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3_14b_think-on_track-A_seed-43_46a40f/run.sh line 52:\n  > \"$TMPFILE\"\n  ^----------^ SC2188 (warning): This redirection doesn't have a command. Move to its command (or use 'true' as no-op).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- VTBI appears unused. Verify use (...\n  https://www.shellcheck.net",
+    "idempotent": null
+  }
+}

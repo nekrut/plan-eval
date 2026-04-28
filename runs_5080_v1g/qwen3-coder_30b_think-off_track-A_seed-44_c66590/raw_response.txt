@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=(M117-bl M117-ch M117C1-bl M117C1-ch)
+
+mkdir -p results
+cd "$(dirname "$0")"
+
+REF=data/ref/chrM.fa
+INDEX_FILES=("$REF".amb "$REF".ann "$REF".bwt "$REF".pac "$REF".sa "$REF".fai)
+
+# Check if reference is indexed
+if [[ ! -f "${INDEX_FILES[0]}" ]] || [[ ! -f "${INDEX_FILES[1]}" ]] || [[ ! -f "${INDEX_FILES[2]}" ]] || [[ ! -f "${INDEX_FILES[3]}"

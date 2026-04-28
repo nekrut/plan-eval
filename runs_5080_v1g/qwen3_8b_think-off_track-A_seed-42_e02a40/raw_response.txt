@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+samples=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p results
+
+for sample in "${samples[@]}"; do
+    if [[ -f results/"${sample}".vcf.gz.tbi && -f results/"${sample}".vcf.gz && -f results/"${sample}".bam.bai && -f results/"${sample}".bam ]]; then
+        continue
+    fi
+
+    if [[ ! -f data/ref/chrM.fa.fai || ! -f data/ref/chrM.fa.amb || !

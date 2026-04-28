@@ -1,0 +1,10 @@
+{
+  "run_id": "qwen3_14b_think-off_track-A_seed-44_c92720",
+  "model": "qwen3:14b",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 9.322914361953735,
+  "duration_ms_generation": 9322
+}

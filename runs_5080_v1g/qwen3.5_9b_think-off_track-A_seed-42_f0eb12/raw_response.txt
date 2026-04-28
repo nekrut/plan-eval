@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+THREADS=4
+SAMPLES="M117-bl M117-ch M117C1-bl M117C1-ch"
+REF="data/ref/chrM.fa"
+RAW_PREFIX="data/raw"
+RESULTS="results"
+
+mkdir -p "$RESULTS"
+
+REF_INDEXED=0
+if [[ ! -f "${REF}.fai" ]] || [[ ! -f "${REF}.amb" ]] || [[ ! -f "${REF}.ann" ]] || [[ ! -f "${REF}.bwt" ]] || [[ ! -f "${REF}.pac" ]] || [[ ! -f "${REF}.sa" ]]; then
+    samtools faidx "$REF"
+    bwa index 

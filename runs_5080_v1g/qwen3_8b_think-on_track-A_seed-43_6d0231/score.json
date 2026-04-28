@@ -1,0 +1,36 @@
+{
+  "run_id": "qwen3_8b_think-on_track-A_seed-43_6d0231",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M2 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.855283498764038,
+    "wall_seconds_execution": 0.3151824474334717,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2119,
+      "eval_count": 1580,
+      "prompt_eval_duration_ns": 8840918,
+      "eval_duration_ns": 11484416642,
+      "total_duration_ns": 11848214175
+    }
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/git/plan-eval/runs_5080_v1g/qwen3_8b_think-on_track-A_seed-43_6d0231/run.sh line 48:\n        $(for sample in \"${SAMPLES[@]}\"; do\n        ^-- SC2046 (warning): Quote this to prevent word splitting.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2046 -- Quote this to prevent word splitt...\n",
+    "idempotent": null
+  }
+}
