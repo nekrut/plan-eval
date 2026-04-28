@@ -146,6 +146,423 @@ Mean v2 generation seconds are computed over seeds 42/43/44 of the (model × v2)
 
 Three of the four failures are independent of the plan-detail axis. Two are reasoning-mode budget exhaustions (one wall-clock, one token-budget); one is a script-correctness bug in code that runs to completion. Only the script-correctness case is what most readers expect a "failure" in this benchmark to look like.
 
+### Plan variants — full text
+
+The six plan variants in Table 2 are reproduced verbatim below. The Markdown body shown is exactly what is concatenated into the per-track user prompt (see §3.2) before sending to the implementer model — no further preprocessing.
+
+<details>
+<summary><b>v1 (lean)</b> — <code>plan/PLAN_v1.md</code>, 3118 bytes</summary>
+
+```markdown
+# Per-sample mtDNA amplicon variant-calling plan
+
+1. **Set globals and prepare results directory**
+   - Define `THREADS=4` and the sample list: `M117-bl M117-ch M117C1-bl M117C1-ch`.
+   - Create `results/` if missing. Use `set -euo pipefail`.
+   - Treat every output step as idempotent: guard each artifact with an existence check (e.g. skip if `results/{sample}.vcf.gz.tbi` already exists and is newer than its inputs). Re-runs on a fully populated `results/` must exit 0 without re-doing work.
+
+2. **Reference indexing (once, in `data/ref/`)**
+   - `samtools faidx data/ref/chrM.fa` → produces `chrM.fa.fai`.
+   - `bwa index data/ref/chrM.fa` → produces the `.amb .ann .bwt .pac .sa` set.
+   - Skip both if the index files already exist.
+
+3. **Per-sample alignment with `bwa mem`**
+   - Use `bwa mem -t 4` with the paired FASTQs `data/raw/{sample}_1.fq.gz` and `data/raw/{sample}_2.fq.gz`.
+   - Pass the read group via `-R` as a single double-quoted argument containing literal backslash-t between fields and colons between key and value:
+     - exact form: `-R "@RG\tID:{sample}\tSM:{sample}\tLB:{sample}\tPL:ILLUMINA"`
+     - The `\t` must remain the two characters backslash and `t` — bwa parses them itself. Do NOT use `printf`, `echo -e`, `$'\t'`, or any mechanism that turns them into real tabs; bwa rejects real tabs with "the read group line contained literal <tab> characters".
+     - Separators between key and value are colons `:`, not `=`.
+
+4. **SAM → sorted BAM**
+   - Pipe `bwa mem` stdout into `samtools sort -@ 4 -o results/{sample}.bam`.
+   - Do NOT run `markdup` or `rmdup`: this is amplicon data where PCR duplicates are expected and biologically meaningful.
+
+5. **BAM indexing**
+   - `samtools index -@ 4 results/{sample}.bam` → `results/{sample}.bam.bai`.
+
+6. **Variant calling with `lofreq call-parallel`**
+   - Use the `call-parallel` subcommand (not plain `lofreq call`) with `--pp-threads 4`.
+   - Reference: `data/ref/chrM.fa`. Input: `results/{sample}.bam`.
+   - Write uncompressed VCF to a temporary path (e.g. `results/{sample}.vcf`); lofreq emits plain VCF.
+
+7. **VCF compression and indexing**
+   - Compress with `bgzip` (not `bcftools view -O z`) producing `results/{sample}.vcf.gz`.
+   - Index with `tabix -p vcf results/{sample}.vcf.gz` → `results/{sample}.vcf.gz.tbi`.
+   - Remove the intermediate uncompressed `.vcf`.
+
+8. **Collapse step → `results/collapsed.tsv`**
+   - For each sample, run `bcftools query -f '{sample}\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' results/{sample}.vcf.gz` (the `{sample}` literal is prepended via the format string so the sample name is attached per row).
+   - Concatenate all four samples' output.
+   - Prepend a single header line `sample\tchrom\tpos\tref\talt\taf` (tab-separated).
+   - Output is tab-separated, one variant per line, header on, written to `results/collapsed.tsv`. Rebuild only if any input VCF is newer than the TSV.
+
+9. **Idempotency check**
+   - Final pass: re-running the script on a fully populated `results/` exits 0, performs no work, and leaves all eight per-sample artifacts plus `collapsed.tsv` intact.
+```
+
+</details>
+
+<details>
+<summary><b>v1.25</b> — <code>plan/PLAN_v1p25.md</code>, 3080 bytes (delta from v1: step 6 gains a literal <code>lofreq call-parallel</code> command line)</summary>
+
+````markdown
+# Per-sample mtDNA amplicon variant-calling plan
+
+1. **Set globals and prepare results directory**
+   - Define `THREADS=4` and the sample list: `M117-bl M117-ch M117C1-bl M117C1-ch`.
+   - Create `results/` if missing. Use `set -euo pipefail`.
+   - Treat every output step as idempotent: guard each artifact with an existence check (e.g. skip if `results/{sample}.vcf.gz.tbi` already exists and is newer than its inputs). Re-runs on a fully populated `results/` must exit 0 without re-doing work.
+
+2. **Reference indexing (once, in `data/ref/`)**
+   - `samtools faidx data/ref/chrM.fa` → produces `chrM.fa.fai`.
+   - `bwa index data/ref/chrM.fa` → produces the `.amb .ann .bwt .pac .sa` set.
+   - Skip both if the index files already exist.
+
+3. **Per-sample alignment with `bwa mem`**
+   - Use `bwa mem -t 4` with the paired FASTQs `data/raw/{sample}_1.fq.gz` and `data/raw/{sample}_2.fq.gz`.
+   - Pass the read group via `-R` as a single double-quoted argument containing literal backslash-t between fields and colons between key and value:
+     - exact form: `-R "@RG\tID:{sample}\tSM:{sample}\tLB:{sample}\tPL:ILLUMINA"`
+     - The `\t` must remain the two characters backslash and `t` — bwa parses them itself. Do NOT use `printf`, `echo -e`, `$'\t'`, or any mechanism that turns them into real tabs; bwa rejects real tabs with "the read group line contained literal <tab> characters".
+     - Separators between key and value are colons `:`, not `=`.
+
+4. **SAM → sorted BAM**
+   - Pipe `bwa mem` stdout into `samtools sort -@ 4 -o results/{sample}.bam`.
+   - Do NOT run `markdup` or `rmdup`: this is amplicon data where PCR duplicates are expected and biologically meaningful.
+
+5. **BAM indexing**
+   - `samtools index -@ 4 results/{sample}.bam` → `results/{sample}.bam.bai`.
+
+6. **Variant calling with `lofreq call-parallel`**
+   - Exact command:
+     ```
+     lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{sample}.vcf results/{sample}.bam
+     ```
+   - Output: `results/{sample}.vcf` (uncompressed). lofreq emits plain VCF.
+
+7. **VCF compression and indexing**
+   - Compress with `bgzip` (not `bcftools view -O z`) producing `results/{sample}.vcf.gz`.
+   - Index with `tabix -p vcf results/{sample}.vcf.gz` → `results/{sample}.vcf.gz.tbi`.
+   - Remove the intermediate uncompressed `.vcf`.
+
+8. **Collapse step → `results/collapsed.tsv`**
+   - For each sample, run `bcftools query -f '{sample}\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' results/{sample}.vcf.gz` (the `{sample}` literal is prepended via the format string so the sample name is attached per row).
+   - Concatenate all four samples' output.
+   - Prepend a single header line `sample\tchrom\tpos\tref\talt\taf` (tab-separated).
+   - Output is tab-separated, one variant per line, header on, written to `results/collapsed.tsv`. Rebuild only if any input VCF is newer than the TSV.
+
+9. **Idempotency check**
+   - Final pass: re-running the script on a fully populated `results/` exits 0, performs no work, and leaves all eight per-sample artifacts plus `collapsed.tsv` intact.
+````
+
+</details>
+
+<details>
+<summary><b>v1.5</b> — <code>plan/PLAN_v1p5.md</code>, 1277 bytes (v2 with every prose paragraph and "Gotchas" subsection deleted; only headings + code fences)</summary>
+
+````markdown
+# Implementation Plan: Per-sample mtDNA Variant Calling
+
+## Boilerplate (top of `run.sh`)
+
+```
+set -euo pipefail
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+mkdir -p results
+```
+
+All per-sample steps run in `for sample in "${SAMPLES[@]}"; do ... done`.
+
+---
+
+## 1. Reference indexing — BWA
+
+```
+bwa index data/ref/chrM.fa
+```
+
+## 2. Reference indexing — samtools faidx
+
+```
+samtools faidx data/ref/chrM.fa
+```
+
+## 3. Per-sample alignment + sort (one pipeline)
+
+```
+bwa mem -t 4 -R "@RG\tID:{sample}\tSM:{sample}\tLB:{sample}\tPL:ILLUMINA" data/ref/chrM.fa data/raw/{sample}_1.fq.gz data/raw/{sample}_2.fq.gz | samtools sort -@ 4 -o results/{sample}.bam -
+```
+
+## 4. BAM index
+
+```
+samtools index -@ 4 results/{sample}.bam
+```
+
+## 5. Variant calling — LoFreq
+
+```
+lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{sample}.vcf results/{sample}.bam
+```
+
+## 6. VCF compression + tabix index
+
+```
+bgzip -f results/{sample}.vcf
+```
+```
+tabix -p vcf results/{sample}.vcf.gz
+```
+
+## 7. Collapsed TSV
+
+```
+printf 'sample\tchrom\tpos\tref\talt\taf\n' > results/collapsed.tsv
+```
+```
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' results/{sample}.vcf.gz | awk -v s={sample} 'BEGIN{OFS="\t"}{print s,$0}' >> results/collapsed.tsv
+```
+````
+
+</details>
+
+<details>
+<summary><b>v1g</b> — <code>plan/PLAN_v1g.md</code>, 4187 bytes (v1 with the lofreq snippet replaced by a mechanical extract from <code>tools-iuc@39e7456</code>)</summary>
+
+````markdown
+# Per-sample mtDNA amplicon variant-calling plan
+<!--
+v1g = v1 with Galaxy-IUC-derived CLI snippets injected per step where IUC has
+clean coverage. Extracted mechanically by scripts/galaxy_to_snippet.py from
+tools-iuc commit 39e745658a6ff7f013788871916574117a0f47f1 (2026-04-27).
+
+IUC coverage map:
+  bwa, bwa-mem        : extraction yields mostly noise (heavy macro use) — fallback to v1 prose
+  samtools_faidx       : all-conditional command block — fallback to v1 prose
+  samtools_sort        : partial extraction with placeholders — fallback to v1 prose
+  samtools_index       : not in IUC — fallback to v1 prose
+  lofreq_call_parallel : clean extraction — INJECTED (step 6)
+  bgzip / tabix        : not in IUC — fallback to v1 prose
+  bcftools_query       : format string in stripped Cheetah var — fallback to v1 prose
+-->
+
+1. **Set globals and prepare results directory**
+   - Define `THREADS=4` and the sample list: `M117-bl M117-ch M117C1-bl M117C1-ch`.
+   - Create `results/` if missing. Use `set -euo pipefail`.
+   - Treat every output step as idempotent: guard each artifact with an existence check (e.g. skip if `results/{sample}.vcf.gz.tbi` already exists and is newer than its inputs). Re-runs on a fully populated `results/` must exit 0 without re-doing work.
+
+2. **Reference indexing (once, in `data/ref/`)**
+   - `samtools faidx data/ref/chrM.fa` → produces `chrM.fa.fai`.
+   - `bwa index data/ref/chrM.fa` → produces the `.amb .ann .bwt .pac .sa` set.
+   - Skip both if the index files already exist.
+
+3. **Per-sample alignment with `bwa mem`**
+   - Use `bwa mem -t 4` with the paired FASTQs `data/raw/{sample}_1.fq.gz` and `data/raw/{sample}_2.fq.gz`.
+   - Pass the read group via `-R` as a single double-quoted argument containing literal backslash-t between fields and colons between key and value:
+     - exact form: `-R "@RG\tID:{sample}\tSM:{sample}\tLB:{sample}\tPL:ILLUMINA"`
+     - The `\t` must remain the two characters backslash and `t` — bwa parses them itself. Do NOT use `printf`, `echo -e`, `$'\t'`, or any mechanism that turns them into real tabs; bwa rejects real tabs with "the read group line contained literal <tab> characters".
+     - Separators between key and value are colons `:`, not `=`.
+
+4. **SAM → sorted BAM**
+   - Pipe `bwa mem` stdout into `samtools sort -@ 4 -o results/{sample}.bam`.
+   - Do NOT run `markdup` or `rmdup`: this is amplicon data where PCR duplicates are expected and biologically meaningful.
+
+5. **BAM indexing**
+   - `samtools index -@ 4 results/{sample}.bam` → `results/{sample}.bam.bai`.
+
+6. **Variant calling with `lofreq call-parallel`**
+   - Galaxy IUC canonical invocation (extracted from `tools/lofreq/lofreq_call.xml` @ tools-iuc 39e7456):
+     ```
+     lofreq call-parallel --pp-threads 4 --verbose
+     --ref data/ref/chrM.fa --out results/{sample}.vcf
+     --sig
+     --bonf
+     results/{sample}.bam
+     ```
+     (The bare `--sig` and `--bonf` lines come from Galaxy-runtime-supplied values; you can omit them and use lofreq's defaults. The load-bearing detail is that `results/{sample}.bam` is a **positional argument at the end**, not behind `-i`/`-b`/`-bam`.)
+
+7. **VCF compression and indexing**
+   - Compress with `bgzip` (not `bcftools view -O z`) producing `results/{sample}.vcf.gz`.
+   - Index with `tabix -p vcf results/{sample}.vcf.gz` → `results/{sample}.vcf.gz.tbi`.
+   - Remove the intermediate uncompressed `.vcf`.
+
+8. **Collapse step → `results/collapsed.tsv`**
+   - For each sample, run `bcftools query -f '{sample}\t%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' results/{sample}.vcf.gz` (the `{sample}` literal is prepended via the format string so the sample name is attached per row).
+   - Concatenate all four samples' output.
+   - Prepend a single header line `sample\tchrom\tpos\tref\talt\taf` (tab-separated).
+   - Output is tab-separated, one variant per line, header on, written to `results/collapsed.tsv`. Rebuild only if any input VCF is newer than the TSV.
+
+9. **Idempotency check**
+   - Final pass: re-running the script on a fully populated `results/` exits 0, performs no work, and leaves all eight per-sample artifacts plus `collapsed.tsv` intact.
+````
+
+The bare `--sig` / `--bonf` lines in step 6 are the bug discussed in §2.4: Galaxy's Cheetah templating strips the runtime-supplied `$value` after each flag, leaving the bare flag on its own line. lofreq then parses `--sig --bonf` as `--sig=--bonf`, attempts `float("--bonf")`, and dies. Strong models drop both flags before emitting their script; weaker models copy the snippet character-for-character.
+
+</details>
+
+<details>
+<summary><b>v2 (detailed)</b> — <code>plan/PLAN.md</code>, 4617 bytes</summary>
+
+````markdown
+# Implementation Plan: Per-sample mtDNA Variant Calling
+
+## Boilerplate (top of `run.sh`)
+- First line after shebang: `set -euo pipefail`.
+- Constants: `THREADS=4` and `SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")`.
+- Create output dir: `mkdir -p results`.
+- All per-sample steps must be wrapped in `for sample in "${SAMPLES[@]}"; do ... done`.
+
+---
+
+## 1. Reference indexing — BWA
+
+```
+bwa index data/ref/chrM.fa
+```
+
+- Outputs (5 sibling files): `data/ref/chrM.fa.amb`, `.ann`, `.bwt`, `.pac`, `.sa`.
+- Idempotency guard: `[[ -f data/ref/chrM.fa.bwt ]] || bwa index data/ref/chrM.fa`
+- Gotcha: `bwa index` writes outputs next to the input; the dir must be writable. No flags needed for a 16 kb reference (default algorithm is fine).
+
+## 2. Reference indexing — samtools faidx
+
+```
+samtools faidx data/ref/chrM.fa
+```
+
+- Output: `data/ref/chrM.fa.fai`.
+- Guard: `[[ -f data/ref/chrM.fa.fai ]] || samtools faidx data/ref/chrM.fa`
+
+## 3. Per-sample alignment + sort (one pipeline)
+
+```
+bwa mem -t 4 -R "@RG\tID:{sample}\tSM:{sample}\tLB:{sample}\tPL:ILLUMINA" data/ref/chrM.fa data/raw/{sample}_1.fq.gz data/raw/{sample}_2.fq.gz | samtools sort -@ 4 -o results/{sample}.bam -
+```
+
+- Output: `results/{sample}.bam`.
+- Guard: `[[ -f results/{sample}.bam ]] || { bwa mem ... | samtools sort ... ; }` — wrap the whole pipeline in braces so the guard covers both stages.
+- RG string gotchas (CRITICAL):
+  - Use colons (`ID:`, `SM:`, `LB:`, `PL:`) — never `=`.
+  - Use the **literal two characters** `\t` (backslash + t) inside the double-quoted string. Do NOT use `printf`, `echo -e`, `$'\t'`, or a real tab. `bwa` expands `\t` itself; a real tab corrupts the SAM header.
+  - The whole `-R` value must be a single double-quoted argument.
+- `samtools sort` trailing `-` reads from stdin.
+
+## 4. BAM index
+
+```
+samtools index -@ 4 results/{sample}.bam
+```
+
+- Output: `results/{sample}.bam.bai`.
+- Guard: `[[ -f results/{sample}.bam.bai ]] || samtools index -@ 4 results/{sample}.bam`
+- Do NOT run `markdup` — this is amplicon data; PCR duplicates are expected and informative.
+
+## 5. Variant calling — LoFreq
+
+```
+lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{sample}.vcf results/{sample}.bam
+```
+
+- Output: `results/{sample}.vcf` (uncompressed).
+- Guard: `[[ -f results/{sample}.vcf || -f results/{sample}.vcf.gz ]] || lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{sample}.vcf results/{sample}.bam`
+  (Check both because step 6 will delete the `.vcf` and leave `.vcf.gz`.)
+- Gotchas: BAM is positional, NOT behind `-b`/`-i`. The flag is `--pp-threads`, not `-t` or `--threads`. Reference (`-f`) requires the `.fai` from step 2 to already exist.
+
+## 6. VCF compression + tabix index
+
+```
+bgzip -f results/{sample}.vcf
+```
+```
+tabix -p vcf results/{sample}.vcf.gz
+```
+
+- Outputs: `results/{sample}.vcf.gz` and `results/{sample}.vcf.gz.tbi`.
+- Combined guard: `[[ -f results/{sample}.vcf.gz.tbi ]] || { bgzip -f results/{sample}.vcf && tabix -p vcf results/{sample}.vcf.gz ; }`
+- Gotchas: `bgzip` operates **in place** — it deletes `results/{sample}.vcf` after writing `.vcf.gz`. `-f` overwrites any stale `.vcf.gz`. `tabix -p vcf` sets the preset for VCF coordinates.
+
+## 7. Collapsed TSV (rebuild every run)
+
+Do NOT guard this step — always overwrite, since per-sample VCFs may have changed.
+
+Header (overwrite):
+
+```
+printf 'sample\tchrom\tpos\tref\talt\taf\n' > results/collapsed.tsv
+```
+
+Per sample, append:
+
+```
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' results/{sample}.vcf.gz | awk -v s={sample} 'BEGIN{OFS="\t"}{print s,$0}' >> results/collapsed.tsv
+```
+
+- Gotchas:
+  - The format string uses `%INFO/AF`, not `%AF` — bcftools requires the `INFO/` prefix for INFO fields.
+  - The `\t` and `\n` inside `-f '...'` are **bcftools format codes**, parsed by bcftools itself; keep them inside single quotes so the shell doesn't touch them.
+  - awk's `OFS="\t"` is required so `print s,$0` joins with a tab (`$0` already contains the tabbed bcftools row, so the result is `sample<TAB>chrom<TAB>pos<TAB>ref<TAB>alt<TAB>af`).
+  - Use `>` for the header line, `>>` for every per-sample append.
+
+---
+
+## Idempotency summary
+- Steps 1–6 each have a `[[ -f <sentinel> ]] ||` guard on their final output. A second invocation on a populated `results/` performs no alignment, calling, compression, or indexing work.
+- Step 7 is intentionally rebuilt from scratch on every run (header `>`, then append per sample). This is cheap (one `bcftools query` per sample) and prevents stale rows if any VCF changed. Exit status of a fully-cached run is `0`.
+````
+
+</details>
+
+<details>
+<summary><b>v0.5</b> — <code>prompts/track_b_with_order_user.tmpl</code>, 1361 bytes (Track B template + a single tool-order line; no plan file)</summary>
+
+```text
+TASK
+====
+Per-sample variant calling on 4 paired-end MiSeq amplicon samples mapped to the human mitochondrial reference (chrM, 16,569 bp). Final outputs (per sample, plus one collapsed table):
+
+  results/{sample}.bam
+  results/{sample}.bam.bai
+  results/{sample}.vcf.gz
+  results/{sample}.vcf.gz.tbi
+  results/collapsed.tsv
+
+The collapsed.tsv must have columns (tab-separated, with header):
+  sample  chrom  pos  ref  alt  af
+
+DATASET (already present under data/raw/ and data/ref/)
+======================================================
+Samples:
+  M117-bl   (paired)
+  M117-ch   (paired)
+  M117C1-bl (paired)
+  M117C1-ch (paired)
+
+Files in data/raw/:
+  M117-bl_1.fq.gz   M117-bl_2.fq.gz
+  M117-ch_1.fq.gz   M117-ch_2.fq.gz
+  M117C1-bl_1.fq.gz M117C1-bl_2.fq.gz
+  M117C1-ch_1.fq.gz M117C1-ch_2.fq.gz
+
+File in data/ref/:
+  chrM.fa            (decompressed; not yet indexed)
+
+TOOL_INVENTORY (only these are on PATH; pinned versions in conda env 'bench')
+============================================================================
+{TOOL_INVENTORY}
+
+PLAN
+====
+No detailed plan provided. Recommended tool sequence: bwa → samtools → lofreq → bcftools → awk (for the final collapse). Design and implement the workflow yourself, using only the tools above.
+
+OUTPUT FORMAT
+=============
+A single bash script. No markdown fences, no commentary. Just the script.
+```
+
+The "Track B (no plan)" baseline is the same template with the `Recommended tool sequence: ...` line removed — that single line is the entire experimental delta between the no-plan baseline and v0.5.
+
+</details>
+
 ## 3. Methods
 
 ### 3.1 Dataset and ground truth
