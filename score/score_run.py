@@ -234,9 +234,14 @@ def m5_quality(run_dir: Path) -> tuple[int, dict]:
     sc = conda_run(["shellcheck", "-S", "warning", str(run_dir / "run.sh")])
     checks["shellcheck_clean"] = sc.returncode == 0
     checks["shellcheck_output"] = sc.stdout[:600] if sc.stdout else ""
-    # Idempotency: only test if M1 already passed
+    # Idempotency: only test if M1 already passed AND no error injection was
+    # active. With an injection, the rerun would run *without* the shim
+    # (env vars aren't preserved) and silently "fix" failures the original
+    # run captured — contaminating the run dir's results/ files.
     e = json.loads((run_dir / "exec.json").read_text())
-    if e.get("exit_code") == 0:
+    meta = json.loads((run_dir / "meta.json").read_text()) if (run_dir / "meta.json").exists() else {}
+    inject_active = (meta.get("inject_pattern") or "none") != "none"
+    if e.get("exit_code") == 0 and not inject_active:
         activate = (
             "source $HOME/miniforge3/etc/profile.d/conda.sh && "
             "conda activate bench && exec bash run.sh"
@@ -247,6 +252,9 @@ def m5_quality(run_dir: Path) -> tuple[int, dict]:
         )
         checks["idempotent"] = rerun.returncode == 0
         checks["idempotent_stderr"] = rerun.stderr[:300] if rerun.returncode != 0 else ""
+    elif inject_active:
+        checks["idempotent"] = None
+        checks["idempotent_stderr"] = "skipped (error injection active)"
     else:
         checks["idempotent"] = None
     score = int(
@@ -268,13 +276,19 @@ def main() -> int:
         out["m2_schema"], out["m2_detail"] = m2_schema(run_dir)
     else:
         out["m2_schema"], out["m2_detail"] = 0, {"reason": "M1 failed"}
-    if out["m2_schema"]:
+    # Always compute M3 (don't gate on M2). For runs where some samples are
+    # missing or have broken VCFs, those samples contribute 0 to the macro
+    # mean. This is what the dynamic-error-handling experiment needs: a 3/4
+    # outcome should score M3≈0.75, not M3=0.
+    if out["m1_executes"]:
         out["m3_jaccard"], out["m3_detail"] = m3_jaccard(run_dir)
     else:
-        out["m3_jaccard"], out["m3_detail"] = 0.0, {"reason": "M2 failed"}
+        out["m3_jaccard"], out["m3_detail"] = 0.0, {"reason": "M1 failed"}
     out["m4"] = m4_costlatency(run_dir)
-    out["m5_quality"], out["m5_detail"] = m5_quality(run_dir)
+    # error_handling first (it reads the run-dir state). M5 may modify state
+    # via its idempotency rerun, so it must come last.
     out["error_handling"] = error_handling(run_dir)
+    out["m5_quality"], out["m5_detail"] = m5_quality(run_dir)
 
     score_path = run_dir / "score.json"
     score_path.write_text(json.dumps(out, indent=2))
