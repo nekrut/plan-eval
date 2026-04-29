@@ -1,0 +1,23 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF="data/ref/chrM.fa"
+OUT="results"
+
+# Create output directory
+mkdir -p "$OUT"
+
+# Initialize failure log (truncate)
+: > "$OUT/failures.log"
+
+# Track survivors
+SURVIVORS=()
+OK=0
+
+# Helper function: try <sample> <step_label> <validation_cmd_string> -- <cmd...>
+try() {
+  local s

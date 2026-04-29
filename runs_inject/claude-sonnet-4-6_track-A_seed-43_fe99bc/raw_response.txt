@@ -1,0 +1,6 @@
+The sandbox is strictly limited to `/home/anton/bench` — the `~/.claude/projects/` transcript directory is blocked entirely. Without transcript access I can't do the frequency analysis the skill requires.
+
+**What I can tell you:**
+
+- No `settings.json` exists yet for this project (only `settings.local.json` with three stale one-off `allow` entries).
+- The `settings.local.json` entries (`kill 67569

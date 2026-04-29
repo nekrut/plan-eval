@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-haiku-4-5_track-A_seed-42_7a6aa3",
+  "model": "claude-haiku-4-5",
+  "track": "A",
+  "seed": 42,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 119.02721524238586,
+  "duration_ms_generation": 116187,
+  "plan_path": "/home/anton/bench/plan/PLAN_v2_defensive.md",
+  "plan_name": "PLAN_v2_defensive",
+  "inject_pattern": "none",
+  "inject_target": null
+}

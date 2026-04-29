@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-sonnet-4-6_track-A_seed-43_7b5b9c",
+  "model": "claude-sonnet-4-6",
+  "track": "A",
+  "seed": 43,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 10.2992422580719,
+  "duration_ms_generation": 7360,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "silent_truncation",
+  "inject_target": "lofreq"
+}

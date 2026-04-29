@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-opus-4-7_track-A_seed-44_af0f4a",
+  "model": "claude-opus-4-7",
+  "track": "A",
+  "seed": 44,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 10.193660497665405,
+  "duration_ms_generation": 7048,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "one_sample_fails",
+  "inject_target": "bwa"
+}

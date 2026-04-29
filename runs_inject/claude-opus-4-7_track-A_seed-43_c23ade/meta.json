@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-opus-4-7_track-A_seed-43_c23ade",
+  "model": "claude-opus-4-7",
+  "track": "A",
+  "seed": 43,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 11.157856941223145,
+  "duration_ms_generation": 7440,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "silent_truncation",
+  "inject_target": "lofreq"
+}

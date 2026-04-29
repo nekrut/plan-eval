@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-opus-4-7_track-A_seed-43_cb9109",
+  "model": "claude-opus-4-7",
+  "track": "A",
+  "seed": 43,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 10.760626792907715,
+  "duration_ms_generation": 7187,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "none",
+  "inject_target": null
+}

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+OUTPUT_DIR="results"
+mkdir -p "$OUTPUT_DIR"
+
+# Helper to ensure output files exist before downstream steps
+ensure_output() {
+  local out=$1
+  if [[ ! -f "$out" ]]; then
+    echo "Running step that produces $out..."
+    # Placeholder commands (actual logic will be executed by the calle

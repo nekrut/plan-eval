@@ -1,0 +1,23 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF="data/ref/chrM.fa"
+OUT="results"
+
+# Setup
+mkdir -p "$OUT"
+: > "$OUT/failures.log"
+
+# Tracking
+SURVIVORS=()
+OK=0
+
+# Helper function: try
+try() {  # try <sample> <step_label> <validation_cmd_string> -- <cmd...>
+  local sample="$1" step="$2" validate="$3"
+  shift 3
+  [[ "$1" 

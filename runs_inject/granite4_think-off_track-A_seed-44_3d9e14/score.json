@@ -1,0 +1,49 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-44_3d9e14",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 23.878373622894287,
+    "wall_seconds_execution": 0.6709349155426025,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 891,
+      "prompt_eval_duration_ns": 90708682,
+      "eval_duration_ns": 22846539498,
+      "total_duration_ns": 23870959729
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 3,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "one_sample_fails",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_inject/granite4_think-off_track-A_seed-44_3d9e14/run.sh line 7:\nREF=data/ref/chrM.fa\n^-^ SC2034 (warning): REF appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/bench/runs_inject/granite4_think-off_track-A_seed-44_3d9e14/run.sh line 52:\n  try \"$s\" comp '[[ -s results/'\"$s\".vcf.gz && -s results/'\"$s\".vcf.gz.tbi ]] && bcftools view -h results/'\"$s\".vcf.gz > /dev/null' -- bgzip ...\n                                                                           ^-- SC2171 (warning): Found trailing ]] outside test. Add missing [[ or quote if intention",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

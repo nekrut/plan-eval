@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-opus-4-7_track-A_seed-42_a34f19",
+  "model": "claude-opus-4-7",
+  "track": "A",
+  "seed": 42,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 69.36889052391052,
+  "duration_ms_generation": 66739,
+  "plan_path": "/home/anton/bench/plan/PLAN_v2_defensive.md",
+  "plan_name": "PLAN_v2_defensive",
+  "inject_pattern": "flake_first_call",
+  "inject_target": "lofreq"
+}

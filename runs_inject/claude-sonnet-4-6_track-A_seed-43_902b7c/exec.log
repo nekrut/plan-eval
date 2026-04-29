@@ -1,0 +1,97 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.150 CPU sec, 0.040 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.052 sec; CPU: 0.159 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 03:17:21,639]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-bl.bam
+
+INFO [2026-04-29 03:17:21,657]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+INFO [2026-04-29 03:17:23,229]: Executing lofreq filter -i /tmp/lofreq2_call_parallell_p63fad/concat.vcf.gz -o results/M117-bl.vcf --snvqual-thresh 48 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.165 CPU sec, 0.043 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-ch\tSM:M117-ch\tLB:M117-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.054 sec; CPU: 0.177 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 03:17:53,762]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-ch.bam
+
+INFO [2026-04-29 03:17:53,778]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+INFO [2026-04-29 03:17:55,517]: Executing lofreq filter -i /tmp/lofreq2_call_parallelaimnzsjr/concat.vcf.gz -o results/M117-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.146 CPU sec, 0.038 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-bl\tSM:M117C1-bl\tLB:M117C1-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.049 sec; CPU: 0.155 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 03:18:26,034]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-bl.bam
+
+INFO [2026-04-29 03:18:26,050]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+INFO [2026-04-29 03:18:27,780]: Executing lofreq filter -i /tmp/lofreq2_call_paralleldg7mi_mp/concat.vcf.gz -o results/M117C1-bl.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.172 CPU sec, 0.044 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-ch\tSM:M117C1-ch\tLB:M117C1-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.058 sec; CPU: 0.185 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 03:18:58,337]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-ch.bam
+
+INFO [2026-04-29 03:18:58,354]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 768
+Number of indel tests performed: 0
+INFO [2026-04-29 03:18:59,965]: Executing lofreq filter -i /tmp/lofreq2_call_parallelqk3j2ani/concat.vcf.gz -o results/M117C1-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[run.sh] 4/4 samples completed; no failures

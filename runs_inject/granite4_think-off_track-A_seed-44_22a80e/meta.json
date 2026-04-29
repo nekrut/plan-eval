@@ -1,0 +1,14 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-44_22a80e",
+  "model": "granite4",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 14.936475038528442,
+  "duration_ms_generation": 14936,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "one_sample_fails",
+  "inject_target": "lofreq"
+}

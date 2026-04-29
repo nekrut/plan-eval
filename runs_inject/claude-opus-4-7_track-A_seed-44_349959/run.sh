@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF=data/ref/chrM.fa
+OUT=results
+
+mkdir -p "$OUT"
+: > "$OUT/failures.log"
+SURVIVORS=()
+OK=0
+
+try() {
+  local sample="$1" step="$2" validate="$3"; shift 3
+  [[ "${1:-}" == "--" ]] && shift
+  if "$@" && eval "$validate"; then return 0; fi
+  "$@" && eval "$validate" && return 0
+  printf '%s\t%s\t%s\n' "$sample" "$step" "command_or_validation_failed" >> "$OUT/failures.log"
+  return 1
+}
+
+align_one() {
+  local s="$1"
+  bwa mem -t "$THREADS" -R "@RG\tID:${s}\tSM:${s}\tLB:${s}\tPL:ILLUMINA" \
+    "$REF" "data/raw/${s}_1.fq.gz" "data/raw/${s}_2.fq.gz" \
+    | samtools sort -@ "$THREADS" -o "$OUT/${s}.bam" -
+}
+
+collapse_one() {
+  local s="$1"
+  bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t%INFO/AF\n' "$OUT/${s}.vcf.gz" \
+    | awk -v s="$s" 'BEGIN{OFS="\t"}{print s,$0}' >> "$OUT/collapsed.tsv"
+}
+
+# Step 1: reference prep
+if [[ ! -s data/ref/chrM.fa.bwt ]]; then
+  if ! try __ref__ bwa_index '[[ -s data/ref/chrM.fa.bwt ]]' -- bwa index data/ref/chrM.fa; then
+    printf '[run.sh] reference index failed\n' >&2
+    exit 1
+  fi
+fi
+
+if [[ ! -s data/ref/chrM.fa.fai ]]; then
+  if ! try __ref__ faidx '[[ -s data/ref/chrM.fa.fai ]]' -- samtools faidx data/ref/chrM.fa; then
+    printf '[run.sh] reference faidx failed\n' >&2
+    exit 1
+  fi
+fi
+
+# Step 2: per-sample loop
+for s in "${SAMPLES[@]}"; do
+  # 2a — align + sort
+  if [[ -f "$OUT/${s}.bam" ]] && samtools quickcheck "$OUT/${s}.bam"; then
+    :
+  else
+    if ! try "$s" align 'samtools quickcheck "'"$OUT"'/'"$s"'.bam"' -- align_one "$s"; then
+      continue
+    fi
+  fi
+
+  # 2b — BAM index
+  if [[ -s "$OUT/${s}.bam.bai" ]]; then
+    :
+  else
+    if ! try "$s" bam_index '[[ -s "'"$OUT"'/'"$s"'.bam.bai" ]]' -- samtools index -@ "$THREADS" "$OUT/${s}.bam"; then
+      continue
+    fi
+  fi
+
+  # 2c — variant calling
+  if [[ -s "$OUT/${s}.vcf.gz" ]] && bcftools view -h "$OUT/${s}.vcf.gz" >/dev/null 2>&1; then
+    :
+  elif [[ -s "$OUT/${s}.vcf" ]] && bcftools view -h "$OUT/${s}.vcf" >/dev/null 2>&1; then
+    :
+  else
+    if ! try "$s" lofreq '[[ -s "'"$OUT"'/'"$s"'.vcf" ]] && bcftools view -h "'"$OUT"'/'"$s"'.vcf" > /dev/null' -- lofreq call-parallel --pp-threads "$THREADS" -f "$REF" -o "$OUT/${s}.vcf" "$OUT/${s}.bam"; then
+      continue
+    fi
+  fi
+
+  # 2d — bgzip + tabix
+  if [[ -s "$OUT/${s}.vcf.gz" && -s "$OUT/${s}.vcf.gz.tbi" ]] && bcftools view -h "$OUT/${s}.vcf.gz" >/dev/null 2>&1; then
+    :
+  else
+    step_failed=0
+    if [[ ! -s "$OUT/${s}.vcf.gz" ]]; then
+      if ! try "$s" bgzip '[[ -s "'"$OUT"'/'"$s"'.vcf.gz" ]] && bcftools view -h "'"$OUT"'/'"$s"'.vcf.gz" > /dev/null' -- bgzip -f "$OUT/${s}.vcf"; then
+        step_failed=1
+      fi
+    fi
+    if (( step_failed == 1 )); then continue; fi
+    if [[ ! -s "$OUT/${s}.vcf.gz.tbi" ]]; then
+      if ! try "$s" tabix '[[ -s "'"$OUT"'/'"$s"'.vcf.gz.tbi" ]]' -- tabix -p vcf "$OUT/${s}.vcf.gz"; then
+        continue
+      fi
+    fi
+  fi
+
+  SURVIVORS+=("$s")
+  OK=$((OK+1))
+done
+
+# Step 3: collapsed.tsv (always rewrite header)
+printf 'sample\tchrom\tpos\tref\talt\taf\n' > "$OUT/collapsed.tsv"
+if (( ${#SURVIVORS[@]} > 0 )); then
+  for s in "${SURVIVORS[@]}"; do
+    if ! try "$s" collapse '[[ -s "'"$OUT"'/collapsed.tsv" ]]' -- collapse_one "$s"; then
+      continue
+    fi
+  done
+fi
+
+# Step 4: summary + exit
+TOTAL=${#SAMPLES[@]}
+if (( OK == TOTAL )) && [[ ! -s "$OUT/failures.log" ]]; then
+  printf '[run.sh] %d/%d samples completed; no failures\n' "$OK" "$TOTAL" >&2
+else
+  if [[ -s "$OUT/failures.log" ]]; then
+    FAILED_MSG=$(awk -F'\t' '$1!="__ref__" && !seen[$1]++ {arr[++n]=$1" failed at step "$2} END{for(i=1;i<=n;i++){if(i>1)printf ", "; printf "%s",arr[i]}}' "$OUT/failures.log")
+    if [[ -n "$FAILED_MSG" ]]; then
+      printf '[run.sh] %d/%d samples completed; %s — see results/failures.log\n' "$OK" "$TOTAL" "$FAILED_MSG" >&2
+    else
+      printf '[run.sh] %d/%d samples completed; no failures\n' "$OK" "$TOTAL" >&2
+    fi
+  else
+    printf '[run.sh] %d/%d samples completed; no failures\n' "$OK" "$TOTAL" >&2
+  fi
+fi
+
+if (( OK >= 1 )); then exit 0; else exit 1; fi

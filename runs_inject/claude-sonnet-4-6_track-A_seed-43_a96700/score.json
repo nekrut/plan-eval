@@ -1,0 +1,82 @@
+{
+  "run_id": "claude-sonnet-4-6_track-A_seed-43_a96700",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 444.00316739082336,
+    "wall_seconds_execution": 129.6202940940857,
+    "cost_usd": 0.3780469,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 15103,
+      "output_tokens": 24667,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 24667,
+          "cache_read_input_tokens": 15103,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    }
+  },
+  "error_handling": {
+    "m_handle": "recover",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl",
+      "M117C1-ch"
+    ],
+    "n_valid": 4,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [
+      "summary_line"
+    ],
+    "exit_code": 0,
+    "inject_pattern": "slow_tool",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

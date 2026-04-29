@@ -1,0 +1,297 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.133 CPU sec, 0.038 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.049 sec; CPU: 0.144 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 06:24:42,166]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-bl.bam
+
+INFO [2026-04-29 06:24:42,182]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+INFO [2026-04-29 06:24:43,777]: Executing lofreq filter -i /tmp/lofreq2_call_parallelawq6aohr/concat.vcf.gz -o results/M117-bl.vcf --snvqual-thresh 48 --indelqual-thresh 20
+
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallelawq6aohr/0.vcf.gz results/M117-bl.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_45,Description="Minimum SNV Quality (Phred) 45">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_42,Description="Minimum SNV Quality (Phred) 42">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallelawq6aohr/concat.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/0.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/1.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/2.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/3.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/4.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/5.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/6.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/7.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/8.vcf.gz; Date=Wed Apr 29 06:24:43 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_48,Description="Minimum SNV Quality (Phred) 48">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117-bl.vcf; Date=Wed Apr 29 06:24:43 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallelawq6aohr/0.vcf.gz results/M117-bl.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_45,Description="Minimum SNV Quality (Phred) 45">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_42,Description="Minimum SNV Quality (Phred) 42">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallelawq6aohr/concat.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/0.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/1.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/2.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/3.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/4.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/5.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/6.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/7.vcf.gz /tmp/lofreq2_call_parallelawq6aohr/8.vcf.gz; Date=Wed Apr 29 06:24:43 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_48,Description="Minimum SNV Quality (Phred) 48">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117-bl.vcf.gz; Date=Wed Apr 29 06:24:43 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.157 CPU sec, 0.044 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-ch\tSM:M117-ch\tLB:M117-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.058 sec; CPU: 0.171 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 06:25:14,314]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-ch.bam
+
+INFO [2026-04-29 06:25:14,330]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+INFO [2026-04-29 06:25:16,045]: Executing lofreq filter -i /tmp/lofreq2_call_parallela492y_ge/concat.vcf.gz -o results/M117-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallela492y_ge/0.vcf.gz results/M117-ch.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_47,Description="Minimum SNV Quality (Phred) 47">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_44,Description="Minimum SNV Quality (Phred) 44">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallela492y_ge/concat.vcf.gz /tmp/lofreq2_call_parallela492y_ge/0.vcf.gz /tmp/lofreq2_call_parallela492y_ge/1.vcf.gz /tmp/lofreq2_call_parallela492y_ge/2.vcf.gz /tmp/lofreq2_call_parallela492y_ge/3.vcf.gz /tmp/lofreq2_call_parallela492y_ge/4.vcf.gz /tmp/lofreq2_call_parallela492y_ge/5.vcf.gz /tmp/lofreq2_call_parallela492y_ge/6.vcf.gz /tmp/lofreq2_call_parallela492y_ge/7.vcf.gz /tmp/lofreq2_call_parallela492y_ge/8.vcf.gz; Date=Wed Apr 29 06:25:16 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117-ch.vcf; Date=Wed Apr 29 06:25:16 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallela492y_ge/0.vcf.gz results/M117-ch.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_47,Description="Minimum SNV Quality (Phred) 47">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_44,Description="Minimum SNV Quality (Phred) 44">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallela492y_ge/concat.vcf.gz /tmp/lofreq2_call_parallela492y_ge/0.vcf.gz /tmp/lofreq2_call_parallela492y_ge/1.vcf.gz /tmp/lofreq2_call_parallela492y_ge/2.vcf.gz /tmp/lofreq2_call_parallela492y_ge/3.vcf.gz /tmp/lofreq2_call_parallela492y_ge/4.vcf.gz /tmp/lofreq2_call_parallela492y_ge/5.vcf.gz /tmp/lofreq2_call_parallela492y_ge/6.vcf.gz /tmp/lofreq2_call_parallela492y_ge/7.vcf.gz /tmp/lofreq2_call_parallela492y_ge/8.vcf.gz; Date=Wed Apr 29 06:25:16 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117-ch.vcf.gz; Date=Wed Apr 29 06:25:16 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.143 CPU sec, 0.037 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-bl\tSM:M117C1-bl\tLB:M117C1-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.047 sec; CPU: 0.152 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 06:25:46,657]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-bl.bam
+
+INFO [2026-04-29 06:25:46,675]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+INFO [2026-04-29 06:25:48,469]: Executing lofreq filter -i /tmp/lofreq2_call_parallel757phkap/concat.vcf.gz -o results/M117C1-bl.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallel757phkap/0.vcf.gz results/M117C1-bl.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_46,Description="Minimum SNV Quality (Phred) 46">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_43,Description="Minimum SNV Quality (Phred) 43">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallel757phkap/concat.vcf.gz /tmp/lofreq2_call_parallel757phkap/0.vcf.gz /tmp/lofreq2_call_parallel757phkap/1.vcf.gz /tmp/lofreq2_call_parallel757phkap/2.vcf.gz /tmp/lofreq2_call_parallel757phkap/3.vcf.gz /tmp/lofreq2_call_parallel757phkap/4.vcf.gz /tmp/lofreq2_call_parallel757phkap/5.vcf.gz /tmp/lofreq2_call_parallel757phkap/6.vcf.gz /tmp/lofreq2_call_parallel757phkap/7.vcf.gz /tmp/lofreq2_call_parallel757phkap/8.vcf.gz; Date=Wed Apr 29 06:25:48 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117C1-bl.vcf; Date=Wed Apr 29 06:25:48 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallel757phkap/0.vcf.gz results/M117C1-bl.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_46,Description="Minimum SNV Quality (Phred) 46">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_43,Description="Minimum SNV Quality (Phred) 43">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallel757phkap/concat.vcf.gz /tmp/lofreq2_call_parallel757phkap/0.vcf.gz /tmp/lofreq2_call_parallel757phkap/1.vcf.gz /tmp/lofreq2_call_parallel757phkap/2.vcf.gz /tmp/lofreq2_call_parallel757phkap/3.vcf.gz /tmp/lofreq2_call_parallel757phkap/4.vcf.gz /tmp/lofreq2_call_parallel757phkap/5.vcf.gz /tmp/lofreq2_call_parallel757phkap/6.vcf.gz /tmp/lofreq2_call_parallel757phkap/7.vcf.gz /tmp/lofreq2_call_parallel757phkap/8.vcf.gz; Date=Wed Apr 29 06:25:48 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117C1-bl.vcf.gz; Date=Wed Apr 29 06:25:48 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.169 CPU sec, 0.044 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-ch\tSM:M117C1-ch\tLB:M117C1-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.057 sec; CPU: 0.182 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-29 06:26:19,103]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-ch.bam
+
+INFO [2026-04-29 06:26:19,122]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 768
+Number of indel tests performed: 0
+INFO [2026-04-29 06:26:20,741]: Executing lofreq filter -i /tmp/lofreq2_call_parallelpzkmxkpm/concat.vcf.gz -o results/M117C1-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallelpzkmxkpm/0.vcf.gz results/M117C1-ch.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_47,Description="Minimum SNV Quality (Phred) 47">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_44,Description="Minimum SNV Quality (Phred) 44">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallelpzkmxkpm/concat.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/0.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/1.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/2.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/3.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/4.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/5.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/6.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/7.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/8.vcf.gz; Date=Wed Apr 29 06:26:20 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117C1-ch.vcf; Date=Wed Apr 29 06:26:20 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+##fileformat=VCFv4.0
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20260429
+##source=lofreq call -f data/ref/chrM.fa --no-default-filter -r chrM:1-2071 -o /tmp/lofreq2_call_parallelpzkmxkpm/0.vcf.gz results/M117C1-ch.bam 
+##reference=data/ref/chrM.fa
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Allele Frequency">
+##INFO=<ID=SB,Number=1,Type=Integer,Description="Phred-scaled strand bias at this position">
+##INFO=<ID=DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##FILTER=<ID=min_snvqual_47,Description="Minimum SNV Quality (Phred) 47">
+##FILTER=<ID=min_indelqual_20,Description="Minimum Indel Quality (Phred) 20">
+##contig=<ID=chrM>
+##FILTER=<ID=min_snvqual_20,Description="Minimum SNV Quality (Phred) 20">
+##FILTER=<ID=min_snvqual_44,Description="Minimum SNV Quality (Phred) 44">
+##bcftools_concatVersion=1.21+htslib-1.21
+##bcftools_concatCommand=concat -a -O z -o /tmp/lofreq2_call_parallelpzkmxkpm/concat.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/0.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/1.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/2.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/3.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/4.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/5.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/6.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/7.vcf.gz /tmp/lofreq2_call_parallelpzkmxkpm/8.vcf.gz; Date=Wed Apr 29 06:26:20 2026
+##FILTER=<ID=min_dp_10,Description="Minimum Coverage 10">
+##FILTER=<ID=sb_fdr,Description="Strand-Bias Multiple Testing Correction: fdr corr. pvalue > 0.001000">
+##FILTER=<ID=min_snvqual_49,Description="Minimum SNV Quality (Phred) 49">
+##bcftools_viewVersion=1.21+htslib-1.21
+##bcftools_viewCommand=view -h results/M117C1-ch.vcf.gz; Date=Wed Apr 29 06:26:20 2026
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+[run.sh] 4/4 samples completed; no failures

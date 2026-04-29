@@ -17,6 +17,10 @@ runs_5080_v0p5/*/data
 runs_5080_v0p5/*/results/
 runs_5080_v1g/*/data
 runs_5080_v1g/*/results/
+runs_inject/*/data
+runs_inject/*/results/
+runs_inject/*/_eval_bin/
+runs_inject/*/_eval_state/
 ground_truth/results/*.bam
 ground_truth/results/*.bam.bai
 ground_truth/results/*.bwa.log

@@ -330,10 +330,114 @@ def fig5_hardware(df: pd.DataFrame, out: Path):
 
 
 # ────────────────────────────────────────────────────────────────────────────
+# Figure 6 — error-handling robustness
+# ────────────────────────────────────────────────────────────────────────────
+HANDLE_ORDER = ["crash", "propagate", "partial", "recover"]
+HANDLE_COLOR = {
+    "crash":     "#d73027",   # red — script died with no detection
+    "propagate": "#fdae61",   # orange — set -e fired, no structured detection
+    "partial":   "#abd9e9",   # light blue — defensive, some/all samples skipped
+    "recover":   "#1a9850",   # green — full recovery
+}
+
+
+PLAN_DISPLAY = {
+    "PLAN":            "v2",
+    "PLAN_v2_defensive": "v2_defensive",
+}
+
+
+def collect_inject_runs(runs_dir: Path):
+    """Return DataFrame of all injection runs with handle/recover/diagnose."""
+    rows = []
+    for d in runs_dir.glob("*_track-A_seed-*"):
+        sj = d / "score.json"
+        if not sj.exists():
+            continue
+        s = json.loads(sj.read_text())
+        eh = s.get("error_handling") or {}
+        meta = json.loads((d / "meta.json").read_text())
+        if not eh.get("inject_pattern") or eh["inject_pattern"] == "none":
+            continue
+        plan_name = meta.get("plan_name") or ""
+        rows.append({
+            "model":   meta["model"].replace(":", "_"),
+            "pattern": eh["inject_pattern"],
+            "target":  eh.get("inject_target", ""),
+            "plan":    PLAN_DISPLAY.get(plan_name, plan_name),
+            "seed":    meta.get("seed"),
+            "handle":  eh.get("m_handle"),
+            "recover": eh.get("m_recover"),
+            "diagnose": eh.get("m_diagnose"),
+            "M3":      s.get("m3_jaccard"),
+        })
+    return pd.DataFrame(rows)
+
+
+def _modal_handle(series):
+    """Most common handle category in a small (n=3) seed group."""
+    if len(series) == 0:
+        return None
+    return series.value_counts().idxmax()
+
+
+def fig6_error_handling(out: Path, runs_dir: Path = BENCH / "runs_inject"):
+    """Heatmap: rows=model, cols=(pattern, target), color=modal handle category.
+    One panel per recipe variant (v2 vs v2_defensive)."""
+    df = collect_inject_runs(runs_dir)
+    if df.empty:
+        print(f"[fig6] no runs in {runs_dir} yet — skipping")
+        return
+    df = df[df["plan"].isin(["v2", "v2_defensive"])]
+    if df.empty:
+        print("[fig6] no runs have plan-tagging yet")
+        return
+
+    plans = ["v2", "v2_defensive"]
+    patterns = sorted(df["pattern"].unique())
+    targets  = sorted(df["target"].unique())
+    cells    = [(p, t) for p in patterns for t in targets if not df[(df["pattern"]==p) & (df["target"]==t)].empty]
+    models   = model_order(df["model"].unique())
+
+    fig, axes = plt.subplots(1, len(plans), figsize=(max(8, 2*len(cells)), 1+0.45*len(models)),
+                             sharey=True)
+    if len(plans) == 1:
+        axes = [axes]
+    for ax, plan in zip(axes, plans):
+        sub = df[df["plan"] == plan]
+        grid = np.full((len(models), len(cells)), -1, dtype=int)
+        for i, m in enumerate(models):
+            for j, (p, t) in enumerate(cells):
+                ms = sub[(sub["model"]==m) & (sub["pattern"]==p) & (sub["target"]==t)]
+                if len(ms) == 0:
+                    continue
+                modal = _modal_handle(ms["handle"])
+                if modal in HANDLE_ORDER:
+                    grid[i, j] = HANDLE_ORDER.index(modal)
+        # Plot as a categorical image
+        cmap = mpl.colors.ListedColormap([HANDLE_COLOR[h] for h in HANDLE_ORDER])
+        masked = np.ma.masked_less(grid, 0)
+        im = ax.imshow(masked, aspect="auto", cmap=cmap, vmin=0, vmax=len(HANDLE_ORDER)-1)
+        ax.set_xticks(range(len(cells)))
+        ax.set_xticklabels([f"{p}\n@{t}" for p, t in cells], rotation=30, ha="right", fontsize=7)
+        ax.set_yticks(range(len(models)))
+        ax.set_yticklabels([pretty(m) for m in models], fontsize=8)
+        ax.set_title(plan)
+
+    handles = [plt.Rectangle((0,0),1,1, color=HANDLE_COLOR[h]) for h in HANDLE_ORDER]
+    fig.legend(handles, HANDLE_ORDER, loc="lower center", ncol=len(HANDLE_ORDER), fontsize=8,
+               bbox_to_anchor=(0.5, -0.02), title="modal m_handle across 3 seeds")
+    fig.suptitle("Figure 6. Error-handling robustness across 7 injection patterns × {v2, v2_defensive}", y=1.02)
+    plt.tight_layout()
+    plt.savefig(out, dpi=130, bbox_inches="tight")
+    plt.close()
+
+
+# ────────────────────────────────────────────────────────────────────────────
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true")
-    ap.add_argument("--fig", type=int, choices=[1, 2, 3, 4, 5])
+    ap.add_argument("--fig", type=int, choices=[1, 2, 3, 4, 5, 6])
     args = ap.parse_args()
 
     if not args.all and args.fig is None:
@@ -346,9 +450,10 @@ def main():
         3: lambda: fig3_track_b(df,        FIGS / "fig3_plan_value.png"),
         4: lambda: fig4_v1g(df,            FIGS / "fig4_v1g_robustness.png"),
         5: lambda: fig5_hardware(df,       FIGS / "fig5_hardware.png"),
+        6: lambda: fig6_error_handling(    FIGS / "fig6_error_handling.png"),
     }
     if args.all:
-        for i in (1, 2, 3, 4, 5):
+        for i in (1, 2, 3, 4, 5, 6):
             print(f"[fig{i}] generating…")
             funcs[i]()
         print("done")

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+OUTPUT_DIR="results"
+mkdir -p "$OUTPUT_DIR"
+
+# Helper: ensure reference files exist
+ref_path="data/ref/chrM.fa"
+[[ -f $ref_path.fai ]] || samtools faidx "$ref_path"
+[[ -f $ref_path.amb ]] && : || bwa index "$ref_path"
+
+for sample in "${SAMPLES[@]}"; do
+  BAM="${OUTPUT_DIR}/${sample}.b

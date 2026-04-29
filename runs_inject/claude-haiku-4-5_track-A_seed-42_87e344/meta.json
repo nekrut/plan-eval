@@ -1,0 +1,14 @@
+{
+  "run_id": "claude-haiku-4-5_track-A_seed-42_87e344",
+  "model": "claude-haiku-4-5",
+  "track": "A",
+  "seed": 42,
+  "think": null,
+  "provider": "anthropic",
+  "wall_seconds_generation": 57.25035238265991,
+  "duration_ms_generation": 54039,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "stderr_warning_storm",
+  "inject_target": "lofreq"
+}

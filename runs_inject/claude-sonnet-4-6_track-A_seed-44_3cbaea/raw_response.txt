@@ -1,0 +1,22 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF=data/ref/chrM.fa
+OUT=results
+
+mkdir -p "$OUT"
+
+: > "$OUT/failures.log"
+
+SURVIVORS=()
+OK=0
+
+try() {
+  local sample="$1" step="$2" validate="$3"; shift 3
+  [[ "$1" == "--" ]] && shift
+  if "$@" && eval "$validate"; then return 0; fi
+  "$@" && eval "$validate" && return 0
+  printf '%s\t%

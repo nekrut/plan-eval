@@ -1,0 +1,14 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-44_cd9d12",
+  "model": "granite4",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 24.133808851242065,
+  "duration_ms_generation": 24133,
+  "plan_path": "/home/anton/bench/plan/PLAN_v2_defensive.md",
+  "plan_name": "PLAN_v2_defensive",
+  "inject_pattern": "flake_first_call",
+  "inject_target": "bwa"
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p results
+
+# 1. BWA index
+[[ -f data/ref/chrM.fa.bwt ]] || bwa index data/ref/chrM.fa
+
+# 2. Samtools faidx
+[[ -f data/ref/chrM.fa.fai ]] || samtools faidx data/ref/chrM.fa
+
+# 3-6. Per-sample: alignment, sort, index, call, compress, tabix
+for sample in "${SAMPLES[@]}"; do
+  # Alignment + s

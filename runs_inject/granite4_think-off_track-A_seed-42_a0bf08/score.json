@@ -1,0 +1,49 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_a0bf08",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 24.768658876419067,
+    "wall_seconds_execution": 0.6702919006347656,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 915,
+      "prompt_eval_duration_ns": 129467515,
+      "eval_duration_ns": 23628370247,
+      "total_duration_ns": 24761963499
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "flake_first_call",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

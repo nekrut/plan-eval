@@ -1,0 +1,17 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.134 CPU sec, 0.037 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.046 sec; CPU: 0.142 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+lofreq: transient I/O error (eval-injected, call #1)

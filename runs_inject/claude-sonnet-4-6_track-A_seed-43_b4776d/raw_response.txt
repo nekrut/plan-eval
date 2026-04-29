@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p results
+
+[[ -f data/ref/chrM.fa.bwt ]] || bwa index data/ref/chrM.fa
+
+[[ -f data/ref/chrM.fa.fai ]] || samtools faidx data/ref/chrM.fa
+
+for sample in "${SAMPLES[@]}"; do
+
+    [[ -f results/${sample}.bam ]] || {
+        bwa mem -t ${THREADS} \
+            -R "@RG\tID:${sample}\tSM:${samp

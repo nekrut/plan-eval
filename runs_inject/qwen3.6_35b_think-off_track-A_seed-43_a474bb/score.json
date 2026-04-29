@@ -1,0 +1,49 @@
+{
+  "run_id": "qwen3.6_35b_think-off_track-A_seed-43_a474bb",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 30.346742630004883,
+    "wall_seconds_execution": 0.8189425468444824,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2424,
+      "eval_count": 525,
+      "prompt_eval_duration_ns": 4719646403,
+      "eval_duration_ns": 24638300652,
+      "total_duration_ns": 30340618632
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "flake_first_call",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

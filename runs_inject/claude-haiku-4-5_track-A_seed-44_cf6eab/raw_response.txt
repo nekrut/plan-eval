@@ -1,0 +1,18 @@
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+# Create output directory
+mkdir -p results
+
+# Step 1: BWA index
+[[ -f data/ref/chrM.fa.bwt ]] || bwa index data/ref/chrM.fa
+
+# Step 2: samtools faidx
+[[ -f data/ref/chrM.fa.fai ]] || samtools faidx data/ref/chrM.fa
+
+# Steps 3-6: Per-sample alignment, indexing, variant calling

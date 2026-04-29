@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+OUTPUT_DIR="results"
+mkdir -p "$OUTPUT_DIR"
+
+# Helper: ensure reference files exist before proceeding
+bwa index data/ref/chrM.fa && samtools faidx data/ref/chrM.fa
+
+for sample in "${SAMPLES[@]}"; do
+  # Alignment & sorting (per-sample)
+  bwa mem -t $THREADS \
+    -R "@RG\tID:$sample\t

@@ -1,0 +1,72 @@
+{
+  "run_id": "claude-haiku-4-5_track-A_seed-42_29b708",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 133.87313771247864,
+    "wall_seconds_execution": 1.5767931938171387,
+    "cost_usd": 0.09743149999999999,
+    "usage": {
+      "input_tokens": 8,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 39275,
+      "output_tokens": 18148,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 8,
+          "output_tokens": 18148,
+          "cache_read_input_tokens": 39275,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 2,
+    "inject_pattern": "flake_first_call",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_inject/claude-haiku-4-5_track-A_seed-42_29b708/run.sh line 4:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/bench/runs_inject/claude-haiku-4-5_track-A_seed-42_29b708/run.sh line 28:\n  [[ -f results/${sample}.vcf -o -f results/${sample}.vcf.gz ]] || lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/${sample}.vcf results/${sample}.bam\n                              ^-- SC2110 (error): In [[..]], use || instead of -o.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2110 ",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

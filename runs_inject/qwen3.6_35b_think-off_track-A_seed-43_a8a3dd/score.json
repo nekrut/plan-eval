@@ -1,0 +1,53 @@
+{
+  "run_id": "qwen3.6_35b_think-off_track-A_seed-43_a8a3dd",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 71.04482460021973,
+    "wall_seconds_execution": 1.7697398662567139,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3101,
+      "eval_count": 1479,
+      "prompt_eval_duration_ns": 1545611088,
+      "eval_duration_ns": 67683248710,
+      "total_duration_ns": 71038461929
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 0,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [
+      "failures_log_populated",
+      "summary_line",
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "flake_first_call",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_inject/qwen3.6_35b_think-off_track-A_seed-43_a8a3dd/run.sh line 4:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/bench/runs_inject/qwen3.6_35b_think-off_track-A_seed-43_a8a3dd/run.sh line 6:\nREF=data/ref/chrM.fa\n^-^ SC2034 (warning): REF appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- REF appears unused. Verify use (o...\n",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

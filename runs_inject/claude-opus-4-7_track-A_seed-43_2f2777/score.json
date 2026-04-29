@@ -1,0 +1,88 @@
+{
+  "run_id": "claude-opus-4-7_track-A_seed-43_2f2777",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "missing": [
+      "M117C1-ch.vcf.gz",
+      "M117C1-ch.vcf.gz.tbi"
+    ]
+  },
+  "m3_jaccard": 0.75,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 0.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 90.08835434913635,
+    "wall_seconds_execution": 7.1413209438323975,
+    "cost_usd": 0.21506750000000002,
+    "usage": {
+      "input_tokens": 5,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 20725,
+      "output_tokens": 8047,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [
+        {
+          "input_tokens": 5,
+          "output_tokens": 8047,
+          "cache_read_input_tokens": 20725,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard"
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl"
+    ],
+    "n_valid": 3,
+    "target_n_for_pattern": 3,
+    "diagnose_signals": [
+      "failures_log_populated",
+      "summary_line",
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 0,
+    "inject_pattern": "one_sample_fails",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

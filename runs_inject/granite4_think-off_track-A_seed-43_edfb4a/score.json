@@ -1,0 +1,55 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-43_edfb4a",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.30888557434082,
+    "wall_seconds_execution": 7.539767026901245,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2255,
+      "eval_count": 419,
+      "prompt_eval_duration_ns": 145899358,
+      "eval_duration_ns": 10556441886,
+      "total_duration_ns": 11300220180
+    }
+  },
+  "error_handling": {
+    "m_handle": "propagate",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl"
+    ],
+    "n_valid": 3,
+    "target_n_for_pattern": 3,
+    "diagnose_signals": [
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "one_sample_fails",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

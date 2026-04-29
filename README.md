@@ -4,7 +4,7 @@ A controlled comparison of frontier (Anthropic Claude 4.x) and open-weight (Olla
 
 ## Abstract
 
-We measure how faithfully a small or local language model converts a hyper-detailed Opus-authored recipe into an executable bioinformatics workflow, holding the substrate constant: per-sample variant calling on four paired-end mtDNA Illumina samples (Zenodo 5119008) against a published Galaxy Training Network reference workflow. Primary metric is M3, the macro-mean Jaccard index of `(chrom, pos, ref, alt)` PASS calls vs the canonical VCF, with an AF tolerance window of ±0.02. Three quantified findings: (i) plan-detail dominates model capability — going from a lean ~1200-token plan (v1) to a hyper-detailed ~1150-byte/command plan (v2) flips most local models from M3 ≈ 0.0 to 1.000 and leaves Anthropic models unchanged at 1.000; (ii) on Jetson MAXN, **13 of 14 free open-weight models score M3 = 1.000 ± 0.000 on v2 Track A**, with the smallest perfect model (`granite4`, 2.1 GB on disk) at 15 s/seed; (iii) the v1→v2 cliff for ≥27 B dense local models reduces to a single command line — adding the literal `lofreq call-parallel` invocation to v1 (variant v1.25) brings them all to 1.000, falsifying a "model size" hypothesis in favour of a "tool-CLI specificity" one. Tracks with no plan collapse all open-weight models to M3 = 0.000 ± 0.000 while leaving frontier Anthropic at M3 ≥ 0.667. Mechanically extracting the lofreq snippet from Galaxy's IUC tool registry (variant v1g) breaks Claude Haiku and small/MoE locals because the registry's Cheetah templates produce syntactically incomplete CLIs once their runtime parameter bindings are stripped. Implication: hand-authored, command-literal plans are the bottleneck for free-local recipe execution; the model class and the hardware are not.
+We measure how faithfully a small or local language model converts a hyper-detailed Opus-authored recipe into an executable bioinformatics workflow, holding the substrate constant: per-sample variant calling on four paired-end mtDNA Illumina samples (Zenodo 5119008) against a published Galaxy Training Network reference workflow. Primary metric is M3, the macro-mean Jaccard index of `(chrom, pos, ref, alt)` PASS calls vs the canonical VCF, with an AF tolerance window of ±0.02. Four quantified findings: (i) plan-detail dominates model capability — going from a lean ~1200-token plan (v1) to a hyper-detailed ~1150-byte/command plan (v2) flips most local models from M3 ≈ 0.0 to 1.000 and leaves Anthropic models unchanged at 1.000; (ii) on Jetson MAXN, **13 of 14 free open-weight models score M3 = 1.000 ± 0.000 on v2 Track A**, with the smallest perfect model (`granite4`, 2.1 GB on disk) at 15 s/seed; (iii) the v1→v2 cliff for ≥27 B dense local models reduces to a single command line — adding the literal `lofreq call-parallel` invocation to v1 (variant v1.25) brings them all to 1.000, falsifying a "model size" hypothesis in favour of a "tool-CLI specificity" one; (iv) under deliberately injected tool failures (390 cells across 7 patterns × 5 models × 2 plan variants × 3 seeds), models without explicit error-handling prose (v2) collapse to identical handle-distribution profiles regardless of class — recipe alone does not produce defensive code — while explicit defensive prose (v2_defensive) cleanly separates frontier (Opus/Sonnet/Haiku, all converge to 21 recover / 14–15 partial / 0 crash) from cheap-local-but-defensive (`qwen3.6:35b`, 7/29/0 — implements the structure but recovers less often) from below-the-floor (`granite4`, 0/0/36 — cannot implement defensive scripting at all). Tracks with no plan collapse all open-weight models to M3 = 0.000 ± 0.000 while leaving frontier Anthropic at M3 ≥ 0.667. Mechanically extracting the lofreq snippet from Galaxy's IUC tool registry (variant v1g) breaks Claude Haiku and small/MoE locals because the registry's Cheetah templates produce syntactically incomplete CLIs once their runtime parameter bindings are stripped. Implication: hand-authored, command-literal plans — including, separately, command-literal *error-handling* prose — are the bottleneck for free-local recipe execution; the model class and the hardware are not.
 
 ## 1. Objective
 
@@ -90,6 +90,57 @@ Figure 5 Panel A plots mean generation time (log scale) against mean M3 for each
 
 Panel B shows the Jetson sweep at 30 W power mode (original 9-of-14 perfect, green) versus MAXN (the 5 originally-failing entries retried, purple). Four of the five MAXN retries reach M3 = 1.000; only `olmo-3.1:32b` remains a real reasoning-mode timeout (excluded from the bar chart because all three of its seeds at MAXN exceed the 900 s budget and produce no run dirs). The Jetson 30 W → MAXN delta is a budget-constrained timeout effect, not a capability one. A latent harness bug — discussed in §3.3 — additionally accounts for three of the original "timeouts" being misroutes rather than real budget failures.
 
+### 2.6 Error-handling robustness under deliberately injected tool failures
+
+§2.1–§2.5 measured implementer behaviour on the happy path. To probe what happens when a tool actually misbehaves at runtime, we ran a second matrix of 390 runs (5 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds) in which one of `bwa` or `lofreq` is shimmed by a Python wrapper that simulates a controlled failure mode. The shim sits ahead of the real tool on `PATH` and reads `EVAL_INJECT_PATTERN` and `EVAL_INJECT_TARGET` to decide its behaviour; the model's own `run.sh` is unchanged across cells.
+
+Seven failure patterns:
+
+| pattern | what the shim does | imitates |
+|---|---|---|
+| `flake_first_call` | first invocation exits 1, subsequent succeed | transient I/O hiccup |
+| `one_sample_fails` | exits 1 only when `M117C1-ch` appears in args | one corrupt sample in a batch |
+| `silent_truncation` | runs the real tool, then truncates the `-o` output to 0 bytes | broken disk write the tool didn't notice |
+| `stderr_warning_storm` | spews 200 `WARNING` lines on stderr, then runs the real tool | false-alarm noise (samtools-view oddities) |
+| `slow_tool` | sleeps 30 s, then runs the real tool | overloaded I/O |
+| `wrong_format_output` | runs the real tool, then strips every variant line from the output VCF | broken caller config that produces no calls |
+| `missing_lib_error` | exits 127 with `error while loading shared libraries: libhts.so.3` | broken conda env, stale cache |
+
+Two recipe variants are crossed with the patterns: **v2** (the existing happy-path detailed plan, no error-handling prose) and **v2_defensive** (a new Opus-authored plan, `plan/PLAN_v2_defensive.md`, that requires a `try()` helper, output-validation after every step, retry-once on failure, per-sample isolation via `continue`, structured `results/failures.log` rows, and a stderr summary line). Five representative implementer models: Claude Opus 4.7 / Sonnet 4.6 / Haiku 4.5, plus open-weight `qwen3.6:35b` (Jetson MAXN) and `granite4` (the smallest passer of §2.1). Three new metrics on top of M3: **`m_handle`** (categorical: `crash` / `propagate` / `partial` / `recover`), **`m_recover`** (binary; was the n_valid_VCF count equal to the *best-achievable* count for this pattern?), **`m_diagnose`** (binary; was failure structurally logged or summarised?). Definitions are in §3.3 and the metric code is `score/score_run.py:error_handling`.
+
+![Figure 6. Error-handling robustness across 7 injection patterns × {v2, v2_defensive}.](figures/fig6_error_handling.png)
+
+**v2 is identical across models.** Without defensive prose, all five models — frontier and local — collapse to the same modal handle distribution per pattern. The four left-panel rows of Figure 6 are visually identical: red on `flake_first_call`, `missing_lib_error`, `silent_truncation`; orange (`propagate`) on `one_sample_fails`; green (`recover`) on `slow_tool`, `stderr_warning_storm`, `wrong_format_output`. Numerically the per-(model, plan) handle counts on v2 are exactly **15 recover / 0 partial / 6 propagate / 15 crash (n=36)** for Opus, Sonnet, Haiku, and qwen3.6:35b. Granite4 lands at 12 / 0 / 4 / 20 — slightly more crashes from a small-model artifact (it sometimes fails to emit a parseable script even on `slow_tool`). The takeaway: **without explicit error-handling instructions, the recipe alone does not produce defensive code, regardless of implementer model class.** Models inherit only the failure modes that follow from `set -euo pipefail` plus naive sequential execution.
+
+**v2_defensive separates frontier from local cleanly.**
+
+- The **three Anthropic models converge again**, but at a much better point: 21 recover / 14–15 partial / 0 propagate / 0–1 crash (n=36 each). They all implement Opus's `try()` helper faithfully, retry transient failures, isolate per-sample failures, and never let a tool error abort the whole script.
+- **`qwen3.6:35b`** drops to **7 recover / 29 partial / 0 propagate / 0 crash**. The defensive script is structurally correct — zero crashes — but its retries and recovery loops succeed on a smaller fraction of cells than Anthropic. Per-pattern mean M3 reflects this: `flake_first_call` 0.33, `one_sample_fails` 0.25, `stderr_warning_storm` 0.33 — versus Opus's 1.00 / 0.75 / 1.00. qwen detects errors and skips, but doesn't always recover even when recovery is possible.
+- **`granite4` cannot implement v2_defensive at all**: every single cell is `crash` (36/36, all M3=0). Its 2.1 GB capacity is enough to transliterate the v2 plan into bash but not enough to faithfully implement the v2_defensive `try()` helper plus per-sample loop continuation. This is a model-capability floor for defensive scripting, well below the threshold for happy-path scripting.
+
+**The pattern character matters as much as the model.** Three patterns are catastrophic in principle and remain so under v2_defensive: `missing_lib_error` cannot be recovered (the workflow can't proceed without `libhts.so.3`); `silent_truncation` and `wrong_format_output` produce content that is structurally valid but biologically empty, and a model can at best detect-and-skip rather than recover. By contrast `flake_first_call`, `slow_tool`, `stderr_warning_storm`, and `one_sample_fails` are fully recoverable in the sense that an aware script (a) retries, (b) waits, (c) ignores noise, or (d) skips the bad sample. The dichotomy isn't model-driven; it's pattern-driven, and §3.3's `m_recover` (binary best-achievable) captures it explicitly.
+
+**Diagnostic-quality results.** `m_diagnose` (whether the script populated `failures.log` or emitted a structured summary) is 0 across every v2 cell (no model writes a failures log without instructions) and is ≥0.85 across every v2_defensive cell except the 4 patterns that exit before any user code runs (`missing_lib_error` exits 127 immediately during reference indexing). For the recoverable patterns the v2_defensive Anthropic cells diagnose with `m_diagnose=1` on every seed.
+
+**Caveats.** `m_handle="recover"` does not mean the output is biologically correct — it means n_valid_VCF=4. For `wrong_format_output`, every Anthropic v2_defensive run scores `recover` while M3=0: the script ships four header-only VCFs that pass `bcftools view -h` but contain no calls. Detecting an empty-but-structurally-valid file would require an explicit content check (e.g. `bcftools view -H | wc -l > 0`) the v2_defensive plan does not require. This is a real gap in the prose, not a model failure, and is the single most informative caveat the experiment surfaces about defensive-recipe design.
+
+The headline (model, plan) summary is reproduced verbatim from the matrix log:
+
+| model / plan | recover | partial | propagate | crash | n |
+|---|---:|---:|---:|---:|---:|
+| Claude Opus 4.7 / v2 | 15 | 0 | 6 | 15 | 36 |
+| Claude Opus 4.7 / v2_defensive | 21 | 15 | 0 | 0 | 36 |
+| Claude Sonnet 4.6 / v2 | 15 | 0 | 6 | 15 | 36 |
+| Claude Sonnet 4.6 / v2_defensive | 21 | 14 | 0 | 1 | 36 |
+| Claude Haiku 4.5 / v2 | 15 | 0 | 6 | 15 | 36 |
+| Claude Haiku 4.5 / v2_defensive | 21 | 15 | 0 | 0 | 36 |
+| qwen3.6:35b / v2 | 15 | 0 | 6 | 15 | 36 |
+| qwen3.6:35b / v2_defensive | 7 | 29 | 0 | 0 | 36 |
+| granite4 / v2 | 12 | 0 | 4 | 20 | 36 |
+| granite4 / v2_defensive | 0 | 0 | 0 | 36 | 36 |
+
+n=36 = 12 (pattern, tool) cells × 3 seeds; baseline (no-injection) cells excluded.
+
 ### Table 1 — Headline results
 
 | model | v2 Track A M3 | v1 Track A M3 | Track B M3 | mean v2 gen (s) | M5 pass |
@@ -134,6 +185,7 @@ Mean v2 generation seconds are computed over seeds 42/43/44 of the (model × v2)
 | v1.5 | `plan/PLAN_v1p5.md` | 1277 | v2 with every prose paragraph and "Gotchas" block deleted, code fences kept | are the prose explanations in v2 load-bearing or decorative? |
 | v1g | `plan/PLAN_v1g.md` | 4187 | v1 + Galaxy-IUC-mechanical lofreq snippet (Cheetah-strip + macro expand from `tools-iuc@39e7456`) | can a tool registry replace a human plan author? |
 | v2 (detailed) | `plan/PLAN.md` | 4617 | Opus 4.7 from `PLANNER_PROMPT_v2.md`: every step gives the exact command line | reference detailed plan |
+| v2_defensive | `plan/PLAN_v2_defensive.md` | 6523 | Opus 4.7 from `PLANNER_PROMPT_v2_defensive.md`: v2 plus a `try()` helper, output-validation after every step, retry-once, per-sample isolation, structured failure log, exit policy | does explicit error-handling prose make implementer scripts defensive against runtime tool failures? (§2.6) |
 
 ### Table 3 — Failure taxonomy on v2 Track A (cells with mean M3 < 1.0)
 
@@ -581,7 +633,11 @@ The user prompt is constructed from a fixed system message (`prompts/system.txt`
 
 ### 3.3 Scoring
 
-Five metrics are computed per run by `score/score_run.py`:
+For the error-handling experiment (§2.6), three additional metrics are computed: **`m_handle`** ∈ {`crash`, `propagate`, `partial`, `recover`} discriminated by whether the script structurally detected its failures (failures.log populated *or* a final summary line emitted) rather than by exit code alone — a defensive script that catches every sample's truncation and exits 1 with all failures logged is `partial`, not `crash`; **`m_recover`** is binary, comparing n_valid_VCF to a pattern-specific best-achievable count (`one_sample_fails` → 3; `silent_truncation`/`wrong_format_output` → 0; `missing_lib_error` → 0; transient/cosmetic patterns → 4); **`m_diagnose`** is binary and triggers on any of failures.log non-empty, a recognizable summary line, or sample-name × failure-word co-occurrence in the run's stderr. Code: `score/score_run.py:error_handling`.
+
+The error-injection apparatus is a Python shim (`harness/error_shims/shim.py`) symlinked into a per-run sandbox bin/ ahead of the conda env's bin/ on PATH. Each shim reads `EVAL_INJECT_PATTERN` and `EVAL_INJECT_TARGET` set by `harness/run_one.py:setup_inject` and either delegates to the real tool or simulates the configured failure (counter-state for `flake_first_call`, post-tool VCF mutation for `silent_truncation` and `wrong_format_output`, etc.). Critically, the PATH override is exported *after* `conda activate bench`, since activate prepends conda's bin/ which would otherwise win the lookup. The matrix is driven by `harness/error_matrix.py`. The M5 idempotency rerun (which re-executes run.sh in the run dir to verify cached re-runs exit 0) is skipped when injection was active to avoid silently fixing the run dir's results/ files without the shim env preserved.
+
+Five primary metrics are computed per run by `score/score_run.py`:
 
 - **M1 (Executes).** Binary. `bash run.sh` exits 0 within 600 s wall-clock.
 - **M2 (Schema).** Binary. All 9 expected outputs are present (4 BAM, 4 BAI, 4 VCF.gz, 4 TBI, 1 collapsed.tsv) and `bcftools view -h` succeeds on each VCF.

@@ -1,0 +1,2 @@
+bwa: transient I/O error (eval-injected, call #1)
+run.sh: line 18: $1: unbound variable

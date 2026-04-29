@@ -1,0 +1,10 @@
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa index data/ref/chrM.fa
+[main] Real time: 0.033 sec; CPU: 0.008 sec
+run.sh: line 19: $1: unbound variable
