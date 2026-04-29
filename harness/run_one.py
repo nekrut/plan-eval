@@ -75,7 +75,7 @@ def call_claude(model: str, system_text: str, user_text: str) -> dict:
         "--output-format", "json",
         "--no-session-persistence",
         "--disallowedTools", "*",
-        "--max-budget-usd", "1",
+        "--max-budget-usd", "5",
     ]
     t0 = time.time()
     p = subprocess.run(cmd, input=user_text, capture_output=True, text=True)
@@ -280,6 +280,8 @@ def main() -> int:
         "provider": gen["provider"],
         "wall_seconds_generation": gen["wall_seconds"],
         "duration_ms_generation": gen["duration_ms"],
+        "plan_path": str(plan_path),
+        "plan_name": plan_path.stem,
         "inject_pattern": args.inject,
         "inject_target": args.inject_target if args.inject != "none" else None,
     }
