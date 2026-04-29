@@ -1,130 +1,169 @@
-# plan-eval: a benchmark for recipe-driven bioinformatics workflow execution
+# plan-eval — can a cheap model run a strong model's bioinformatics recipe?
 
-A controlled comparison of frontier (Anthropic Claude 4.x) and open-weight (Ollama-hosted, 4–70 B) language models at executing an Opus-authored mtDNA variant-calling recipe, scored against a published canonical answer key. Two consumer hardware platforms (Jetson AGX Orin, RTX 5080), six plan-detail levels, two tracks (with-plan, no-plan), three seeds per cell, **n=403 scored runs**, **25 distinct models**.
+Opus 4.7 wrote a recipe for variant-calling on four mtDNA samples. We gave that recipe to 25 models — three Anthropic tiers plus 22 free open-weight ones — and asked each to turn it into a bash script. We ran the scripts on real data and checked their variant calls against a published answer key. Hardware: Jetson AGX Orin and RTX 5080. Three seeds per cell, several recipe styles, with-recipe and no-recipe runs, plus seven kinds of deliberate tool failure. **793 scored runs.**
 
 ## Abstract
 
-We measure how faithfully a small or local language model converts a hyper-detailed Opus-authored recipe into an executable bioinformatics workflow, holding the substrate constant: per-sample variant calling on four paired-end mtDNA Illumina samples (Zenodo 5119008) against a published Galaxy Training Network reference workflow. Primary metric is M3, the macro-mean Jaccard index of `(chrom, pos, ref, alt)` PASS calls vs the canonical VCF, with an AF tolerance window of ±0.02. Four quantified findings: (i) plan-detail dominates model capability — going from a lean ~1200-token plan (v1) to a hyper-detailed ~1150-byte/command plan (v2) flips most local models from M3 ≈ 0.0 to 1.000 and leaves Anthropic models unchanged at 1.000; (ii) on Jetson MAXN, **13 of 14 free open-weight models score M3 = 1.000 ± 0.000 on v2 Track A**, with the smallest perfect model (`granite4`, 2.1 GB on disk) at 15 s/seed; (iii) the v1→v2 cliff for ≥27 B dense local models reduces to a single command line — adding the literal `lofreq call-parallel` invocation to v1 (variant v1.25) brings them all to 1.000, falsifying a "model size" hypothesis in favour of a "tool-CLI specificity" one; (iv) under deliberately injected tool failures (390 cells across 7 patterns × 5 models × 2 plan variants × 3 seeds), models without explicit error-handling prose (v2) collapse to identical handle-distribution profiles regardless of class — recipe alone does not produce defensive code — while explicit defensive prose (v2_defensive) cleanly separates frontier (Opus/Sonnet/Haiku, all converge to 21 recover / 14–15 partial / 0 crash) from cheap-local-but-defensive (`qwen3.6:35b`, 7/29/0 — implements the structure but recovers less often) from below-the-floor (`granite4`, 0/0/36 — cannot implement defensive scripting at all). Tracks with no plan collapse all open-weight models to M3 = 0.000 ± 0.000 while leaving frontier Anthropic at M3 ≥ 0.667. Mechanically extracting the lofreq snippet from Galaxy's IUC tool registry (variant v1g) breaks Claude Haiku and small/MoE locals because the registry's Cheetah templates produce syntactically incomplete CLIs once their runtime parameter bindings are stripped. Implication: hand-authored, command-literal plans — including, separately, command-literal *error-handling* prose — are the bottleneck for free-local recipe execution; the model class and the hardware are not.
+The question: can a small model take a recipe from a strong model and produce a script that runs and gives the right answer? The task: per-sample variant calling on four mtDNA samples from Zenodo 5119008. The score: M3, the average overlap of variant calls against a published answer key. M3 = 1.000 means every call is right; M3 = 0 means none of them match.
+
+Four findings.
+
+**Detail beats model size.** The brief recipe (v1, ~1,200 words of prose) gives M3 ≈ 0 for most local models. The detailed recipe (v2, every command spelled out) gives M3 = 1.000 for 13 of 14 free local models on Jetson at full power. The fastest is `granite4` — 2.1 GB on disk, 15 seconds per run. Anthropic models score 1.000 on both.
+
+**The jump is one line.** Adding one literal `lofreq` command to v1 (call that v1.25) brings every dense model ≥ 27 B parameters from M3 ≈ 0 back to 1.000. The limit is not model size but how exotic the tool's command syntax is. Lofreq takes the BAM as a positional argument, not behind a flag; v1's prose did not say so.
+
+**No recipe means no work.** Without any recipe, every local model scores M3 = 0. Anthropic models score M3 ≥ 0.67 from what they already know. Local models cannot recover this workflow on their own.
+
+**Error handling needs its own prose.** We broke `bwa` or `lofreq` in seven ways and re-ran the matrix on the regular recipe and on one that adds defensive prose (v2_defensive). Without that prose, every model — Opus and granite4 alike — wrote the same brittle script. With it, three tiers appeared: Opus, Sonnet, and Haiku wrote clean defensive bash and never crashed; qwen3.6:35b wrote the right structure but its retries succeeded less often, ending in *detect-and-skip*; granite4 (2 GB) crashed on all 36 cells, unable to write a working `try()` helper. One useful caveat: a script that "recovered" still shipped junk if the recipe asked only that the file parse, not that it contain anything.
+
+The headline: detail in the recipe — both for the happy path and for error handling — is what local execution needs. Model class and hardware are not what limit performance.
 
 ## 1. Objective
 
-### 1.1 Question
+### 1.1 The question
 
-Can a small or local implementer model faithfully convert an Opus-authored recipe into an executable workflow, and how does this depend on recipe specificity?
+Can a small or local model take a strong model's recipe and write a working script? How much does the answer change with how detailed the recipe is?
 
-### 1.2 Why mtDNA variant calling as substrate
+### 1.2 Why mtDNA variant calling
 
-The human mitochondrial chromosome (`chrM`, 16,569 bp) is a uniquely well-defined target for an LLM-execution benchmark:
+The human mitochondrial chromosome is a small target — 16,569 bases — and it has four useful properties for this kind of benchmark:
 
-- **Deterministic ground truth.** The dataset was published with a complete canonical workflow in the [Galaxy Training Network mitochondrial-short-variants tutorial](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/mitochondrial-short-variants/tutorial.html). The workflow author and the dataset author overlap with this paper's author, so the answer key is not contested.
-- **Small, fast.** Four paired-end Illumina samples, ~838 KB compressed total. Each model's `run.sh` finishes in 8–17 s on either platform once the model emits a valid script.
-- **Spans homoplasmic and heteroplasmic variants.** The four samples include both clean (AF ≈ 1.0) and low-frequency (AF down to ~0.04) calls, so an AF-tolerant scoring function is non-trivially exercised.
-- **Toolchain is canonical and locked.** BWA-MEM → LoFreq → bcftools/SnpSift, all from a pinned bioconda environment, so model "creativity" in tool selection is constrained.
+- **The answer is known.** The dataset comes with a tutorial that walks through the canonical workflow, written and published by the dataset's own author.
+- **It runs fast.** Four short-read samples, 838 KB compressed total. Each script finishes in 8 to 17 seconds.
+- **Two kinds of call.** The four samples include both clean variants (every read carries them) and low-frequency variants (about 4% of reads carry them). A score that ignored allele frequency would lose the second kind.
+- **Tools are pinned.** BWA-MEM, LoFreq, bcftools — all from a locked conda environment. The model can't "improve" the toolchain; it can only run what we have.
 
-### 1.3 Why Jaccard on PASS 4-tuples as the primary metric
+### 1.3 What M3 measures, with an example
 
-For each sample, the canonical and model-produced VCFs are compared as sets of 4-tuples `(chrom, pos, ref, alt)` over PASS-filtered records, with a per-call AF tolerance of ±0.02:
+For each sample, list the variants in the model's VCF and the variants in the answer key. M3 is the count of variants in *both* files, divided by the count in *either* file. Average that over the four samples.
 
-> M3 = mean over 4 samples of |M ∩ G| / |M ∪ G|
+> Example: the answer key has variants {A, B, C, D}; the model's VCF has {A, B, C, E}. Variants in both = 3 (A, B, C). Variants in either = 5 (A, B, C, D, E). M3 for this sample = 3/5 = 0.6.
 
-where M and G are the model's and the ground-truth tuple sets respectively. The metric is set-based, bounded `[0, 1]`, agnostic to caller-specific INFO/FORMAT fields, and averages cleanly across samples without weighting. It does not penalize a model for using a different but valid tool than the recipe specifies (e.g. `bcftools mpileup` instead of `lofreq`); only the *calls* are compared.
+> Example: three of the four samples are perfect (M3 = 1.0 each), the fourth has zero overlap. Average M3 = (1 + 1 + 1 + 0) / 4 = 0.75.
 
-### 1.4 Recipe-then-implement framing
+A "match" requires the same chromosome, position, reference base, and alternate base, plus allele frequencies within 0.02 of each other. We use only PASS or unfiltered records. The score doesn't care which tool produced the VCF — `bcftools mpileup` or `lofreq` count the same — only the variant calls themselves.
 
-Workflow generation is split into two stages: a **plan** (Markdown recipe) authored once by Claude Opus 4.7, and an **implementation** (single self-contained `run.sh`) emitted by the model under test. This decomposition (a) separates planning capability from execution capability — a question that "ask Opus to do everything end-to-end" cannot answer; (b) mirrors how practitioners actually delegate (a senior writes the recipe, a junior writes the script); and (c) admits a clean no-plan control (Track B) that quantifies the marginal value of the plan.
+### 1.4 Why split the work into recipe and script
+
+Two stages. Opus 4.7 writes a recipe and we freeze it. Every implementer model gets the same recipe and writes one bash script. We run the script on the data.
+
+Splitting like this lets us measure two things separately. The recipe's quality is one variable; the implementer's ability to follow it is another. It also gives us a clean control: Track B asks the model to write the script with no recipe at all. The drop from Track A to Track B says how much the recipe is worth.
 
 ## 2. Results
 
-### 2.1 Plan-detail dominates model capability
+### 2.1 Detail beats model size
 
 ![Figure 1. Mean M3 by model × plan variant.](figures/fig1_headline_heatmap.png)
 
-The headline matrix (Figure 1) shows mean M3 across all (model × plan variant) cells, with both hardware platforms pooled. Plan variants are ordered from no-plan (Track B) on the left to most detailed (v2) on the right; intermediate columns v0.5 / v1 / v1g / v1.25 / v1.5 are defined in §4 and Table 2. The v2 column is uniformly green (M3 ≈ 1.0); the no-plan column is uniformly red except for Anthropic frontier models. Most non-frontier rows transition sharply between v1 and v2.
+Figure 1 shows mean M3 for each model and each recipe variant, both hardware platforms pooled. Rows are 25 models, columns are seven recipe variants from no-recipe (left) to most detailed (right). Cells are colored by score: green is 1.000, red is 0.
 
-**Anthropic models are insensitive to plan detail on Track A.** Opus 4.7, Sonnet 4.6 and Haiku 4.5 all score M3 = 1.000 ± 0.000 (n = 3) on both v1 and v2 Track A. They have enough internal toolchain knowledge to fill in v1's ambiguities themselves.
+The v2 column is uniformly green. The no-recipe column is red except for the three Anthropic rows. Most non-Anthropic rows jump from red on v1 to green on v2.
 
-**Local open-weight models are dominated by plan detail.** On the RTX 5080, only `qwen3.6:27b` (dense) reaches v2 levels on the lean v1 plan. All other tested open-weight models score M3 ∈ {0.000, 0.333} on v1 and 1.000 ± 0.000 on v2.
+**Anthropic models score the same on every Track A recipe.** Opus, Sonnet, and Haiku all hit M3 = 1.000 on v1 and on v2 (n = 3 each). They know the toolchain well enough to fill in v1's gaps on their own.
 
-**On Jetson AGX Orin in MAXN power mode, 13 of 14 free open-weight models score M3 = 1.000 ± 0.000 on v2 Track A** (Table 1). The single failure (`nemotron-3-nano`, 24 B) is not a plan-detail or budget issue but a code-correctness bug: the model emits a script in 22 s that calls `bgzip results/${sample}.vcf` before `lofreq` has produced the file, exits 255 in 8 s. A second model (`olmo-3.1:32b`) is excluded from the n=14 count above because its three seeds time out at the 900 s wall budget — a real reasoning-mode failure that does not respect Ollama's `/no_think`.
+**Free local models depend on detail.** On the RTX 5080, only `qwen3.6:27b` (dense) reaches v2 levels on the v1 recipe. Every other tested open-weight model scores M3 ∈ {0, 0.33} on v1 and 1.000 on v2.
 
-### 2.2 The v1 cliff reduces to one missing command line
+**On Jetson at full power, 13 of 14 free open-weight models score M3 = 1.000 on v2** (Table 1). The exception is `nemotron-3-nano`: it writes a script in 22 seconds that runs `bgzip results/${sample}.vcf` *before* `lofreq` has produced the file, so bash exits 255 in 8 seconds — a code bug, not a recipe or budget problem. A 14th model, `olmo-3.1:32b`, never produces a single completed run; all three seeds time out at the 900-second budget. It is a thinking-mode model that does not honor Ollama's `/no_think` setting.
+
+### 2.2 The jump is one command line
 
 ![Figure 2. The v1 cliff and its single-line repair.](figures/fig2_v1_cliff_repair.png)
 
-The v1→v2 transition adds ≈1500 bytes of prose and code fences. Two intermediate plan variants isolate which part of that delta carries the load (Figure 2, RTX 5080, Track A, n = 3 per cell):
+v2 is about 1,500 bytes longer than v1. Two in-between recipes test which part of that extra text matters (Figure 2, RTX 5080, Track A, n = 3 per cell):
 
-- **v1.25** = v1 + one extra code-fenced line, the literal `lofreq call-parallel --pp-threads $T -f $REF -o $OUT $BAM` invocation.
-- **v1.5** = v2 with every prose paragraph and "Gotchas" subsection stripped — only numbered headings and code fences remain.
+- **v1.25 = v1 + one extra line.** The line is `lofreq call-parallel --pp-threads $T -f $REF -o $OUT $BAM`.
+- **v1.5 = v2 with every prose paragraph removed.** Headings and code blocks remain; the "Gotchas" notes are gone.
 
-For ≥27 B dense models (qwen3.5:27b, qwen3.6:35b-a3b, qwen3-coder:30b, gemma4:26b) **v1.25 alone is sufficient** to bring M3 to 1.000 ± 0.000. The only tool whose CLI these models could not reconstruct from prose is `lofreq`, whose BAM is positional and not flagged. Smaller models (≤14 B, including qwen3:14b, qwen3.5:9b, qwen3:8b, gemma4:e4b) require **every** command line to be literalized; v1.5 brings them to 1.000 while v1.25 leaves them at 0.000–0.333.
+For dense models ≥ 27 B (qwen3.5:27b, qwen3.6:35b-a3b, qwen3-coder:30b, gemma4:26b), v1.25 alone takes M3 to 1.000. The one tool whose syntax these models could not work out from v1's prose was `lofreq`, whose BAM goes at the end as a positional argument — not behind `-i` or `-b`. Smaller models — qwen3:14b, qwen3.5:9b, qwen3:8b, gemma4:e4b — need every command spelled out: v1.5 takes them to 1.000, while v1.25 leaves them at 0 to 0.33.
 
-The prose paragraphs in v2 — read-group escape-character warnings, in-place bgzip notes, format-string conventions — are not load-bearing for the implementer model. v1.5 omits all of them and produces equivalent M3 to v2 on the models that pass v2 at all. The variants are summarized in Table 2.
+The prose paragraphs in v2 — read-group escape warnings, in-place bgzip notes, format-string conventions — do not help the implementer model. v1.5 drops them all and produces the same M3 as v2 on the models that pass v2. The recipe variants are listed in Table 2.
 
-### 2.3 No-plan tracks isolate plan value from model capability
+### 2.3 No recipe means no work
 
 ![Figure 3. Plan value: Track B vs Track A v1 vs Track A v2.](figures/fig3_plan_value.png)
 
-Track B presents only the problem statement and a tool inventory — no recipe — to the model. Across all tested open-weight models on Track B (any plan-version), mean M3 is 0.000 ± 0.000 with two exceptions: a single 1/3 fluke for `qwen3_14b` (mean 0.17) and an isolated 1/3 for `gemma4:26b` (mean 0.33). Anthropic Opus 4.7 and Sonnet 4.6 reach 0.94 ± 0.00 on Track B; Haiku 4.5 reaches 0.67 ± 0.58 (one of three runs returns zero correct variants, instability without the recipe).
+Track B gives the model only the problem and a list of tools. No recipe. Across every tested open-weight model on Track B, mean M3 is 0 — with two exceptions, both 1-of-3 flukes: qwen3:14b at 0.17 average, gemma4:26b at 0.33 average. Anthropic Opus and Sonnet reach M3 = 0.94 on Track B. Haiku reaches 0.67, dragged down by one of three runs that returns zero correct variants.
 
-The slope plot (Figure 3) makes the inversion explicit: the open-weight curve is essentially flat at zero through Track B and Track A v1, then jumps to 1.0 at Track A v2. The Anthropic curve is flat near 1.0 across all three points. **The plan is not a productivity hack for local models; it is a capability prerequisite.**
+Figure 3 shows the slope plot. The open-weight lines stay near zero through Track B and Track A v1, then jump to 1.0 on Track A v2. The Anthropic lines stay near 1.0 the whole way. Open-weight models cannot guess this workflow on their own; Anthropic ones can.
 
-A control (variant v0.5 = Track B + a sequence of tool names with no flags or commands) shows that telling local models *what* to do without specifying *how* is operationally identical to giving them nothing: M3 stays at 0.000 ± 0.000 across all 11 RTX 5080 models tested.
+A control (v0.5 = Track B + one extra line giving the order of tools, like `bwa → samtools → lofreq → bcftools → awk`) does not move the needle. M3 stays at 0 across every one of the 11 RTX 5080 models tested. Telling a model *what* to call without telling it *how* to call it is the same as telling it nothing.
 
-### 2.4 Mechanically extracted plans degrade weak models more than strong ones
+### 2.4 Recipes pulled from a tool registry break weak models
 
 ![Figure 4. Plan-source robustness: hand-authored v1.25 vs IUC-extracted v1g.](figures/fig4_v1g_robustness.png)
 
-If the v1.25 result reduces the v1 cliff to a single command line, a natural follow-up is whether that command line must be human-authored. Galaxy's IUC tool collection (`galaxyproject/tools-iuc`) is a community-curated registry of XML wrappers, one per tool, with `<command><![CDATA[...]]></command>` blocks that — after Cheetah templating substitution at Galaxy runtime — produce the canonical CLI invocation each tool expects.
+If §2.2 says the v1 jump is one command line, the next question is: does that line have to be hand-written? Galaxy's IUC tool collection (`galaxyproject/tools-iuc`) is a community-maintained registry of XML wrappers, one per tool. Inside each wrapper, a `<command>` block holds a Cheetah template; at Galaxy runtime, the template fills in flag values from the user interface and emits a real command line.
 
-We replaced the hand-authored lofreq snippet in v1.25 with a snippet mechanically extracted from `tools-iuc` commit `39e7456` by `scripts/galaxy_to_snippet.py` (Cheetah-strip + macro expansion + path substitution) — call this v1g. Galaxy's lofreq XML emits `--sig $value` and `--bonf $value` where `$value` is supplied at Galaxy runtime; Cheetah strips the variables, so the bare flags `--sig` and `--bonf` end up in the snippet on adjacent lines. lofreq then reads `--sig --bonf` as `--sig=--bonf`, attempts `float("--bonf")`, and exits with `ValueError`.
+We replaced the hand-authored lofreq line in v1.25 with one extracted directly from the registry — call that v1g. The extractor (`scripts/galaxy_to_snippet.py`) strips Cheetah variables, expands macros, and substitutes paths.
 
-Figure 4 splits the test pool by self-correction capacity. Claude Opus 4.7, Claude Sonnet 4.6, qwen3.5:27b dense, qwen3.6:27b dense, and qwen3-coder:30b recognize the malformed bare flags and drop them before emitting the script — M3 stays at 1.000. Claude Haiku 4.5, qwen3.6:35b-a3b MoE, gemma4:26b, gemma4:e4b, glm-4.7-flash, and the small qwen3 models copy the snippet character-for-character and ship a script that lofreq refuses to parse — M3 drops to 0.000 ± 0.000. **Haiku regresses from M3 = 1.000 ± 0.000 on v1.25 (hand) to M3 = 0.000 ± 0.000 on v1g (IUC) with no other change.**
+The bug in the extracted line: Galaxy's lofreq XML writes `--sig $value` and `--bonf $value`, where `$value` is supplied at runtime. Without Galaxy, `$value` is just empty. The Cheetah strip leaves the bare flags `--sig` and `--bonf` on adjacent lines:
 
-The Galaxy-IUC wrappers are Galaxy-runtime templates rather than self-contained CLIs. Without per-tool default-value substitution at extraction time, a deterministic transpiler cannot replace a human plan author for cheaper open-weight models. Strong models can repair noisy registry output; weak models cannot.
+```
+--ref data/ref/chrM.fa --out results/{sample}.vcf
+--sig
+--bonf
+results/{sample}.bam
+```
 
-### 2.5 Hardware is not the bottleneck
+lofreq reads `--sig --bonf` as `--sig=--bonf`, calls `float("--bonf")`, and exits with `ValueError`.
+
+Figure 4 splits the models by whether they noticed. Opus, Sonnet, qwen3.5:27b dense, qwen3.6:27b dense, and qwen3-coder:30b dropped both flags before writing the script and scored M3 = 1.000. Haiku, qwen3.6:35b-a3b (MoE), gemma4:26b, gemma4:e4b, glm-4.7-flash, and the small qwen3 models copied the snippet exactly and shipped a script lofreq refuses to parse — M3 = 0. **Haiku scored 1.000 on v1.25 (hand-written) and 0.000 on v1g (registry) with nothing else changed.**
+
+The IUC wrappers are templates, not stand-alone command lines. Without per-tool default values substituted at extraction time, a mechanical extractor produces strings that strong models repair and weak models copy verbatim.
+
+### 2.5 Hardware is not what limits performance
 
 ![Figure 5. Hardware comparison.](figures/fig5_hardware.png)
 
-Figure 5 Panel A plots mean generation time (log scale) against mean M3 for each (model × hardware) cell on v2 Track A. The Jetson AGX Orin and the RTX 5080 produce indistinguishable M3 distributions; the only sub-1.0 outliers are model-specific (`gpt-oss:20b` Harmony reasoning eating output budget, `qwen3:8b` minimum-size effects, `nemotron-3-nano`'s scripting bug). The 5080 is faster (typical 5–60 s/seed for the Group A in-VRAM models) than the Jetson (typical 15–300 s/seed), but does not score higher.
+Figure 5 Panel A plots mean generation time (log scale) against mean M3 for every (model, hardware) pair on v2 Track A. The Jetson and the RTX 5080 produce the same M3 distribution. The only points below 1.000 are model-specific: `gpt-oss:20b` runs out of output tokens on internal reasoning; `qwen3:8b` is too small; `nemotron-3-nano` has its bgzip-before-lofreq bug. The 5080 is faster (5–60 s per run for in-VRAM models) than the Jetson (15–300 s), but does not score higher.
 
-Panel B shows the Jetson sweep at 30 W power mode (original 9-of-14 perfect, green) versus MAXN (the 5 originally-failing entries retried, purple). Four of the five MAXN retries reach M3 = 1.000; only `olmo-3.1:32b` remains a real reasoning-mode timeout (excluded from the bar chart because all three of its seeds at MAXN exceed the 900 s budget and produce no run dirs). The Jetson 30 W → MAXN delta is a budget-constrained timeout effect, not a capability one. A latent harness bug — discussed in §3.3 — additionally accounts for three of the original "timeouts" being misroutes rather than real budget failures.
+Panel B shows the Jetson sweep at 30 W (the original 9-of-14 passers, in green) and at full power (the 5 originally-failing models retested, in purple). Four of the five passes at full power; only `olmo-3.1:32b` still times out — its three seeds all hit the 900-second wall budget. The 30 W → full-power gap is a budget effect, not a capability one. A separate harness bug — see §3.3 — explains why three of the original five "timeouts" were really misroutes, not real budget failures.
 
-### 2.6 Error-handling robustness under deliberately injected tool failures
+### 2.6 What happens when a tool actually breaks
 
-§2.1–§2.5 measured implementer behaviour on the happy path. To probe what happens when a tool actually misbehaves at runtime, we ran a second matrix of 390 runs (5 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds) in which one of `bwa` or `lofreq` is shimmed by a Python wrapper that simulates a controlled failure mode. The shim sits ahead of the real tool on `PATH` and reads `EVAL_INJECT_PATTERN` and `EVAL_INJECT_TARGET` to decide its behaviour; the model's own `run.sh` is unchanged across cells.
+Sections 2.1 to 2.5 measured the happy path. This section measures what the same models do when a tool misbehaves.
 
-Seven failure patterns:
+We ran 390 cells: 5 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds. The trick is **PATH shimming**. Before each run, the harness drops two short shell wrappers — one named `bwa`, one named `lofreq` — into a per-run directory and puts that directory at the front of `PATH`. When the script types `bwa mem`, bash finds the wrapper first and runs it instead of the real bwa. The wrapper reads two environment variables (`EVAL_INJECT_PATTERN`, `EVAL_INJECT_TARGET`) and either passes the call through to the real binary or simulates a failure. The model's `run.sh` doesn't know.
 
-| pattern | what the shim does | imitates |
+Seven failure patterns. Each one targets bwa, lofreq, or both. Concrete effect on the script in each case:
+
+| pattern | what the shim does | example effect |
 |---|---|---|
-| `flake_first_call` | first invocation exits 1, subsequent succeed | transient I/O hiccup |
-| `one_sample_fails` | exits 1 only when `M117C1-ch` appears in args | one corrupt sample in a batch |
-| `silent_truncation` | runs the real tool, then truncates the `-o` output to 0 bytes | broken disk write the tool didn't notice |
-| `stderr_warning_storm` | spews 200 `WARNING` lines on stderr, then runs the real tool | false-alarm noise (samtools-view oddities) |
-| `slow_tool` | sleeps 30 s, then runs the real tool | overloaded I/O |
-| `wrong_format_output` | runs the real tool, then strips every variant line from the output VCF | broken caller config that produces no calls |
-| `missing_lib_error` | exits 127 with `error while loading shared libraries: libhts.so.3` | broken conda env, stale cache |
+| `flake_first_call` | first call exits 1, the rest pass through | stderr: `lofreq: transient I/O error (eval-injected, call #1)` |
+| `one_sample_fails` | exits 1 only when `M117C1-ch` is in argv | `bwa: error processing M117C1-ch (eval-injected)`; the other three samples run clean |
+| `silent_truncation` *(lofreq only)* | runs the real lofreq, then truncates the `-o` file to 0 bytes | lofreq returns 0; the VCF is empty; downstream `bgzip` writes a useless `.vcf.gz` |
+| `stderr_warning_storm` | dumps 200 `WARNING` lines to stderr, then runs the real tool | output correct; stderr looks alarming |
+| `slow_tool` | sleeps 30 s, then runs the real tool | output identical, just delayed |
+| `wrong_format_output` *(lofreq only)* | runs lofreq, then strips every variant line from the VCF; only the header survives | the file still parses; the calls section is empty |
+| `missing_lib_error` | exits 127 without invoking the real tool | `lofreq: error while loading shared libraries: libhts.so.3: cannot open shared object file` |
 
-Two recipe variants are crossed with the patterns: **v2** (the existing happy-path detailed plan, no error-handling prose) and **v2_defensive** (a new Opus-authored plan, `plan/PLAN_v2_defensive.md`, that requires a `try()` helper, output-validation after every step, retry-once on failure, per-sample isolation via `continue`, structured `results/failures.log` rows, and a stderr summary line). Five representative implementer models: Claude Opus 4.7 / Sonnet 4.6 / Haiku 4.5, plus open-weight `qwen3.6:35b` (Jetson MAXN) and `granite4` (the smallest passer of §2.1). Three new metrics on top of M3: **`m_handle`** (categorical: `crash` / `propagate` / `partial` / `recover`), **`m_recover`** (binary; was the n_valid_VCF count equal to the *best-achievable* count for this pattern?), **`m_diagnose`** (binary; was failure structurally logged or summarised?). Definitions are in §3.3 and the metric code is `score/score_run.py:error_handling`.
+Two recipe variants. **v2** is the happy-path recipe from §2.1; it says nothing about errors. **v2_defensive** is a new recipe (`plan/PLAN_v2_defensive.md`) that adds a `try()` helper, asks the implementer to validate every output, retries on failure, skips bad samples without aborting, writes a structured `failures.log`, and prints a summary line at the end.
+
+Five implementer models: Opus 4.7, Sonnet 4.6, Haiku 4.5, plus open-weight `qwen3.6:35b` (Jetson at full power) and `granite4` (the smallest passer of §2.1).
+
+Three new scores on top of M3:
+
+- **`m_handle`** is one of `crash`, `propagate`, `partial`, `recover`. The classifier looks at exit code and at whether the script structurally announced its failures (a populated `failures.log` or a recognisable summary line). A defensive script that catches every truncation and exits 1 with all four failures logged is `partial`, not `crash`. Definition in `score/score_run.py:error_handling`.
+- **`m_recover`** is binary. It compares the count of valid output VCFs to the *best achievable* count for that pattern. For `one_sample_fails` the best is 3. For `silent_truncation` and `wrong_format_output` the best is 0 (every call is supposed to be skipped). For `missing_lib_error` the best is 0. For everything else the best is 4.
+- **`m_diagnose`** is binary. It triggers if `failures.log` has any rows, or a recognisable summary line appears in stderr, or a sample name and a failure word appear together on one line.
 
 ![Figure 6. Error-handling robustness across 7 injection patterns × {v2, v2_defensive}.](figures/fig6_error_handling.png)
 
-**v2 is identical across models.** Without defensive prose, all five models — frontier and local — collapse to the same modal handle distribution per pattern. The four left-panel rows of Figure 6 are visually identical: red on `flake_first_call`, `missing_lib_error`, `silent_truncation`; orange (`propagate`) on `one_sample_fails`; green (`recover`) on `slow_tool`, `stderr_warning_storm`, `wrong_format_output`. Numerically the per-(model, plan) handle counts on v2 are exactly **15 recover / 0 partial / 6 propagate / 15 crash (n=36)** for Opus, Sonnet, Haiku, and qwen3.6:35b. Granite4 lands at 12 / 0 / 4 / 20 — slightly more crashes from a small-model artifact (it sometimes fails to emit a parseable script even on `slow_tool`). The takeaway: **without explicit error-handling instructions, the recipe alone does not produce defensive code, regardless of implementer model class.** Models inherit only the failure modes that follow from `set -euo pipefail` plus naive sequential execution.
+**v2 is identical across model classes.** Without error-handling prose, every model wrote the same brittle script. Opus, Sonnet, Haiku, and qwen3.6:35b all crash on `flake_first_call`, `missing_lib_error`, and `silent_truncation`; all "recover" on `slow_tool` and `stderr_warning_storm` (waiting and ignoring noise both work); all `propagate` on `one_sample_fails` (set -e fires after three samples have already succeeded). Per-(model, plan) handle counts on v2 are exactly **15 recover / 0 partial / 6 propagate / 15 crash** (n = 36) for those four models. Granite4 lands at 12 / 0 / 4 / 20 — a few extra crashes because it sometimes fails to write a parseable script even on the cosmetic patterns. The four top rows of Figure 6's left panel look the same. The recipe alone does not make code defensive.
 
-**v2_defensive separates frontier from local cleanly.**
+**v2_defensive splits the field into three tiers.**
 
-- The **three Anthropic models converge again**, but at a much better point: 21 recover / 14–15 partial / 0 propagate / 0–1 crash (n=36 each). They all implement Opus's `try()` helper faithfully, retry transient failures, isolate per-sample failures, and never let a tool error abort the whole script.
-- **`qwen3.6:35b`** drops to **7 recover / 29 partial / 0 propagate / 0 crash**. The defensive script is structurally correct — zero crashes — but its retries and recovery loops succeed on a smaller fraction of cells than Anthropic. Per-pattern mean M3 reflects this: `flake_first_call` 0.33, `one_sample_fails` 0.25, `stderr_warning_storm` 0.33 — versus Opus's 1.00 / 0.75 / 1.00. qwen detects errors and skips, but doesn't always recover even when recovery is possible.
-- **`granite4` cannot implement v2_defensive at all**: every single cell is `crash` (36/36, all M3=0). Its 2.1 GB capacity is enough to transliterate the v2 plan into bash but not enough to faithfully implement the v2_defensive `try()` helper plus per-sample loop continuation. This is a model-capability floor for defensive scripting, well below the threshold for happy-path scripting.
+- **Anthropic frontier (Opus, Sonnet, Haiku).** Each implements the `try()` helper faithfully. Zero crashes. Opus on `flake_first_call@bwa` scores M3 = 1.000 across all three seeds: the first bwa call fails, `try` retries, the second succeeds, the BAM appears. Counts: 21 recover / 14–15 partial / 0–1 crash (n = 36).
+- **`qwen3.6:35b`.** Writes the same defensive structure but recovers less often. Same `flake_first_call@bwa` cells: M3 = 0.333. One seed of three recovered; the other two ended in `partial` — `try` ran but the BAM never showed up. Zero crashes; partials dominate (29 of 36 cells).
+- **`granite4`.** All 36 v2_defensive cells crash. The 2 GB model that handles v2 cleanly cannot produce a working `try() { ... }` plus per-sample-loop `continue` in bash. This is the floor for defensive scripting; it sits well below the floor for happy-path scripting.
 
-**The pattern character matters as much as the model.** Three patterns are catastrophic in principle and remain so under v2_defensive: `missing_lib_error` cannot be recovered (the workflow can't proceed without `libhts.so.3`); `silent_truncation` and `wrong_format_output` produce content that is structurally valid but biologically empty, and a model can at best detect-and-skip rather than recover. By contrast `flake_first_call`, `slow_tool`, `stderr_warning_storm`, and `one_sample_fails` are fully recoverable in the sense that an aware script (a) retries, (b) waits, (c) ignores noise, or (d) skips the bad sample. The dichotomy isn't model-driven; it's pattern-driven, and §3.3's `m_recover` (binary best-achievable) captures it explicitly.
+**Pattern shape matters as much as model class.** Three patterns are not recoverable in principle and stay broken even on v2_defensive: `missing_lib_error` (the workflow cannot proceed without `libhts.so.3`), `silent_truncation`, and `wrong_format_output` (both produce files that look structurally valid but contain no real calls; a script can at best skip the bad sample). The other four patterns — `flake_first_call`, `slow_tool`, `stderr_warning_storm`, `one_sample_fails` — are fully recoverable: an aware script retries, waits, ignores, or skips. `m_recover` captures the difference.
 
-**Diagnostic-quality results.** `m_diagnose` (whether the script populated `failures.log` or emitted a structured summary) is 0 across every v2 cell (no model writes a failures log without instructions) and is ≥0.85 across every v2_defensive cell except the 4 patterns that exit before any user code runs (`missing_lib_error` exits 127 immediately during reference indexing). For the recoverable patterns the v2_defensive Anthropic cells diagnose with `m_diagnose=1` on every seed.
+**Diagnostic quality.** `m_diagnose` is 0 on every v2 cell. No model writes a `failures.log` without being told to. On v2_defensive it rises above 0.85 for every cell except the patterns that exit before user code runs (`missing_lib_error` returns 127 during reference indexing).
 
-**Caveats.** `m_handle="recover"` does not mean the output is biologically correct — it means n_valid_VCF=4. For `wrong_format_output`, every Anthropic v2_defensive run scores `recover` while M3=0: the script ships four header-only VCFs that pass `bcftools view -h` but contain no calls. Detecting an empty-but-structurally-valid file would require an explicit content check (e.g. `bcftools view -H | wc -l > 0`) the v2_defensive plan does not require. This is a real gap in the prose, not a model failure, and is the single most informative caveat the experiment surfaces about defensive-recipe design.
+**Caveat: "recover" does not mean correct.** When `wrong_format_output` stripped every variant line from lofreq's output, every defensive Anthropic script said the file looked fine. The file *did* look fine: `bcftools view -h` parsed it. But it had no calls. M3 = 0. The defensive recipe asked for structural validation but not content. The gap is between two commands: `bcftools view -h` (does the header parse?) and `bcftools view -H | wc -l > 0` (does the file have any calls?). The first is in the recipe; the second is not. The failure here was recipe quality, not model quality. This is the most useful single thing the experiment surfaced about how to write defensive recipes.
 
-The headline (model, plan) summary is reproduced verbatim from the matrix log:
+Headline counts:
 
 | model / plan | recover | partial | propagate | crash | n |
 |---|---:|---:|---:|---:|---:|
@@ -617,51 +656,57 @@ The "Track B (no plan)" baseline is the same template with the `Recommended tool
 
 ## 3. Methods
 
-### 3.1 Dataset and ground truth
+### 3.1 Dataset and answer key
 
-Four paired-end Illumina MiSeq samples (M117-bl, M117-ch, M117C1-bl, M117C1-ch) from [Zenodo 5119008](https://zenodo.org/records/5119008), enriched by long-range PCR for the human mitochondrial chromosome (chrM, 16,569 bp, GRCh38). Total compressed FASTQ size: ~838 KB across 8 files plus 1 reference fasta. Files are md5-verified at fetch time.
+Four paired-end Illumina MiSeq samples (M117-bl, M117-ch, M117C1-bl, M117C1-ch) from [Zenodo 5119008](https://zenodo.org/records/5119008), enriched by long-range PCR for the human mitochondrial chromosome (chrM, 16,569 bp, GRCh38). 838 KB compressed across eight files plus a reference fasta. We md5-verify on fetch.
 
-Ground truth is produced once by `ground_truth/canonical.sh`, a hand-authored bash workflow that pins to the same locked bioconda environment used by all model runs. Tools and versions are: BWA-MEM (alignment), samtools (sort/index), LoFreq (variant calling), bgzip/tabix (compression/indexing), bcftools (VCF query), SnpSift (annotation in the canonical workflow only — not required for model runs).
+The answer key comes from `ground_truth/canonical.sh`, a hand-written bash workflow that uses the same locked conda environment as the model runs. Tools: BWA-MEM (align), samtools (sort, index), LoFreq (call variants), bgzip and tabix (compress, index), bcftools (query). SnpSift annotates in the published tutorial but isn't needed for the model runs.
 
 ### 3.2 Harness
 
-`harness/run_one.py` generates one model run, executes the resulting script in a sandboxed directory, and writes per-run JSON metadata. Scoring (`score/score_run.py`) is a separate step that compares the run's outputs against the ground truth. `harness/sweep_local.py` and `harness/matrix_5080.py` orchestrate the model and plan grids; `score/aggregate.py` produces `results.csv` from the per-run JSONs.
+`harness/run_one.py` generates one model's script, runs it in a sandbox, and writes per-run JSON. `score/score_run.py` reads those files and produces a score.json. `harness/sweep_local.py`, `harness/matrix_5080.py`, and `harness/error_matrix.py` drive the matrices. `score/aggregate.py` flattens per-run JSON into `results.csv`.
 
-Generation is invoked via the local `claude` CLI for Anthropic models (no `ANTHROPIC_API_KEY` required) or via the Ollama HTTP API for local models. Sampling parameters: temperature = 0.2 for Ollama; Anthropic uses the `claude` CLI default. Ollama `num_predict` = 16384, `seed` ∈ {42, 43, 44}, `think` = `false` for all local runs except the `/think`-comparison cells in §2.5; the rationale is that thinking-mode models routinely exhaust the 900 s wall budget on this workflow's output requirements. Per-call generation budget: 900 s (15 min). Per-script execution budget: 600 s (10 min).
+For Anthropic models the harness calls the local `claude` CLI (no API key needed). For local models it talks to Ollama's HTTP API. Ollama settings: `temperature` = 0.2, `num_predict` = 16384, `seed` ∈ {42, 43, 44}, `think` = false (except for the `/think` comparison cells in §2.1; thinking-mode models otherwise eat the 900-second budget on this workflow). Anthropic uses the `claude` CLI defaults. Per-call generation budget: 900 s. Per-script execution budget: 600 s.
 
-The user prompt is constructed from a fixed system message (`prompts/system.txt`, 1023 bytes), a per-track user template (`prompts/track_a_user.tmpl` or `prompts/track_b_user.tmpl`), the tool inventory, and the plan body. The model emits a single bash script as its raw response; the harness strips a single optional code fence around the script.
+The user prompt = a fixed system message (`prompts/system.txt`, 1,023 bytes) + a per-track template + the tool inventory + the plan body. The model returns one bash script. The harness strips one optional fence around it.
 
 ### 3.3 Scoring
 
-For the error-handling experiment (§2.6), three additional metrics are computed: **`m_handle`** ∈ {`crash`, `propagate`, `partial`, `recover`} discriminated by whether the script structurally detected its failures (failures.log populated *or* a final summary line emitted) rather than by exit code alone — a defensive script that catches every sample's truncation and exits 1 with all failures logged is `partial`, not `crash`; **`m_recover`** is binary, comparing n_valid_VCF to a pattern-specific best-achievable count (`one_sample_fails` → 3; `silent_truncation`/`wrong_format_output` → 0; `missing_lib_error` → 0; transient/cosmetic patterns → 4); **`m_diagnose`** is binary and triggers on any of failures.log non-empty, a recognizable summary line, or sample-name × failure-word co-occurrence in the run's stderr. Code: `score/score_run.py:error_handling`.
+Five base metrics, computed per run by `score/score_run.py`:
 
-The error-injection apparatus is a Python shim (`harness/error_shims/shim.py`) symlinked into a per-run sandbox bin/ ahead of the conda env's bin/ on PATH. Each shim reads `EVAL_INJECT_PATTERN` and `EVAL_INJECT_TARGET` set by `harness/run_one.py:setup_inject` and either delegates to the real tool or simulates the configured failure (counter-state for `flake_first_call`, post-tool VCF mutation for `silent_truncation` and `wrong_format_output`, etc.). Critically, the PATH override is exported *after* `conda activate bench`, since activate prepends conda's bin/ which would otherwise win the lookup. The matrix is driven by `harness/error_matrix.py`. The M5 idempotency rerun (which re-executes run.sh in the run dir to verify cached re-runs exit 0) is skipped when injection was active to avoid silently fixing the run dir's results/ files without the shim env preserved.
+- **M1 (executes).** Binary. `bash run.sh` returns 0 within 600 seconds.
+- **M2 (schema).** Binary. All nine expected files exist (4 BAM, 4 BAI, 4 VCF.gz, 4 TBI, 1 collapsed.tsv) and `bcftools view -h` parses every VCF.
+- **M3 (variant overlap).** Float in [0, 1]. For each sample, the Jaccard overlap of `(chrom, pos, ref, alt)` over PASS-or-unfiltered records, with allele frequency tolerance ±0.02. Averaged over the four samples. **M3 is the headline score** in every results section.
+- **M4 (cost and time).** Tokens, USD (Anthropic; ollama is free), generation seconds, execution seconds.
+- **M5 (script quality).** Binary AND of: `set -euo pipefail` present; no `/home/anton` paths; `shellcheck` clean; idempotent (a second run on a populated output dir exits 0).
 
-Five primary metrics are computed per run by `score/score_run.py`:
+A run with M1 = 0 gets M2 = 0 by construction. M3 we compute over whatever VCFs the script produced; missing files contribute 0 to the per-sample Jaccard. A model that uses a different but valid tool from the one in the recipe (e.g. `bcftools mpileup` instead of `lofreq`) gets credit on M3 for the variants it called, not for the tool it picked.
 
-- **M1 (Executes).** Binary. `bash run.sh` exits 0 within 600 s wall-clock.
-- **M2 (Schema).** Binary. All 9 expected outputs are present (4 BAM, 4 BAI, 4 VCF.gz, 4 TBI, 1 collapsed.tsv) and `bcftools view -h` succeeds on each VCF.
-- **M3 (Variant agreement).** Float ∈ [0, 1]. For each of 4 samples, the Jaccard index on the set of (chrom, pos, ref, alt) 4-tuples among PASS-or-unfiltered records, with a per-call AF tolerance of ±0.02. The four per-sample values are macro-averaged. M3 is the **primary metric**; all results sections report M3.
-- **M4 (Cost and time).** Reported tuple of input/output token counts, USD cost (Anthropic only; Ollama is $0), wall-clock generation seconds, and wall-clock execution seconds.
-- **M5 (Script quality).** Binary, conjunction of: `set -euo pipefail` present; no `/home/anton` paths; `shellcheck` clean (no errors); idempotent (re-run on a populated output dir exits 0).
+The error-handling experiment (§2.6) adds three more scores:
 
-A run with M1 = 0 returns M2 = 0 and M3 = 0 by construction. A model that uses a different but valid tool than the recipe specifies (e.g. `bcftools mpileup` instead of `lofreq`) is scored on its variant calls, not its tool selection.
+- **`m_handle`** is one of `crash`, `propagate`, `partial`, `recover`. The classifier looks at exit code and at whether the script announced its failures structurally — a populated `failures.log` or a recognisable summary line. A defensive script that catches every truncation and exits 1 with all four failures logged is `partial`, not `crash`.
+- **`m_recover`** is binary. Counts valid output VCFs and compares to the best achievable for that pattern: 3 for `one_sample_fails`, 0 for `silent_truncation` / `wrong_format_output` / `missing_lib_error`, 4 for everything else.
+- **`m_diagnose`** is binary. Triggers on `failures.log` non-empty, a recognisable summary line, or a sample name and a failure word together on a single stderr line.
+
+Code for all eight scores: `score/score_run.py:error_handling` (the new three) and the rest of the file (the original five).
+
+The error-injection apparatus is a Python shim (`harness/error_shims/shim.py`, 130 lines). The harness drops two wrappers — `bwa` and `lofreq` — into a per-run directory and prepends that directory to `PATH` *after* `conda activate bench` (activate puts its own bin/ first; the shim has to win that race). Each wrapper reads `EVAL_INJECT_PATTERN` and `EVAL_INJECT_TARGET` and either passes the call to the real tool or simulates the configured failure (a counter file for `flake_first_call`, post-tool VCF mutation for `silent_truncation` and `wrong_format_output`, etc.). The driver is `harness/error_matrix.py`. We skip the M5 idempotency rerun when an injection is active — otherwise the rerun, which goes without the shim env, would silently overwrite results files and contaminate the cell.
 
 ### 3.4 Hardware
 
-- **Jetson AGX Orin Developer Kit.** 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64. Two power modes are exercised. The original 9-of-14 sweep ran at **30 W**; after a routing-bug fix in `harness/run_one.py` (provider dispatch was misclassifying any model tag without a `:`), the originally-failing 5 entries were retested at **MAXN**.
-- **RTX 5080 desktop.** NVIDIA RTX 5080 16 GB VRAM, 125 GB system RAM, x86_64. Models ≤14 GB fit fully in VRAM (Group A); 17–23 GB models partial-offload to CPU (Group B). `/think` mode was enabled on the Group A models that fit cleanly; on Group B models /think reproducibly hit the 1800 s urlopen timeout and was disabled.
+- **Jetson AGX Orin Developer Kit.** 64 GB unified RAM, Ampere-class GPU (sm_87), aarch64. Two power modes. The original 9-of-14 sweep ran at 30 W. After a harness routing fix (provider dispatch had been misclassifying any model tag without a colon as Anthropic), we retested the five originally-failing models at full power.
+- **RTX 5080 desktop.** 16 GB VRAM, 125 GB system RAM, x86_64. Models up to 14 GB fit in VRAM (Group A); 17–23 GB models partial-offload to CPU (Group B). `/think` ran on Group A models that fit cleanly; on Group B models `/think` hit the 1,800-second HTTP timeout reliably, so we disabled it.
 
 ### 3.5 Statistics
 
-Each (model × plan_version × track) cell is run with seeds 42/43/44 (occasionally additional seeds where a retry was performed). All M3 values reported in tables and figures are mean ± standard deviation across seeds, with n indicated. Per-sample Jaccards (4 samples × 3 seeds = 12 values per cell) are used only as the box-plot unit when noted; all other figures aggregate at the seed level. We report standard deviations rather than confidence intervals and avoid significance claims; n = 3 is too small for inferential statistics, but is sufficient to distinguish 0/3 from 3/3 patterns reliably.
+Each (model, plan, track) cell runs with seeds 42, 43, 44. A few cells got extra seeds where a retry was needed. M3 values in tables and figures are mean ± standard deviation over seeds, with n shown. Per-sample Jaccards (4 samples × 3 seeds = 12 values per cell) we only use as the box-plot unit when called out. Everywhere else we aggregate at the seed level. We report standard deviations, not confidence intervals; n = 3 is too small for either p-values or CIs, but it cleanly distinguishes 0/3 from 3/3.
 
 ## 4. Limitations
 
-1. **Single workflow, single substrate.** We score one task — per-sample variant calling on a 16.6 kb mitochondrial reference — in one canonical toolchain. The recipe-detail effect documented here may not transfer to multi-step ML pipelines, statistical analyses, image processing, or workflows lacking a single canonical toolchain.
-2. **Plan author is the strongest model in the test pool.** Claude Opus 4.7 wrote v1, v2, v1.25, v1.5; plan quality is therefore coupled to one model's idiom. v1g (mechanical Galaxy-IUC extraction) is a partial control demonstrating that *non*-Opus plan sources can degrade weak implementer models, but it does not control for the possibility that a different frontier author (e.g. a Gemini- or GPT-authored plan) would produce systematically different cliff structure.
-3. **Q4_K_M quantization and `/no_think` are confounders for local models.** All Ollama models run quantized to ~4 bits per parameter, and all run with thinking disabled because of the 900 s wall budget. The reported M3 values therefore measure (Q4-quantized + no-think) capability, not the underlying architectures' ceilings.
-4. **n = 3 seeds.** Cell-level standard deviations are informative for distinguishing stable from unstable behaviour but are not confidence intervals; we therefore report std rather than CIs, and avoid significance claims throughout.
+1. **One task, one set of tools.** We measure variant calling on 16.6 kb of mitochondrial DNA with one toolchain. The detail-beats-size effect may not carry over to ML pipelines, statistics workflows, image processing, or workflows that lack a canonical set of tools.
+2. **The recipe author is also the strongest model in the test pool.** Opus 4.7 wrote v1, v2, v1.25, and v1.5. Recipe quality is tied to one model's voice. v1g (mechanical extraction from the Galaxy registry) is a partial control: it shows that non-Opus recipe sources can break weak implementer models. But we did not test recipes from Gemini or GPT.
+3. **Quantization and `/no_think` are confounders.** Every local model runs at ~4 bits per parameter (Q4_K_M) and with thinking turned off — the 900-second budget forced the latter. The M3 numbers measure (Q4 + no-think) ability, not the unconstrained architecture.
+4. **n = 3 seeds.** Cell-level standard deviations distinguish stable from unstable behaviour, but they are not confidence intervals. We avoid significance claims.
 
 ## 5. Reproduction
 
@@ -722,19 +767,20 @@ Each run dir contains `meta.json`, `usage.json`, `exec.json`, `score.json`, the 
 
 MIT (see `LICENSE`). The dataset itself (FASTQ files in Zenodo 5119008) is a separate work by A. Nekrutenko under the original Zenodo terms; this repository does not redistribute it.
 
-## Appendix — Glossary
+## Appendix — Terms
 
-A reference for readers without a bioinformatics background:
+A reference for readers without a bioinformatics background.
 
-- **Variant identity.** Every variant call is a 4-tuple `(chromosome, position, reference allele, alternate allele)`. Two variants are "the same" only if all four fields match.
-- **PASS variants.** Most variant callers tag each call with a confidence filter; we score only calls marked `PASS` or unfiltered.
-- **Allele frequency (AF).** Fraction of reads at a position that support the alternate allele. AF = 1.0 means a clean homozygous call; AF = 0.04 means ~4 % of reads carry the variant. Different callers can estimate AF slightly differently for the same position, which is why we apply a ±0.02 tolerance.
-- **Jaccard index.** For two sets A and B, J = |A ∩ B| / |A ∪ B|. Bounded [0, 1]; 1.0 means the two sets are identical, 0 means disjoint.
-- **chrM.** Human mitochondrial chromosome, 16,569 bp.
-- **BWA-MEM.** Alignment of short Illumina reads to a reference genome.
-- **LoFreq.** Variant caller emphasizing low-frequency (heteroplasmic) calls; produces a VCF.
-- **MoE / A3B.** Mixture-of-Experts model with ~3 B active parameters per token (vs a "dense" model that activates all parameters every token). MoEs are faster per token than a dense model with the same total parameter count.
-- **Q4_K_M.** Weight quantization to ~4 bits per parameter; standard for Ollama-hosted models, well-validated for these classes.
-- **`/no_think`.** Switches off the chain-of-thought-before-answer behaviour of recent open-weight models (Qwen3 family especially) when supported. We use it for all local model runs because thinking-mode wall-clocks routinely exceed our 900 s budget on this workflow.
-- **Track A vs Track B.** A = "with plan", B = "no plan" (problem statement and tool inventory only).
-- **Seed.** Random-sampling seed; fixed seeds make the same prompt approximately reproducible. Three seeds per cell give a sense of variance over a single run.
+- **Variant.** One mismatch between the read data and the reference genome, written as four fields: chromosome, position, reference base, alternate base. Example: `(chrM, 16519, T, C)` means "at base 16,519 on the mitochondrial chromosome, the reference is T but this sample is C." Two variants are the same only if all four fields match.
+- **PASS.** Variant callers tag each call with a confidence filter. We only score calls marked `PASS` or unfiltered.
+- **Allele frequency (AF).** Fraction of reads at one position that carry the alternate base. AF = 1.0 means every read at that position carries it. AF = 0.04 means about 4% do. Different callers estimate AF slightly differently, which is why we allow ±0.02 wiggle.
+- **Jaccard.** For two sets A and B, the Jaccard score is `|A ∩ B| / |A ∪ B|` — variants in both, divided by variants in either. Range is 0 to 1. Two identical sets score 1; two disjoint sets score 0.
+- **chrM.** The human mitochondrial chromosome. 16,569 bases.
+- **BWA-MEM.** Aligns short Illumina reads to a reference genome.
+- **LoFreq.** Calls variants from aligned reads. Designed to find low-frequency calls. Outputs a VCF.
+- **VCF.** Variant Call Format. A text table of variants. `.vcf.gz` is the gzip-compressed version; `.tbi` is the position index. `bcftools view -h` reads only the header; `bcftools view -H` reads only the data rows.
+- **MoE.** Mixture-of-Experts model. `qwen3.6:35b-a3b` has 35 billion parameters total but only ~3 billion fire per token. MoE models run faster per token than dense models of the same total size.
+- **Q4_K_M.** Weight quantization to about 4 bits per parameter. Standard for Ollama models.
+- **`/no_think`.** A switch that turns off the chain-of-thought-before-answer mode in recent open-weight models (Qwen3 most importantly). With thinking on, the model often runs past our 900-second budget without writing the script.
+- **Track A vs Track B.** Track A: the model gets the recipe. Track B: the model gets only the problem statement and the list of tools. Track B measures what the recipe is worth.
+- **Seed.** A random-sampling seed; the same prompt with the same seed gives roughly the same output. We run three seeds per cell so one lucky or unlucky run doesn't dominate.
