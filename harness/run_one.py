@@ -153,15 +153,56 @@ def setup_sandbox(run_dir: Path) -> None:
     (run_dir / "results").mkdir(exist_ok=True)
 
 
-def execute(run_dir: Path, script: str, budget_s: int = 600) -> dict:
+SHIMS_DIR = BENCH / "harness" / "error_shims"
+CONDA_BIN = "/home/anton/miniforge3/envs/bench/bin"
+INJECT_PATTERNS = {
+    "none", "flake_first_call", "one_sample_fails", "silent_truncation",
+    "stderr_warning_storm", "slow_tool", "wrong_format_output", "missing_lib_error",
+}
+
+
+def setup_inject(run_dir: Path, pattern: str, target: str) -> dict:
+    """Prepare per-run shim bin/ and return env-var overrides for execute()."""
+    bin_dir = run_dir / "_eval_bin"
+    bin_dir.mkdir(exist_ok=True)
+    state_dir = run_dir / "_eval_state"
+    state_dir.mkdir(exist_ok=True)
+    # Symlink wrapper scripts for both shimmed tools so the shim is always
+    # in front of conda's bin/, regardless of which tool the model invokes.
+    for tool in ("bwa", "lofreq"):
+        link = bin_dir / tool
+        if link.exists() or link.is_symlink():
+            link.unlink()
+        link.symlink_to(SHIMS_DIR / tool)
+    return {
+        "EVAL_INJECT_PATTERN": pattern,
+        "EVAL_INJECT_TARGET": target,
+        "EVAL_INJECT_STATE": str(state_dir),
+        "EVAL_REAL_BIN_DIR": CONDA_BIN,
+        "_PATH_PREFIX": str(bin_dir),
+    }
+
+
+def execute(run_dir: Path, script: str, budget_s: int = 600, inject_env: dict | None = None) -> dict:
     script_path = run_dir / "run.sh"
     script_path.write_text(script)
     script_path.chmod(0o755)
     log_path = run_dir / "exec.log"
     t0 = time.time()
+    # Conda's `activate` prepends the env's bin/ to PATH, so any custom PATH
+    # prefix we set BEFORE activate gets pushed back behind conda's bin/.
+    # Inject the shim path AFTER conda activate so the shim wins.
+    env = os.environ.copy()
+    path_prefix = ""
+    if inject_env:
+        path_prefix = inject_env.pop("_PATH_PREFIX", "")
+        env.update(inject_env)
+    inject_path_cmd = f'export PATH="{path_prefix}:$PATH" && ' if path_prefix else ""
     activate = (
         "source $HOME/miniforge3/etc/profile.d/conda.sh && "
-        "conda activate bench && exec bash run.sh"
+        "conda activate bench && "
+        + inject_path_cmd
+        + "exec bash run.sh"
     )
     try:
         with log_path.open("wb") as logf:
@@ -170,6 +211,7 @@ def execute(run_dir: Path, script: str, budget_s: int = 600) -> dict:
                 cwd=str(run_dir),
                 stdout=logf, stderr=subprocess.STDOUT,
                 timeout=budget_s,
+                env=env,
             )
         return {
             "exit_code": p.returncode,
@@ -197,6 +239,10 @@ def main() -> int:
     ap.add_argument("--track-template", default=None,
                     help="Override template stem (default: track_<a|b>_user). "
                          "E.g. 'track_b_with_order_user' for the v0.5 condition.")
+    ap.add_argument("--inject", default="none", choices=sorted(INJECT_PATTERNS),
+                    help="Error-injection pattern (default: none).")
+    ap.add_argument("--inject-target", default="lofreq", choices=["bwa", "lofreq"],
+                    help="Tool the injection targets (default: lofreq).")
     args = ap.parse_args()
 
     runs_root = Path(args.runs_dir)
@@ -234,6 +280,8 @@ def main() -> int:
         "provider": gen["provider"],
         "wall_seconds_generation": gen["wall_seconds"],
         "duration_ms_generation": gen["duration_ms"],
+        "inject_pattern": args.inject,
+        "inject_target": args.inject_target if args.inject != "none" else None,
     }
     (run_dir / "meta.json").write_text(json.dumps(meta, indent=2))
     (run_dir / "usage.json").write_text(json.dumps({
@@ -248,8 +296,13 @@ def main() -> int:
             {"exit_code": None, "skipped": "empty_script"}, indent=2))
         return 2
 
+    inject_env = None
+    if args.inject != "none":
+        inject_env = setup_inject(run_dir, args.inject, args.inject_target)
+        print(f"[run_one] error injection: pattern={args.inject} target={args.inject_target}", file=sys.stderr)
+
     print(f"[run_one] executing run.sh in {run_dir} (budget 600s)", file=sys.stderr)
-    exec_res = execute(run_dir, gen["script"], budget_s=600)
+    exec_res = execute(run_dir, gen["script"], budget_s=600, inject_env=inject_env)
     (run_dir / "exec.json").write_text(json.dumps(exec_res, indent=2))
 
     print(f"[run_one] done: {run_dir}  exit={exec_res['exit_code']}  exec_wall={exec_res['wall_seconds']:.1f}s", file=sys.stderr)

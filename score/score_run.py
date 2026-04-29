@@ -115,6 +115,103 @@ def m3_jaccard(run_dir: Path) -> tuple[float, dict]:
     return macro, {"per_sample": per_sample}
 
 
+def _samples_with_valid_vcf(run_dir: Path) -> list[str]:
+    """Return the list of samples that have a parseable, non-zero-byte .vcf.gz."""
+    res = run_dir / "results"
+    ok = []
+    for s in SAMPLES:
+        v = res / f"{s}.vcf.gz"
+        if not v.exists() or v.stat().st_size == 0:
+            continue
+        p = conda_run(["bcftools", "view", "-H", str(v)])
+        if p.returncode != 0:
+            continue
+        # Also require at least one record OR a valid header — silent_truncation
+        # leaves a 0-byte file (caught above); wrong_format_output leaves a
+        # header-only file (which we accept as "structurally valid but biology
+        # missing" — that is detected via M3 dropping, not M_recover).
+        ok.append(s)
+    return ok
+
+
+def error_handling(run_dir: Path) -> dict:
+    """Compute the three error-handling metrics. Only meaningful when an
+    injection was active; for non-injected runs we still compute and return
+    them but they are mostly trivial (recover=1, handle='recover'). The
+    aggregator filters by inject_pattern."""
+    meta = json.loads((run_dir / "meta.json").read_text())
+    pattern = meta.get("inject_pattern") or "none"
+    target = meta.get("inject_target")
+
+    exec_ = json.loads((run_dir / "exec.json").read_text())
+    exit_code = exec_.get("exit_code")
+    valid = _samples_with_valid_vcf(run_dir)
+    n_valid = len(valid)
+
+    # M_diagnose first (M_handle depends on it).
+    log = (run_dir / "exec.log").read_text(errors="replace") if (run_dir / "exec.log").exists() else ""
+    fail_log = (run_dir / "results" / "failures.log").read_text(errors="replace") if (run_dir / "results" / "failures.log").exists() else ""
+    diagnose_signals = []
+    if fail_log.strip():
+        diagnose_signals.append("failures_log_populated")
+    if re.search(r"\b\d+\s*/\s*\d+\s+samples", log):
+        diagnose_signals.append("summary_line")
+    fail_word = r"(fail|error|skip|abort|missing|truncat|corrupt)"
+    sample_pat = "|".join(re.escape(s) for s in SAMPLES)
+    if re.search(rf"({sample_pat}).*{fail_word}|{fail_word}.*({sample_pat})", log, re.I):
+        diagnose_signals.append("sample_failure_mentioned")
+    diagnose = int(bool(diagnose_signals))
+
+    # M_handle: one of crash / propagate / partial / recover.
+    # Discriminator is whether the script structurally detected failures
+    # (failures.log populated OR a summary line was emitted), not just
+    # exit_code.  A defensive script that catches every sample's truncation
+    # and exits 1 with all failures logged is 'partial', not 'crash'.
+    structurally_detected = (
+        "failures_log_populated" in diagnose_signals
+        or "summary_line" in diagnose_signals
+    )
+    if n_valid == len(SAMPLES):
+        handle = "recover"
+    elif structurally_detected:
+        handle = "partial"
+    elif n_valid >= 1 and exit_code != 0:
+        handle = "propagate"
+    else:
+        handle = "crash"
+
+    # M_recover: did the script produce the *best-achievable* set of valid
+    # outputs given the injection? Pattern-specific.
+    if pattern == "none":
+        target_n = len(SAMPLES)
+    elif pattern == "one_sample_fails":
+        target_n = len(SAMPLES) - 1  # the deliberately failing sample
+    elif pattern in ("missing_lib_error",):
+        target_n = 0  # nothing should work
+    elif pattern in ("silent_truncation", "wrong_format_output"):
+        # Pattern produces broken output for every lofreq call; the best
+        # possible outcome is for the script to detect and skip every sample.
+        # We treat 'no valid samples' as good (script detected) and any valid
+        # samples as the script having failed to detect.
+        target_n = 0
+    else:
+        target_n = len(SAMPLES)
+    recover = int(n_valid == target_n)
+
+    return {
+        "m_handle": handle,
+        "m_recover": recover,
+        "m_diagnose": diagnose,
+        "samples_with_valid_vcf": valid,
+        "n_valid": n_valid,
+        "target_n_for_pattern": target_n,
+        "diagnose_signals": diagnose_signals,
+        "exit_code": exit_code,
+        "inject_pattern": pattern,
+        "inject_target": target,
+    }
+
+
 def m4_costlatency(run_dir: Path) -> dict:
     meta = json.loads((run_dir / "meta.json").read_text())
     usage = json.loads((run_dir / "usage.json").read_text())
@@ -177,6 +274,7 @@ def main() -> int:
         out["m3_jaccard"], out["m3_detail"] = 0.0, {"reason": "M2 failed"}
     out["m4"] = m4_costlatency(run_dir)
     out["m5_quality"], out["m5_detail"] = m5_quality(run_dir)
+    out["error_handling"] = error_handling(run_dir)
 
     score_path = run_dir / "score.json"
     score_path.write_text(json.dumps(out, indent=2))
