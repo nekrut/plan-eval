@@ -154,7 +154,9 @@ def setup_sandbox(run_dir: Path) -> None:
 
 
 SHIMS_DIR = BENCH / "harness" / "error_shims"
-CONDA_BIN = "/home/anton/miniforge3/envs/bench/bin"
+# Resolve the conda env's bin/ portably. Override with EVAL_REAL_BIN_DIR.
+CONDA_BIN = os.environ.get("EVAL_REAL_BIN_DIR",
+                           str(Path.home() / "miniforge3" / "envs" / "bench" / "bin"))
 INJECT_PATTERNS = {
     "none", "flake_first_call", "one_sample_fails", "silent_truncation",
     "stderr_warning_storm", "slow_tool", "wrong_format_output", "missing_lib_error",

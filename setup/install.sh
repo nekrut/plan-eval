@@ -7,8 +7,13 @@ set -euo pipefail
 MINIFORGE_DIR="$HOME/miniforge3"
 ENV_NAME="bench"
 ARCH="$(uname -m)"
-INSTALLER="/tmp/Miniforge3-Linux-${ARCH}.sh"
-URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-${ARCH}.sh"
+case "$(uname -s)" in
+  Darwin) OS="MacOSX" ;;
+  Linux)  OS="Linux"  ;;
+  *)      echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+INSTALLER="/tmp/Miniforge3-${OS}-${ARCH}.sh"
+URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-${OS}-${ARCH}.sh"
 
 if [[ ! -d "$MINIFORGE_DIR" ]]; then
   echo "[install] downloading miniforge..."

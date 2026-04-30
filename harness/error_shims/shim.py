@@ -42,7 +42,8 @@ LIB_ERROR = "error while loading shared libraries: libhts.so.3: cannot open shar
 
 
 def real_bin(tool: str) -> str:
-    real_dir = os.environ.get("EVAL_REAL_BIN_DIR", "/home/anton/miniforge3/envs/bench/bin")
+    default = str(Path.home() / "miniforge3" / "envs" / "bench" / "bin")
+    real_dir = os.environ.get("EVAL_REAL_BIN_DIR", default)
     return str(Path(real_dir) / tool)
 
 
