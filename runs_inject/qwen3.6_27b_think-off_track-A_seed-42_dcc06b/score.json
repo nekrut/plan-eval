@@ -1,0 +1,53 @@
+{
+  "run_id": "qwen3.6_27b_think-off_track-A_seed-42_dcc06b",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 207.69071245193481,
+    "wall_seconds_execution": 1.7734966278076172,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3101,
+      "eval_count": 1283,
+      "prompt_eval_duration_ns": 3108289981,
+      "eval_duration_ns": 203170838333,
+      "total_duration_ns": 207681181354
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "failures_log_populated",
+      "summary_line",
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "missing_lib_error",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_inject/qwen3.6_27b_think-off_track-A_seed-42_dcc06b/run.sh line 4:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/bench/runs_inject/qwen3.6_27b_think-off_track-A_seed-42_dcc06b/run.sh line 92:\nFAILED_SAMPLES=$(cut -f1 \"$OUT/failures.log\" 2>/dev/null | sort -u | grep -v '^__ref__$' | paste -sd, || true)\n^------------^ SC2034 (warning): FAILED_SAMPLES appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- FAILED_SAMPLES appears",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

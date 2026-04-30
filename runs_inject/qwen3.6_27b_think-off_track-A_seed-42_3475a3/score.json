@@ -1,0 +1,59 @@
+{
+  "run_id": "qwen3.6_27b_think-off_track-A_seed-42_3475a3",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 207.61448645591736,
+    "wall_seconds_execution": 129.42367720603943,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3101,
+      "eval_count": 1283,
+      "prompt_eval_duration_ns": 3161761842,
+      "eval_duration_ns": 202996142691,
+      "total_duration_ns": 207606098230
+    }
+  },
+  "error_handling": {
+    "m_handle": "recover",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl",
+      "M117C1-ch"
+    ],
+    "n_valid": 4,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [
+      "summary_line"
+    ],
+    "exit_code": 0,
+    "inject_pattern": "slow_tool",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_inject/qwen3.6_27b_think-off_track-A_seed-42_3475a3/run.sh line 4:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\n\nIn /home/anton/bench/runs_inject/qwen3.6_27b_think-off_track-A_seed-42_3475a3/run.sh line 92:\nFAILED_SAMPLES=$(cut -f1 \"$OUT/failures.log\" 2>/dev/null | sort -u | grep -v '^__ref__$' | paste -sd, || true)\n^------------^ SC2034 (warning): FAILED_SAMPLES appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- FAILED_SAMPLES appears",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

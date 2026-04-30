@@ -1,0 +1,57 @@
+{
+  "run_id": "qwen3.6_27b_think-off_track-A_seed-44_120327",
+  "m1_executes": 1,
+  "m1_detail": {
+    "exit_code": 0,
+    "timed_out": false
+  },
+  "m2_schema": 1,
+  "m2_detail": {},
+  "m3_jaccard": 1.0,
+  "m3_detail": {
+    "per_sample": {
+      "M117-bl": 1.0,
+      "M117-ch": 1.0,
+      "M117C1-bl": 1.0,
+      "M117C1-ch": 1.0
+    }
+  },
+  "m4": {
+    "wall_seconds_generation": 93.99558115005493,
+    "wall_seconds_execution": 129.38434600830078,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2424,
+      "eval_count": 530,
+      "prompt_eval_duration_ns": 10113792540,
+      "eval_duration_ns": 82964345085,
+      "total_duration_ns": 93984012651
+    }
+  },
+  "error_handling": {
+    "m_handle": "recover",
+    "m_recover": 1,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl",
+      "M117C1-ch"
+    ],
+    "n_valid": 4,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 0,
+    "inject_pattern": "slow_tool",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}
