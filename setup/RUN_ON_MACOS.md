@@ -38,18 +38,21 @@ bash ground_truth/canonical.sh              # produces ground_truth/results/
 
 After ground truth: `ls ground_truth/results/` should show four `.vcf.gz` files plus their `.tbi` indexes.
 
-## Pull ollama models (~10–20 min, ~52 GB disk)
+## Pull ollama models (~15–25 min, ~70 GB disk)
 
-24 GB unified RAM has to hold macOS, Ollama's runtime, and the model. The four models below cover the three tiers seen in §2.6 (frontier, mid-size local, MoE) plus a control:
+24 GB unified RAM has to hold macOS, Ollama's runtime, and the model. macOS background processes occupy roughly 5–6 GB resident; that leaves ~18–19 GB for the model itself. Five models, ordered by priority:
 
 ```bash
-ollama pull granite4               # 2.1 GB — fastest passer, defensive-scripting floor
+ollama pull qwen3.6:27b            # 17 GB — the only local model that solved v1 (lean) at M3=1.000 in §2.1
+ollama pull granite4               # 2.1 GB — fastest passer; defensive-scripting floor
 ollama pull qwen3:14b              # 9 GB — clean dense fit
-ollama pull qwen3-coder:30b        # 18 GB — borderline; partial offload territory
-ollama pull qwen3.6:35b-a3b        # 23 GB — MoE, the data point unique to unified memory
+ollama pull qwen3-coder:30b        # 18 GB — borderline; partial-offload territory
+ollama pull qwen3.6:35b-a3b        # 23 GB — MoE; the data point unique to unified memory
 ```
 
-If `qwen3.6:35b-a3b` evicts macOS into swap so badly that cells time out at 900 s, drop it: `ollama rm qwen3.6:35b-a3b` and exclude it from the ollama matrix below. Don't pull anything 30 GB+ dense — those won't run usefully.
+Why `qwen3.6:27b` is first: §2.1 of the README found that on the RTX 5080, only this dense model reached v2 levels on the v1 (lean) recipe — every other tested open-weight model scored M3 ∈ {0, 0.33} on v1. Confirming that result on M4 makes §2.1 a three-platform finding. It also fits more comfortably in 24 GB than the 18 GB or 23 GB cases below it.
+
+The 23 GB MoE (`qwen3.6:35b-a3b`) is the borderline case. If macOS swaps so badly that cells time out at 900 s, run `ollama rm qwen3.6:35b-a3b` and exclude it from the ollama matrix below — its absence is a finding too. Don't pull anything 30 GB+ dense.
 
 ## Sanity check (~2 min)
 
@@ -88,14 +91,16 @@ nohup python3 -u harness/error_matrix.py \
 echo "anthropic pid: $!"
 
 nohup python3 -u harness/error_matrix.py \
-    --models granite4 qwen3:14b qwen3-coder:30b qwen3.6:35b-a3b \
+    --models qwen3.6:27b granite4 qwen3:14b qwen3-coder:30b qwen3.6:35b-a3b \
     --plans v2 v2_defensive --include-baseline \
     --log error_matrix_ollama_m4.jsonl \
     > /tmp/error_matrix_ollama_m4.log 2>&1 &
 echo "ollama pid: $!"
 ```
 
-Cell count: 234 (Anthropic) + ~312 (4 ollama models × 78 cells) = ~546. Estimated wall: ~6–10 h.
+Cell count: 234 (Anthropic) + 390 (5 ollama models × 78 cells) = ~624. Estimated wall: ~8–12 h.
+
+If the 35b-a3b MoE doesn't fit, drop it from the `--models` list — the matrix becomes 312 ollama cells and the wall drops to ~6–10 h.
 
 Watch progress:
 
