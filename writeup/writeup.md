@@ -55,19 +55,23 @@ Given this (rapidly evolving) landscape we decided to do the following experimen
 
 ### Hardware
 
-We selected five different computers listed in Table 3. It is a combination ranging from an old workstation saved from university salvage and a desktop with a gaming GPU to the latest MacBooks and a purpose-built inexpensive NVIDIA device.
+We selected five different computers listed in Table 3. It is a combination ranging from an old workstation saved from university salvage and a desktop with a gaming GPU to the latest MacBooks and a purpose-built inexpensive NVIDIA device---NVIDIA Jetson AGX Orin. The Orin is a "RaspberryPi"-like offering from NVIDIA that costs under $2,000 and has a very small footprint making it an idea lab-ready tiny but powerful workstation.
 
 **Table 3.** Test machines used in this study.
 
-| Computer | Year released | RAM | GPU |
-|---|---|---|---|
-| NVIDIA Jetson AGX Orin Developer Kit | 2022 | 64 GB LPDDR5 (unified with GPU) | Integrated 2048-core Ampere |
-| RTX 5080 desktop (Linux) | 2025 (GPU) | 64 GB DDR5 (system) | NVIDIA RTX 5080, 16 GB GDDR7 |
-| MacBook Air M4 (24 GB) | 2025 | 24 GB LPDDR5X (unified with GPU) | Apple M4 integrated GPU, 10-core |
-| MacBook Pro M4 Pro (48 GB) | 2024 | 48 GB LPDDR5X (unified with GPU) | Apple M4 Pro integrated GPU, 16- to 20-core |
-| 2× NVIDIA RTX A5000 desktop (Linux) | 2021 (GPUs) | 128 GB DDR4 (system) | 2× NVIDIA RTX A5000, 24 GB GDDR6 each (48 GB total) |
+| Computer | Manufacturer | Year released | RAM | OS | GPU |
+|---|---|---|---|---|---|
+| NVIDIA Jetson AGX Orin Developer Kit | NVIDIA | 2022 | 64 GB LPDDR5 (unified with GPU) | Ubuntu 22.04 LTS (NVIDIA JetPack 6) | Integrated Ampere, 2,048 CUDA cores + 64 Tensor cores |
+| RTX 5080 desktop | Custom build | 2025 (GPU) | 64 GB DDR5 (system) | Linux (Ubuntu) | NVIDIA RTX 5080, 10,752 CUDA cores, 16 GB GDDR7 |
+| MacBook Air M4 (24 GB) | Apple | 2025 | 24 GB LPDDR5X (unified with GPU) | macOS 26 | Apple M4 integrated GPU, 10 cores |
+| MacBook Pro M4 Pro (48 GB) | Apple | 2024 | 48 GB LPDDR5X (unified with GPU) | macOS Sequoia 15.6 | Apple M4 Pro integrated GPU, 16 to 20 cores |
+| 2× NVIDIA RTX A5000 desktop | Custom build | 2021 (GPUs) | 128 GB DDR4 (system) | Linux (Ubuntu 25.10) | 2× NVIDIA RTX A5000, 8,192 CUDA cores each, 24 GB GDDR6 each (48 GB total) |
 
 System RAM listed for the two Linux desktops reflects the build configuration; for inference workloads the relevant memory is the GPU VRAM (last column). For the Jetson and the MacBook, RAM is unified between CPU and GPU and the model can use up to roughly the listed RAM minus the operating-system reservation.
+
+### Workflow
+
+
 
 
 ## References
