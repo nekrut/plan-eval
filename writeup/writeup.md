@@ -36,7 +36,18 @@ To decide which open models to use we first need to survey the landscape of avai
 
 Table 1 has notable absences: Apple's 3-billion-parameter on-device model ships only inside iOS and macOS 26, and xAI has openly released only Grok-1 (March 2024) and Grok-2.5 (August 2025) — everything newer is closed. Every flagship since late 2025 is a sparse MoE, but dense persists below ~40 B because it is simpler to deploy, and Alibaba's April 2026 27 B dense Qwen3.6 beats their own 397 B MoE on coding benchmarks — training quality, not parameter count, now sets the ceiling.
 
-Two practical filters narrow the choice for most labs. First, license: most weights now ship under Apache 2.0 or MIT (DeepSeek, Qwen, Gemma 4, Mistral Large 3, Granite, OLMo, Phi), but Meta's Llama 4 retains a custom Community License with a 700-million-monthly-active-user cap and an explicit exclusion of EU users, and Cohere's Command and Aya are research-and-non-commercial only. Anyone publishing a method built on a given model has to know which license applies. Second, hardware: a 7-billion model at Q4 quantization fits in 5–6 GB of VRAM (any consumer GPU); a 27- to 32-billion dense model fits in a 24 GB GPU (RTX 4090, A5000); the 100-billion-class MoE flagships need 50–60 GB just for weights, which on commodity hardware means two GPUs at minimum; the trillion-parameter tier is multi-node regardless of quantization. Allen AI's OLMo and NVIDIA's Nemotron also release the training data and recipes, not just the weights — relevant when independent replication, not just inference, matters.
+Two practical filters narrow the choice for most labs. First, license: most weights now ship under Apache 2.0 or MIT (DeepSeek, Qwen, Gemma 4, Mistral Large 3, Granite, OLMo, Phi), but Meta's Llama 4 retains a custom Community License with a 700-million-monthly-active-user cap and an explicit exclusion of EU users, and Cohere's Command and Aya are research-and-non-commercial only. Anyone publishing a method built on a given model has to know which license applies. Second, hardware: the four size tiers in Table 1 map to four very different machines, from a $400–$600 consumer card for the smallest models to a multi-GPU server costing several hundred thousand dollars for the trillion-parameter tier (Table 2). Allen AI's OLMo and NVIDIA's Nemotron also release the training data and recipes, not just the weights — relevant when independent replication, not just inference, matters.
+
+**Table 2.** GPU options and ballpark May 2026 US street prices for running each Table 1 model class locally at 4-bit compression. Where multiple cards are needed, the listed price is the per-card cost.
+
+| Model class (Table 1 example) | GPU memory needed | GPU options (May 2026 USD) | Refs |
+|---|---|---|---|
+| **7–8 B dense** (Phi-4, Granite 8B, OLMo 3 7B) | ~5–6 GB | NVIDIA RTX 5060 Ti 16 GB (~$560); RTX 4060 Ti 16 GB (~$430); RTX 5070 12 GB (~$635); Apple M4 Mac mini 16 GB unified (~$600) | [11, 16] |
+| **27–32 B dense** (Qwen3.6-27B, Gemma 4 31B, OLMo 3 32B) | ~17–22 GB | NVIDIA RTX 5090 32 GB (~$2,900–$3,500, street price 50–75 % over $1,999 MSRP); RTX 4090 24 GB (~$1,500–$2,200, EOL Oct 2024); RTX A5000 24 GB (~$700–$1,400 used); Apple Mac Studio M3 Ultra 96 GB unified (~$4,000) | [11, 12, 16] |
+| **100–400 B MoE** (Llama 4 Scout 109B, Maverick 400B) | ~55–250 GB | NVIDIA RTX Pro 6000 Blackwell 96 GB (~$8,500); 2× RTX 5090 (~$6,000–$7,000 total); RTX 6000 Ada 48 GB (~$6,800); H100 80 GB (~$25K–$33K); AMD Instinct MI300X 192 GB (~$15K–$20K, OEM-only); Apple Mac Studio M3 Ultra 256 GB unified (~$9,500) | [11, 12, 13, 14, 16] |
+| **Trillion-parameter MoE** (DeepSeek-V4-Pro 1.6T) | ~700+ GB | NVIDIA H200 141 GB (~$31K–$40K each); B200 192 GB (~$35K–$55K each); 8-GPU DGX H200 server (~$350K–$500K); GB200 NVL72 rack (~$3M+); cloud rental on B200 ~$2.25–$16/GPU-hour | [13, 15] |
+
+May 2026 prices are dominated by an ongoing HBM/GDDR7 shortage; consumer NVIDIA 50-series cards and high-RAM Apple Mac Studio configurations sit 30–75 % above launch MSRP. AMD MI300X and the newer MI325X are sold almost exclusively through OEM channels — public per-card numbers reflect bulk pricing or cloud rental rates [13]. The used market is liquid for retired flagships (RTX 4090, RTX A5000) and is often the cheapest path into the 27–32 B tier [11].
 
 ## References
 
@@ -59,3 +70,15 @@ Two practical filters narrow the choice for most labs. First, license: most weig
 [9] NVIDIA. NVIDIA debuts Nemotron 3 family of open models. NVIDIA Newsroom. https://nvidianews.nvidia.com/news/nvidia-debuts-nemotron-3-family-of-open-models
 
 [10] Cohere. Models — Command A, Aya. Cohere docs. https://docs.cohere.com/docs/models
+
+[11] BestValueGPU. Consumer NVIDIA RTX GPU price history and specifications (RTX 4060 Ti, 4090, 5060 Ti, 5070, 5090). https://bestvaluegpu.com/
+
+[12] Thunder Compute. NVIDIA RTX Pro 6000 Blackwell pricing analysis. https://www.thundercompute.com/blog/nvidia-rtx-pro-6000-pricing
+
+[13] Thunder Compute. AMD Instinct MI300X pricing. https://www.thundercompute.com/blog/amd-mi300x-pricing
+
+[14] Jarvis Labs. NVIDIA H100 80 GB pricing guide. https://jarvislabs.ai/blog/h100-price
+
+[15] Northflank. NVIDIA B200 cost analysis and cloud rental rates. https://northflank.com/blog/how-much-does-an-nvidia-b200-gpu-cost
+
+[16] Apple. Mac Studio configurations and pricing. https://www.apple.com/mac-studio/specs/
