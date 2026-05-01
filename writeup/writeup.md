@@ -156,6 +156,24 @@ Seven failure patterns cover the kinds of breakage a real lab pipeline encounter
 
 Beyond the variant-overlap score `M3`, we score each cell on three error-handling metrics. `m_handle` classifies the script's overall response as `crash` (exited non-zero with no failure log), `propagate` (the failure passed through to a downstream step), `partial` (the script aborted but recorded the failure structurally), or `recover` (the script completed successfully despite the injection). `m_recover` is binary: did the script produce the count of valid VCFs that the failure pattern allows? For `one_sample_fails` the best achievable is 3 (the bad sample's VCF is correctly absent); for `silent_truncation`, `wrong_format_output` and `missing_lib_error` the best is 0 (the script should detect the broken or missing output and skip it); for the remaining three patterns the best is 4. `m_diagnose` is binary: did the script announce the failure — through a populated `failures.log`, a summary line on stderr, or a sample-name-and-failure-word pair in its output — or did it stay silent? All three metrics are defined in `score/score_run.py:error_handling`.
 
+### Scoring
+
+We score every run on five metrics computed automatically by `score/score_run.py` from the script's outputs and the canonical answer key. The metrics range from coarse ("did anything execute?") to fine ("which exact variants did we call, and at what allele frequencies?") so that we can tell apart a run that produced no output, a run that produced output of the wrong content, and a run that got every call right.
+
+**Table 6.** Per-run scoring metrics.
+
+| Metric | Type | What it measures | Pass condition |
+|---|---|---|---|
+| **M1** (executes) | binary | Did the script run to completion? | `bash run.sh` returns exit 0 within the 600-second wall-clock budget. |
+| **M2** (schema) | binary | Did the script produce the right *files*? | All nine expected outputs exist (4 BAM + 4 BAI + 4 VCF.gz + 4 TBI + `collapsed.tsv`) and `bcftools view -h` parses each VCF header. |
+| **M3** (variant overlap) | float in [0, 1] | Did the script call the right *variants*? | Per sample, the Jaccard overlap of `(chrom, pos, ref, alt)` between the script's PASS-or-unfiltered records and the answer key, requiring matched allele frequencies within ±0.02. Averaged over the four samples. |
+| **M4** (cost and time) | quantitative | What did the run cost? | Tokens consumed; USD spent (Anthropic only — Ollama is free); generation time and execution time, both in seconds. |
+| **M5** (script quality) | binary | Is the script defensible bash? | All four of: `set -euo pipefail` present; no absolute user paths (`/home/anton/…`); `shellcheck` clean; idempotent (a second run on a fully populated output directory exits 0 without redoing work). |
+
+**M3 is the headline score** in every results section. It is the metric that captures whether the model has actually done the job, and it is the only one that distinguishes a script that produced four well-formed VCFs of the wrong content from one that produced four correct VCFs. A run that fails M1 (the script did not execute to completion) gets M2 = 0 by construction; we still compute M3 over whatever VCFs the script did produce and treat any missing file as zero overlap on its sample. A model that uses a different but valid tool from the one named in the plan — `bcftools mpileup` in place of `lofreq`, for example — gets credit on M3 for the variants it called, not for the tool it chose.
+
+For the error-injection cells (described under *Error simulation*) we add the three further metrics — `m_handle`, `m_recover`, `m_diagnose` — that score how the script behaved when one of its tools deliberately misbehaved. All eight metrics are written to a per-run `score.json` and aggregated by `score/aggregate.py` into the table used to produce every figure and table in the Results section.
+
 ## References
 
 [1] Meta. Llama 4: a new crop of flagship AI models. *TechCrunch*, April 5, 2025. https://techcrunch.com/2025/04/05/meta-releases-llama-4-a-new-crop-of-flagship-ai-models/
