@@ -1,0 +1,29 @@
+# BioMaster: Multi-agent System for Automated Bioinformatics Analysis Workflow
+
+PDF unavailable from bioRxiv (HTTP 403 to automated fetchers). Summary below sourced from Europe PMC API record `PPR970702`.
+
+## Title
+BioMaster: Multi-agent System for Automated Bioinformatics Analysis Workflow
+
+## Authors
+Su H, Long W, Zhang Y
+
+## Venue
+bioRxiv preprint (Europe PMC accession PPR970702)
+
+## Year / DOI
+- Year: 2025
+- Posted: January 26, 2025
+- DOI: 10.1101/2025.01.23.634608
+- URL: https://www.biorxiv.org/content/10.1101/2025.01.23.634608v1
+- Code: https://github.com/ai4nucleome/BioMaster
+- Contact: yanlinzhang@hkust-gz.edu.cn
+
+## Abstract
+
+**Motivation.** The rapid expansion of biological data has significantly increased the complexity of bioinformatics workflows, which often involve intricate, multi-step processes. These tasks demand considerable manual effort from bioinformaticians, creating inefficiencies and limiting scalability. Recent advancements in large language model (LLM)-powered agents offer promising solutions to streamline and automate these workflows. However, existing automated systems, while effective for short, well-defined tasks, often struggle with long, multi-step workflows due to challenges such as error propagation, limited adaptability to emerging tools, and the inability of LLMs to generalize to niche bioinformatics tasks. Achieving effective workflow automation requires robust task coordination, dynamic knowledge retrieval, and mechanisms to ensure errors are identified and resolved before they impact downstream processes.
+
+**Results.** We present BioMaster, a multi-agent framework designed to automate and streamline complex bioinformatics workflows. BioMaster incorporates specialized agents with role-based responsibilities, enabling precise task decomposition, execution, and validation. It leverages Retrieval-Augmented Generation (RAG) to dynamically retrieve domain-specific knowledge, improving adaptability to new tools and niche analyses. BioMaster also introduces enhanced control over input and output validation to ensure pipeline consistency and employs a memory management strategy optimized for handling long workflows. Experiments across diverse bioinformatics tasks, including RNA-seq, ChIP-seq, single-cell analysis, and Hi-C processing, demonstrate that BioMaster significantly outperforms existing methods in accuracy, efficiency, and scalability. By addressing key limitations in workflow automation, BioMaster offers a robust solution for modern bioinformatics challenges.
+
+## Open-weight model coverage
+Framework is LLM-agnostic (RAG-augmented multi-agent); per the GitHub repo the primary evaluation backbone is closed (GPT-4-class) but the architecture supports any chat-completion LLM including open-weight ones.
