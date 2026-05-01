@@ -68,6 +68,17 @@ DEFAULT_PATTERNS = list(PATTERN_TOOLS.keys())
 
 SEEDS = [42, 43, 44]
 
+# How long to wait between retries when the Claude Code CLI hits its usage cap.
+# Signature: exit 1 with empty stderr → usage limit, not a model/network error.
+# Retries continue indefinitely so an unattended run always completes eventually.
+_RATE_LIMIT_WAIT_S = 1800  # 30 min per retry
+
+
+def _is_claude_rate_limit(r: dict) -> bool:
+    """Return True when a cell failed because the claude CLI exhausted its usage cap."""
+    err = r.get("error", "")
+    return "claude failed (exit 1):" in err and err.rstrip().endswith("exit 1):")
+
 
 def run_cell(model: str, plan: str, pattern: str, target: str, seed: int, dry: bool) -> dict:
     plan_path = PLAN_FILES[plan]
@@ -162,7 +173,20 @@ def main() -> int:
 
     with log_path.open("a") as logf:
         for model, plan, pat, tool, seed in cells:
-            r = run_cell(model, plan, pat, tool, seed, dry=False)
+            is_ollama = not model.startswith("claude-")
+            attempt = 0
+            while True:
+                r = run_cell(model, plan, pat, tool, seed, dry=False)
+                if not is_ollama and _is_claude_rate_limit(r):
+                    attempt += 1
+                    print(
+                        f"  [rate-limit] claude usage cap hit (attempt {attempt}) — "
+                        f"pausing {_RATE_LIMIT_WAIT_S // 60} min...",
+                        flush=True,
+                    )
+                    time.sleep(_RATE_LIMIT_WAIT_S)
+                else:
+                    break
             logf.write(json.dumps(r) + "\n")
             logf.flush()
             print(f"  -> {r.get('m_handle','-')} M3={r.get('M3','-')} valid={r.get('n_valid','-')} wall={r.get('wall_s',0):.0f}s",
