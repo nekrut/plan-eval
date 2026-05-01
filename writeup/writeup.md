@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Frontier models from Anthropic, OpenAI, and Google write quilaity working code for data analysis tasks, but they cost cents to dollars per call resulting a quickly balooning bills. Asking Opus to write a hundred-line bash script every time a postdoc aligns a few FASTQ files spends the budget that should go to harder problems. We ask a simple question: can a frontier model write the recipe once, and a free, small open-weight model running on the lab's own hardware turn that recipe into a working script every time after?
+Frontier models from Anthropic, OpenAI, and Google write quality working code for data analysis tasks, but they cost cents to dollars per call, resulting in quickly ballooning bills. Asking Opus to write a hundred-line bash script every time a postdoc aligns a few FASTQ files spends the budget that should go to harder problems. We ask a simple question: can a frontier model write the recipe once, and a free, small open-weight model running on the lab's own hardware turn that recipe into a working script every time after?
 
 To decide which open models to use we first need to survey the landscape of available models. For 2026 this landscape is summarized in Table 1 below. 
 
@@ -49,7 +49,13 @@ Two practical filters narrow the choice for most labs. First, license: most weig
 
 May 2026 prices are dominated by an ongoing HBM/GDDR7 shortage; consumer NVIDIA 50-series cards and high-RAM Apple Mac Studio configurations sit 30–75 % above launch MSRP. AMD MI300X and the newer MI325X are sold almost exclusively through OEM channels — public per-card numbers reflect bulk pricing or cloud rental rates [13]. The used market is liquid for retired flagships (RTX 4090, RTX A5000) and is often the cheapest path into the 27–32 B tier [11].
 
-We ran the experiments described in this paper on four machines that span the small- and mid-tier rows of Table 2 (Table 3).
+Given this (rapidly evolving) landscape we decided to do the following experiment: take a common sequencing data processing workflow and ask open models running on hardware accessible to an average research lab to design and execute the analysis. In doing so we experimented with a range of possibilities ranging from allowing open models to figure out everything by themselves to guiding them using a very detailed plan produced by commercial frontier models. We further complicated these tasks by simulating a variety of errors that may occur during workflow execution.
+
+## Results
+
+### Hardware
+
+We selected five different computers listed in Table 3. It is a combination ranging from an old workstation saved from university salvage and a desktop with a gaming GPU to the latest MacBooks and a purpose-built inexpensive NVIDIA device.
 
 **Table 3.** Test machines used in this study.
 
@@ -58,19 +64,10 @@ We ran the experiments described in this paper on four machines that span the sm
 | NVIDIA Jetson AGX Orin Developer Kit | 2022 | 64 GB LPDDR5 (unified with GPU) | Integrated 2048-core Ampere |
 | RTX 5080 desktop (Linux) | 2025 (GPU) | 64 GB DDR5 (system) | NVIDIA RTX 5080, 16 GB GDDR7 |
 | MacBook Air M4 (24 GB) | 2025 | 24 GB LPDDR5X (unified with GPU) | Apple M4 integrated GPU, 10-core |
+| MacBook Pro M4 Pro (48 GB) | 2024 | 48 GB LPDDR5X (unified with GPU) | Apple M4 Pro integrated GPU, 16- to 20-core |
 | 2× NVIDIA RTX A5000 desktop (Linux) | 2021 (GPUs) | 128 GB DDR4 (system) | 2× NVIDIA RTX A5000, 24 GB GDDR6 each (48 GB total) |
 
 System RAM listed for the two Linux desktops reflects the build configuration; for inference workloads the relevant memory is the GPU VRAM (last column). For the Jetson and the MacBook, RAM is unified between CPU and GPU and the model can use up to roughly the listed RAM minus the operating-system reservation.
-
-Given this (rapidly evolving) landscape we decided to do the following experiment: take a common sequencing data processing workflow and ask open models running on hardware accessible to an average research lab to design and execute the analysis. In going we experimented with a range of possibilities ranging from allowing open models to figure out everything by themselves to guiding them using very detailed plan produced by commercial frontier models. We further complicated these dasks by simulating a varity of errors that may occur during worekfloiw execution.
-
-## Results
-
-### Hardware
-
-We selected five different computers listed in Table 3. It is a combination ranging from an old workstation saved from university salvage and desktop with a gaming GPU to latest macrooks and a purpose built inexpensive NVIDIA device.
-
-
 
 
 ## References
