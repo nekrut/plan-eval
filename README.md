@@ -14,7 +14,7 @@ Four findings.
 
 **No recipe means no work.** Without any recipe, every local model scores M3 = 0. Anthropic models score M3 ≥ 0.67 from what they already know. Local models cannot recover this workflow on their own.
 
-**Error handling needs its own prose.** We broke `bwa` or `lofreq` in seven ways and re-ran the matrix on the regular recipe and on one that adds defensive prose (v2_defensive). Without that prose, every model — Opus and granite4 alike — wrote the same brittle script. With it, three tiers appeared: **Opus, Sonnet, Haiku, and `qwen3.6:27b`** all wrote clean defensive bash with the same per-pattern outcome distribution (21 recover / 14–15 partial / 0–1 crash, n=36 each). `qwen3.6:35b` (a different model from the same family) wrote the right structure but its retries succeeded less often, ending in *detect-and-skip*. `granite4` (2 GB) crashed on all 36 cells, unable to write a working `try()` helper. One useful caveat: a script that "recovered" still shipped junk if the recipe asked only that the file parse, not that it contain anything.
+**Error handling needs its own prose.** We broke `bwa` or `lofreq` in seven ways and ran the matrix twice — once on the regular recipe (v2) and once on a defensive variant (v2_defensive). Without the defensive prose, every model wrote the same brittle script: Opus and granite4 had the same 15 / 0 / 6 / 15 handle distribution. With it, three tiers appeared. **Six models** — Opus, Sonnet, Haiku, qwen3.6:27b, qwen3:14b, and qwen3-coder:30b — share a top tier: 21 recover / 14–15 partial / 0–1 crash. The Anthropic-and-open-weight tier boundary collapses; three free dense Qwen-family models from 9 to 18 GB sit alongside the three Anthropic tiers. One step down, `qwen3.6:35b` writes the right defensive structure but its retries succeed less often (7 recover / 29 partial). At the floor, `granite4` (2 GB) crashed on all 36 cells, unable to produce a working `try()` helper — confirmed on two hardware platforms. One useful caveat: a script that "recovered" still shipped junk if the recipe asked only that the file parse, not that it contain anything.
 
 The headline: detail in the recipe — both for the happy path and for error handling — is what local execution needs. Model class and hardware are not what limit performance.
 
@@ -123,7 +123,7 @@ Panel B shows the Jetson sweep at 30 W (the original 9-of-14 passers, in green) 
 
 Sections 2.1 to 2.5 measured the happy path. This section measures what the same models do when a tool misbehaves.
 
-We ran 468 cells: 6 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds. The trick is **PATH shimming**. Before each run, the harness drops two short shell wrappers — one named `bwa`, one named `lofreq` — into a per-run directory and puts that directory at the front of `PATH`. When the script types `bwa mem`, bash finds the wrapper first and runs it instead of the real bwa. The wrapper reads two environment variables (`EVAL_INJECT_PATTERN`, `EVAL_INJECT_TARGET`) and either passes the call through to the real binary or simulates a failure. The model's `run.sh` doesn't know.
+We ran 468 cells on the Jetson at full power, plus a partial 624-cell replication on a 48 GB MacBook M4 contributed via PR (Scott Cain), of which 234 cells across three open-weight models landed cleanly. Total usable: 702 cells, 6 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds (Jetson) plus three M4 model rows (qwen3:14b, qwen3-coder:30b, granite4 cross-platform). The trick is **PATH shimming**. Before each run, the harness drops two short shell wrappers — one named `bwa`, one named `lofreq` — into a per-run directory and puts that directory at the front of `PATH`. When the script types `bwa mem`, bash finds the wrapper first and runs it instead of the real bwa. The wrapper reads two environment variables (`EVAL_INJECT_PATTERN`, `EVAL_INJECT_TARGET`) and either passes the call through to the real binary or simulates a failure. The model's `run.sh` doesn't know.
 
 Seven failure patterns. Each one targets bwa, lofreq, or both. Concrete effect on the script in each case:
 
@@ -151,11 +151,11 @@ Three new scores on top of M3:
 
 **v2 is identical across model classes.** Without error-handling prose, every model writes the same brittle script. Opus, Sonnet, Haiku, qwen3.6:27b, and qwen3.6:35b all crash on `flake_first_call`, `missing_lib_error`, and `silent_truncation`; all "recover" on `slow_tool` and `stderr_warning_storm` (waiting and ignoring noise both work); all `propagate` on `one_sample_fails` (set -e fires after three samples have already succeeded). Per-(model, plan) handle counts on v2 are **exactly** 15 recover / 0 partial / 6 propagate / 15 crash (n = 36) for **five of the six models**. Granite4 lands at 12 / 0 / 4 / 20 — a few extra crashes because it sometimes fails to write a parseable script even on the cosmetic patterns. Five rows in Figure 6's left panel are visually indistinguishable. The recipe alone does not make code defensive.
 
-**v2_defensive splits the field into three tiers.** Two of those tiers contain models from different classes:
+**v2_defensive splits the field into three tiers.** Two of those tiers contain models from different classes; six models share the top tier.
 
-- **Frontier-tier (Opus, Sonnet, Haiku, *and* qwen3.6:27b).** Each implements the `try()` helper faithfully. Zero or one crashes across 36 cells. The four rows are visually identical in Figure 6's right panel. Counts: 21 recover / 14–15 partial / 0–1 crash (n = 36 each). Concrete: on `flake_first_call@bwa`, all four models score M3 = 1.000 across every seed — the first bwa call fails, `try` retries, the second succeeds, the BAM appears. **A free, locally-runnable 17 GB dense model lands in the same defensive-bash tier as Claude Opus.** This is the only finding in the paper that elevates a free open-weight model into the frontier-Anthropic distribution on a *task* metric, not just a happy-path score.
-- **`qwen3.6:35b`.** Writes the same defensive structure but recovers less often. Same `flake_first_call@bwa` cells: M3 = 0.333. One seed of three recovered; the other two ended in `partial` — `try` ran but the BAM never showed up. Zero crashes; partials dominate (29 of 36 cells). The 35b dense model from the same family does not match the 27b dense.
-- **`granite4`.** All 36 v2_defensive cells crash. The 2 GB model that handles v2 cleanly cannot produce a working `try() { ... }` plus per-sample-loop `continue` in bash. This is the floor for defensive scripting; it sits well below the floor for happy-path scripting.
+- **Frontier-tier — six models.** Opus, Sonnet, Haiku, qwen3.6:27b (all Jetson), plus qwen3:14b and qwen3-coder:30b (M4 PR from Scott Cain). Each implements the `try()` helper faithfully. Zero or one crashes across 36 cells. All six rows look the same in Figure 6's right panel. Counts: 21 recover / 14–15 partial / 0–1 crash (n = 36 each). Concrete: on `flake_first_call@bwa`, every one of the six models scores M3 = 1.000 across every seed — the first bwa call fails, `try` retries, the second succeeds, the BAM appears. **Three free, locally-runnable open-weight dense models — qwen3.6:27b at 17 GB, qwen3:14b at 9 GB, and qwen3-coder:30b at 18 GB — share the defensive-bash tier with Claude Opus.** The tier is not "Anthropic vs open-weight"; it is a stable cluster of trained-out-of-the-box defensive coding ability that contains four open-weight dense models (three from the Qwen family) and three Anthropic models.
+- **`qwen3.6:35b`.** Writes the same defensive structure but recovers less often. Same `flake_first_call@bwa` cells: M3 = 0.333. One seed of three recovered; the other two ended in `partial` — `try` ran but the BAM never showed up. Zero crashes; partials dominate (29 of 36 cells). A larger dense model from the same family as qwen3.6:27b does *not* match the 27b dense.
+- **`granite4`.** All 36 v2_defensive cells crash on Jetson. Confirmed on M4 by Scott's PR. The 2 GB model that handles v2 cleanly cannot produce a working `try() { ... }` plus per-sample-loop `continue` in bash. This is the floor for defensive scripting; it sits well below the floor for happy-path scripting, and it does not depend on hardware.
 
 **Pattern shape matters as much as model class.** Three patterns are not recoverable in principle and stay broken even on v2_defensive: `missing_lib_error` (the workflow cannot proceed without `libhts.so.3`), `silent_truncation`, and `wrong_format_output` (both produce files that look structurally valid but contain no real calls; a script can at best skip the bad sample). The other four patterns — `flake_first_call`, `slow_tool`, `stderr_warning_storm`, `one_sample_fails` — are fully recoverable: an aware script retries, waits, ignores, or skips. `m_recover` captures the difference.
 
@@ -175,10 +175,16 @@ Headline counts:
 | Claude Haiku 4.5 / v2_defensive | 21 | 15 | 0 | 0 | 36 |
 | **qwen3.6:27b / v2** | **15** | **0** | **6** | **15** | **36** |
 | **qwen3.6:27b / v2_defensive** | **21** | **15** | **0** | **0** | **36** |
+| **qwen3:14b / v2 (M4)** | **15** | **0** | **6** | **15** | **36** |
+| **qwen3:14b / v2_defensive (M4)** | **21** | **15** | **0** | **0** | **36** |
+| **qwen3-coder:30b / v2 (M4)** | 15 | 0 | 0 | **21** | 36 |
+| **qwen3-coder:30b / v2_defensive (M4)** | **21** | **15** | **0** | **0** | **36** |
 | qwen3.6:35b / v2 | 15 | 0 | 6 | 15 | 36 |
 | qwen3.6:35b / v2_defensive | 7 | 29 | 0 | 0 | 36 |
-| granite4 / v2 | 12 | 0 | 4 | 20 | 36 |
-| granite4 / v2_defensive | 0 | 0 | 0 | 36 | 36 |
+| granite4 / v2 (Jetson) | 12 | 0 | 4 | 20 | 36 |
+| granite4 / v2_defensive (Jetson) | 0 | 0 | 0 | 36 | 36 |
+| granite4 / v2 (M4) | 5 | 0 | 0 | 31 | 36 |
+| granite4 / v2_defensive (M4) | 0 | 0 | 0 | 36 | 36 |
 
 n=36 = 12 (pattern, tool) cells × 3 seeds; baseline (no-injection) cells excluded.
 

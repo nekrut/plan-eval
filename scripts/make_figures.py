@@ -348,8 +348,15 @@ PLAN_DISPLAY = {
 
 
 def collect_inject_runs(runs_dir: Path):
-    """Return DataFrame of all injection runs with handle/recover/diagnose."""
+    """Return DataFrame of all injection runs with handle/recover/diagnose.
+    Reads per-run dirs under runs_dir, then augments with rows from any
+    error_matrix_*.jsonl files at the repo root that aren't already covered
+    (lets us pick up cross-platform results contributed via PR — e.g. an
+    M4 run that only landed the JSONL log, not the per-run dirs)."""
     rows = []
+    seen_run_ids = set()
+
+    # Primary source: per-run dirs (have full meta.json + score.json)
     for d in runs_dir.glob("*_track-A_seed-*"):
         sj = d / "score.json"
         if not sj.exists():
@@ -366,11 +373,62 @@ def collect_inject_runs(runs_dir: Path):
             "target":  eh.get("inject_target", ""),
             "plan":    PLAN_DISPLAY.get(plan_name, plan_name),
             "seed":    meta.get("seed"),
+            "hardware": "jetson",
             "handle":  eh.get("m_handle"),
             "recover": eh.get("m_recover"),
             "diagnose": eh.get("m_diagnose"),
             "M3":      s.get("m3_jaccard"),
         })
+        seen_run_ids.add(meta.get("run_id"))
+
+    # Augment from JSONL summary logs (covers cross-platform PRs)
+    for jsonl in BENCH.glob("error_matrix_*.jsonl"):
+        # Hardware tag from filename suffix
+        name = jsonl.stem
+        if name.endswith("_m4"):
+            hw = "m4"
+        elif name.endswith("_a5000"):
+            hw = "a5000"
+        else:
+            hw = "jetson"
+        for line in jsonl.read_text().splitlines():
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            if "error" in r:
+                continue
+            if r.get("run_id") in seen_run_ids:
+                continue
+            cell = r.get("cell", "")
+            parts = cell.split("/")
+            if len(parts) < 4:
+                continue
+            model, plan, pattern_at_target, seed_str = parts[0], parts[1], parts[2], parts[3]
+            if "@" not in pattern_at_target:
+                continue
+            pattern, target = pattern_at_target.split("@", 1)
+            if pattern == "none":
+                continue
+            try:
+                seed = int(seed_str.replace("seed-", ""))
+            except ValueError:
+                seed = None
+            if r.get("m_handle") is None:
+                continue
+            rows.append({
+                "model":   model.replace(":", "_"),
+                "pattern": pattern,
+                "target":  target,
+                "plan":    plan,
+                "seed":    seed,
+                "hardware": hw,
+                "handle":  r.get("m_handle"),
+                "recover": r.get("m_recover"),
+                "diagnose": r.get("m_diagnose"),
+                "M3":      r.get("M3"),
+            })
+            if r.get("run_id"):
+                seen_run_ids.add(r["run_id"])
     return pd.DataFrame(rows)
 
 
