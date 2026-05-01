@@ -687,6 +687,45 @@ Four paired-end Illumina MiSeq samples (M117-bl, M117-ch, M117C1-bl, M117C1-ch) 
 
 The answer key comes from `ground_truth/canonical.sh`, a hand-written bash workflow that uses the same locked conda environment as the model runs. Tools: BWA-MEM (align), samtools (sort, index), LoFreq (call variants), bgzip and tabix (compress, index), bcftools (query). SnpSift annotates in the published tutorial but isn't needed for the model runs.
 
+The data flow:
+
+```mermaid
+flowchart TB
+    REF["chrM.fa<br/>(16,569 bp)"]
+    FQ["paired FASTQ × 4 samples<br/>M117-bl · M117-ch · M117C1-bl · M117C1-ch"]
+
+    REF -->|bwa index| REFIDX["chrM.fa.{amb,ann,bwt,pac,sa}"]
+    REF -->|samtools faidx| FAI["chrM.fa.fai"]
+
+    FQ --> ALIGN["bwa mem -t 4 | samtools sort -t 4"]
+    REFIDX --> ALIGN
+    ALIGN --> BAM["sample.bam"]
+    BAM -->|samtools index| BAI["sample.bam.bai"]
+
+    BAM --> CALL["lofreq call-parallel<br/>--pp-threads 4"]
+    REF --> CALL
+    FAI --> CALL
+    CALL --> VCF["sample.vcf"]
+
+    VCF -->|bgzip| VCFGZ["sample.vcf.gz"]
+    VCFGZ -->|tabix -p vcf| TBI["sample.vcf.gz.tbi"]
+
+    VCFGZ -->|"bcftools query + awk (× 4 samples)"| TSV["collapsed.tsv<br/>sample · chrom · pos · ref · alt · af"]
+
+    classDef inp  fill:#e3f2fd,stroke:#1976d2,color:#0d47a1
+    classDef tool fill:#fff8e1,stroke:#f57f17,color:#e65100
+    classDef art  fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
+    classDef ans  fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20,stroke-width:2px
+
+    class REF,FQ inp
+    class ALIGN,CALL tool
+    class REFIDX,FAI,BAM,BAI,VCF,VCFGZ,TBI art
+    class TSV ans
+```
+
+Per-sample steps (alignment through tabix) run independently for each of the four samples; the only inter-sample dependency is the final `bcftools query + awk` fan-in that builds `collapsed.tsv`. That structure is what makes the §2.6 `one_sample_fails` injection informative — without per-sample isolation, `set -e` aborts the whole run mid-fan-out.
+
+
 ### 3.2 Harness
 
 `harness/run_one.py` generates one model's script, runs it in a sandbox, and writes per-run JSON. `score/score_run.py` reads those files and produces a score.json. `harness/sweep_local.py`, `harness/matrix_5080.py`, and `harness/error_matrix.py` drive the matrices. `score/aggregate.py` flattens per-run JSON into `results.csv`.
