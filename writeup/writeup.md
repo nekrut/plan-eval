@@ -138,8 +138,23 @@ We wanted to ask free models to perform variant calling using these data in seve
 
 ### Error simulation
 
+To test how each model handles tool failures, we wrapped `bwa` and `lofreq` in short shell scripts ("shims") that imitate the real binaries on disk. Before each run, the harness writes the two shims into a per-run directory and adds that directory to the front of `PATH` — the colon-separated list of directories the shell consults when it needs to find an executable. When the script types `bwa mem`, the shell finds the shim first and runs it instead of the real `bwa`. Each shim reads two environment variables: `EVAL_INJECT_PATTERN` names the failure type and `EVAL_INJECT_TARGET` names which of `bwa` or `lofreq` the failure applies to. For every untargeted invocation the shim passes the call straight through to the real binary; for the targeted invocation it injects the failure and then either passes through or stops. The model's `run.sh` does not know it is being intercepted.
 
+Seven failure patterns cover the kinds of breakage a real lab pipeline encounters (Table 5). Each pattern is paired with one tool (or both), so a full error-matrix cell is one (model × plan × pattern × target tool × seed) combination. We use seeds 42, 43 and 44, and run every cell on both the `v2` and the `v2_defensive` plan to measure how the defensive prose changes outcomes.
 
+**Table 5.** Failure patterns injected by the PATH shims into `bwa` and / or `lofreq`.
+
+| Pattern | Affected tool | What the shim does |
+|---|---|---|
+| `flake_first_call` | both | First call exits 1; later calls pass through. |
+| `one_sample_fails` | both | Shim exits 1 only when `M117C1-ch` appears in the command line; the other three samples run clean. |
+| `slow_tool` | both | Sleep 30 s, then run the real tool — output identical, just delayed. |
+| `stderr_warning_storm` | both | Dump 200 lines of `WARNING:` text to stderr, then run the real tool — output is correct but the stderr looks alarming. |
+| `missing_lib_error` | both | Exit 127 without invoking the real tool, mimicking a missing shared library (`error while loading shared libraries: libhts.so.3: cannot open shared object file`). |
+| `silent_truncation` | lofreq only | Run the real `lofreq`, then truncate the `-o` output file to zero bytes — `lofreq` returns 0 but the VCF is empty. |
+| `wrong_format_output` | lofreq only | Run the real `lofreq`, then strip every variant line from the VCF; only the header survives — the file still parses, but contains no calls. |
+
+Beyond the variant-overlap score `M3`, we score each cell on three error-handling metrics. `m_handle` classifies the script's overall response as `crash` (exited non-zero with no failure log), `propagate` (the failure passed through to a downstream step), `partial` (the script aborted but recorded the failure structurally), or `recover` (the script completed successfully despite the injection). `m_recover` is binary: did the script produce the count of valid VCFs that the failure pattern allows? For `one_sample_fails` the best achievable is 3 (the bad sample's VCF is correctly absent); for `silent_truncation`, `wrong_format_output` and `missing_lib_error` the best is 0 (the script should detect the broken or missing output and skip it); for the remaining three patterns the best is 4. `m_diagnose` is binary: did the script announce the failure — through a populated `failures.log`, a summary line on stderr, or a sample-name-and-failure-word pair in its output — or did it stay silent? All three metrics are defined in `score/score_run.py:error_handling`.
 
 ## References
 
