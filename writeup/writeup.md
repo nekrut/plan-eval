@@ -4,6 +4,10 @@
 
 Frontier models from Anthropic, OpenAI, and Google write quality working code for data analysis tasks, but they cost cents to dollars per call, resulting in quickly ballooning bills. Asking Opus to write a hundred-line bash script every time a postdoc aligns a few FASTQ files spends the budget that should go to harder problems. We ask a simple question: can a frontier model write the recipe once, and a free, small open-weight model running on the lab's own hardware turn that recipe into a working script every time after?
 
+Several groups have already asked what large language models (LLMs) can do for bioinformatics, but the questions they pose differ from ours. The earliest evaluations measured single-shot recall on genomics question-and-answer sets: GeneGPT [22] gave a closed model live access to NCBI web APIs and reported strong scores on the GeneTuring benchmark, and the 2025 GeneTuring re-run [23] put 1,600 questions to sixteen model configurations spanning closed frontiers (GPT-4o, Claude 3.5, Gemini) and small biomedical models (BioGPT, BioMedLM). A second strand swapped trivia for code on isolated puzzles. BioCoder [24] graded 2,269 short bioinformatics functions against unit tests and ran an open-versus-closed bake-off, but with code-completion models (InCoder, SantaCoder, StarCoder, CodeGen) that pre-date current open-weight chat models (publicly released model weights that anyone can download and run locally). BioLLMBench [25] scored GPT-4, Gemini and LLaMA on 24 tasks and found LLaMA often failed to emit runnable code, while an out-of-the-box study of 104 Rosalind problems [26] put GPT-3.5 ahead of GPT-4o and Llama-3-70B and compared all three to human solvers. More recent work moves from snippets to whole pipelines and to agentic systems (LLMs that plan, call tools, and revise their own output in a loop): BixBench [27] scores closed models on 50+ Dockerised computational-biology scenarios at roughly 17 % open-answer accuracy; BioMaster [28] wraps a Plan/Task/Debug/Check loop around retrieval-augmented generation (RAG, where the model is fed relevant documentation at query time) for RNA-seq, ChIP-seq, scRNA-seq and Hi-C; BioAgents [29] fine-tunes small open-weight models for local execution and claims expert-level performance on conceptual tasks; and two workflow-language studies generate Galaxy and Nextflow pipelines with closed models plus DeepSeek-V3 [30] or rerank Galaxy workflows with Mistral-7B against GPT-4o [31].
+
+We differ from this body of work in four ways. First, every prior end-to-end evaluation either tests closed frontier models alone [22, 23, 27, 28, 30] or pits one or two older open-weight models against them [24, 25, 26, 31]; none place the current Anthropic, OpenAI, Google and Meta frontiers next to the open-weight models a lab can actually run today (Qwen3.6-27B, Llama 3.3 70B, Mistral, gpt-oss). Second, accuracy is almost always measured as a string match on a Q-and-A item or a unit test on an isolated function, not as whether a full pipeline runs to a VCF on real FASTQ input. Third, when open-weight models are tested at all, the hardware is left implicit; we report the same task on a Jetson AGX Orin, an RTX 5080 desktop, two Apple-silicon MacBooks and a 2× RTX A5000 workstation, so a reader can map model choice to the box on their bench. Fourth, no prior study separates the recipe (the natural-language plan a frontier model writes once) from the implementer (the local model that turns that recipe into bash on every run), which is the split that lets a lab pay for cloud inference once and then work offline. Together these gaps motivate the design of the present study.
+
 To decide which open models to use we first need to survey the landscape of available models. For 2026 this landscape is summarized in Table 1 below. 
 
 **Table 1.** Major open-weight model families as of May 2026.
@@ -51,7 +55,7 @@ May 2026 prices are dominated by an ongoing HBM/GDDR7 shortage; consumer NVIDIA 
 
 Given this (rapidly evolving) landscape we decided to do the following experiment: take a common sequencing data processing workflow and ask open models running on hardware accessible to an average research lab to design and execute the analysis. In doing so we experimented with a range of possibilities ranging from allowing open models to figure out everything by themselves to guiding them using a very detailed plan produced by commercial frontier models. We further complicated these tasks by simulating a variety of errors that may occur during workflow execution.
 
-## Results
+## Materials and Methods
 
 ### Hardware
 
@@ -75,7 +79,7 @@ We selected a small dataset [17] derived from our previous work on the analysis 
 
 ### Workflow
 
-We developed a simplified version of a haploid variant-calling workflow (original [19]) that omits pre-processing steps before variant calling and the variant-annotation phase [20, 21]. The structure of the workflow is shown in Fig. 1 below.
+We developed a simplified version of a haploid variant-calling workflow (original: [19]) that omits pre-processing steps before variant calling and the variant-annotation phase [20, 21]. The structure of the workflow is shown in Fig. 1 below.
 
 **Figure 1.** Data flow of the simplified mtDNA variant-calling workflow used in this study. Per-sample steps (alignment through tabix) run independently for each of the four samples; the only inter-sample dependency is the final `bcftools query + awk` fan-in that builds `collapsed.tsv`.
 
@@ -112,6 +116,14 @@ flowchart LR
     class REFIDX,FAI,BAM,BAI,VCF,VCFGZ,TBI art
     class TSV ans
 ```
+
+### Plans
+
+We wanted to ask free models to perform variant calling using these data in several ways: with not plan and guided by several plans of increased granularity. The plans are breifly describe in Table 4 below and listed in their full form in the Supplement section. 
+
+### Error simulation
+
+
 
 
 ## References
@@ -157,3 +169,23 @@ flowchart LR
 [20] Maier W, Bray S, van den Beek M, Bouvier D, Coraor N, Miladi M, Singh B, De Argila JR, Baker D, Roach N, Gladman S, Coppens F, Martin DP, Lonie A, Grüning B, Kosakovsky Pond SL, Nekrutenko A. Ready-to-use public infrastructure for global SARS-CoV-2 monitoring. *Nat Biotechnol.* 2021;39(10):1178–1179. https://pubmed.ncbi.nlm.nih.gov/34588690/
 
 [21] Mei H, Arbeithuber B, Cremona MA, DeGiorgio M, Nekrutenko A. A high-resolution view of adaptive event dynamics in a plasmid. *Genome Biol Evol.* 2019;11(10):3022–3034. https://pubmed.ncbi.nlm.nih.gov/31539047/
+
+[22] Jin Q, Yang Y, Chen Q, Lu Z. GeneGPT: augmenting large language models with domain tools for improved access to biomedical information. *Bioinformatics.* 2024;40(2):btae075. doi:10.1093/bioinformatics/btae075. PMID:38341654.
+
+[23] Shang X, Liao X, Ji Z, Hou W. Benchmarking large language models for genomic knowledge with GeneTuring. *Brief Bioinform.* 2025;26(5):bbaf492. doi:10.1093/bib/bbaf492.
+
+[24] Tang X, Qian B, Gao R, Chen J, Chen X, Gerstein MB. BioCoder: a benchmark for bioinformatics code generation with large language models. *Bioinformatics.* 2024;40(Suppl_1):i266–i276. doi:10.1093/bioinformatics/btae230. PMID:38940140.
+
+[25] Sarwal V, Andreoletti G, Munteanu V, Suhodolschi A, Ciorba D, Bostan V, Dimian M, Eskin E, Wang W, Mangul S. BioLLMBench: a benchmark for large language models in bioinformatics. *bioRxiv*; 2023. doi:10.1101/2023.12.19.572483.
+
+[26] Rajesh V, Siwo GH. Out-of-the-box bioinformatics capabilities of large language models (LLMs). *bioRxiv*; 2025. doi:10.1101/2025.08.22.671610. PMID:40909484.
+
+[27] Mitchener L, Laurent JM, Andonian A, Tenmann B, Narayanan S, Wellawatte GP, White A, Sani L, Rodriques SG. BixBench: a comprehensive benchmark for LLM-based agents in computational biology. *arXiv*:2503.00096; 2025. https://arxiv.org/abs/2503.00096
+
+[28] Su H, Long W, Zhang Y. BioMaster: multi-agent system for automated bioinformatics analysis workflow. *bioRxiv*; 2025. doi:10.1101/2025.01.23.634608.
+
+[29] Mehandru N, Hall AK, Melnichenko O, Dubinina Y, Tsirulnikov D, Bamman D, Alaa A, Saponas S, Malladi VS. BioAgents: bridging the gap in bioinformatics analysis with multi-agent systems. *Sci Rep.* 2025;15:39036. doi:10.1038/s41598-025-25919-z.
+
+[30] Alam K, Roy B. From Prompt to Pipeline: large language models for scientific workflow development in bioinformatics. *arXiv*:2507.20122; 2025. https://arxiv.org/abs/2507.20122
+
+[31] Cynthia ST, Roy B. Towards LLM-powered task-aware retrieval of scientific workflows for Galaxy. *arXiv*:2511.01757; 2025. https://arxiv.org/abs/2511.01757
