@@ -62,16 +62,56 @@ We selected five different computers listed in Table 3. It is a combination rang
 | Computer | Manufacturer | Year released | RAM | OS | GPU |
 |---|---|---|---|---|---|
 | NVIDIA Jetson AGX Orin Developer Kit | NVIDIA | 2022 | 64 GB LPDDR5 (unified with GPU) | Ubuntu 22.04 LTS (NVIDIA JetPack 6) | Integrated Ampere, 2,048 CUDA cores + 64 Tensor cores |
-| RTX 5080 desktop | Custom build | 2025 (GPU) | 64 GB DDR5 (system) | Linux (Ubuntu) | NVIDIA RTX 5080, 10,752 CUDA cores, 16 GB GDDR7 |
+| RTX 5080 desktop | Dell | 2025 (GPU) | 64 GB DDR5 (system) | Linux (Ubuntu) | NVIDIA RTX 5080, 10,752 CUDA cores, 16 GB GDDR7 |
 | MacBook Air M4 (24 GB) | Apple | 2025 | 24 GB LPDDR5X (unified with GPU) | macOS 26 | Apple M4 integrated GPU, 10 cores |
 | MacBook Pro M4 Pro (48 GB) | Apple | 2024 | 48 GB LPDDR5X (unified with GPU) | macOS Sequoia 15.6 | Apple M4 Pro integrated GPU, 16 to 20 cores |
-| 2× NVIDIA RTX A5000 desktop | Custom build | 2021 (GPUs) | 128 GB DDR4 (system) | Linux (Ubuntu 25.10) | 2× NVIDIA RTX A5000, 8,192 CUDA cores each, 24 GB GDDR6 each (48 GB total) |
+| 2× NVIDIA RTX A5000 desktop | Dell | 2021 (GPUs) | 128 GB DDR4 (system) | Linux (Ubuntu 25.10) | 2× NVIDIA RTX A5000, 8,192 CUDA cores each, 24 GB GDDR6 each (48 GB total) |
 
 System RAM listed for the two Linux desktops reflects the build configuration; for inference workloads the relevant memory is the GPU VRAM (last column). For the Jetson and the MacBook, RAM is unified between CPU and GPU and the model can use up to roughly the listed RAM minus the operating-system reservation.
 
+### Data
+
+We selected a small dataset [17] derived from our previous work on the analysis of mutational patterns in human mitochondria [18]. It contains four paired-end Illumina samples derived from blood and cheek tissues of a mother–child pair. It contains two fixed changes and a low-frequency variant in the child's cheek sample — a heteroplasmy example.
+
 ### Workflow
 
+We developed a simplified version of a haploid variant-calling workflow (original [19]) that omits pre-processing steps before variant calling and the variant-annotation phase [20, 21]. The structure of the workflow is shown in Fig. 1 below.
 
+**Figure 1.** Data flow of the simplified mtDNA variant-calling workflow used in this study. Per-sample steps (alignment through tabix) run independently for each of the four samples; the only inter-sample dependency is the final `bcftools query + awk` fan-in that builds `collapsed.tsv`.
+
+```mermaid
+flowchart LR
+    REF["chrM.fa<br/>(16,569 bp)"]
+    FQ["paired FASTQ × 4 samples<br/>M117-bl · M117-ch · M117C1-bl · M117C1-ch"]
+
+    REF -->|bwa index| REFIDX["chrM.fa.{amb,ann,bwt,pac,sa}"]
+    REF -->|samtools faidx| FAI["chrM.fa.fai"]
+
+    FQ --> ALIGN["bwa mem -t 4 | samtools sort -t 4"]
+    REFIDX --> ALIGN
+    ALIGN --> BAM["sample.bam"]
+    BAM -->|samtools index| BAI["sample.bam.bai"]
+
+    BAM --> CALL["lofreq call-parallel<br/>--pp-threads 4"]
+    REF --> CALL
+    FAI --> CALL
+    CALL --> VCF["sample.vcf"]
+
+    VCF -->|bgzip| VCFGZ["sample.vcf.gz"]
+    VCFGZ -->|tabix -p vcf| TBI["sample.vcf.gz.tbi"]
+
+    VCFGZ -->|"bcftools query + awk (× 4 samples)"| TSV["collapsed.tsv<br/>sample · chrom · pos · ref · alt · af"]
+
+    classDef inp  fill:#e3f2fd,stroke:#1976d2,color:#0d47a1
+    classDef tool fill:#fff8e1,stroke:#f57f17,color:#e65100
+    classDef art  fill:#f3e5f5,stroke:#7b1fa2,color:#4a148c
+    classDef ans  fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20,stroke-width:2px
+
+    class REF,FQ inp
+    class ALIGN,CALL tool
+    class REFIDX,FAI,BAM,BAI,VCF,VCFGZ,TBI art
+    class TSV ans
+```
 
 
 ## References
@@ -107,3 +147,13 @@ System RAM listed for the two Linux desktops reflects the build configuration; f
 [15] Northflank. NVIDIA B200 cost analysis and cloud rental rates. https://northflank.com/blog/how-much-does-an-nvidia-b200-gpu-cost
 
 [16] Apple. Mac Studio configurations and pricing. https://www.apple.com/mac-studio/specs/
+
+[17] Nekrutenko A. Datasets for Galaxy Collection Operations Tutorial. *Zenodo* dataset, 2021. doi:10.5281/zenodo.5119008. https://zenodo.org/records/5119008
+
+[18] Rebolledo-Jaramillo B, Su MS, Stoler N, McElhoe JA, Dickins B, Blankenberg D, Korneliussen TS, Chiaramonte F, Nielsen R, Holland MM, Paul IM, Nekrutenko A, Makova KD. Maternal age effect and severe germ-line bottleneck in the inheritance of human mitochondrial DNA. *Proc Natl Acad Sci U S A.* 2014;111(43):15474–15479. https://pubmed.ncbi.nlm.nih.gov/25313049/
+
+[19] Nekrutenko A. iwc-workflows/haploid-variant-calling-wgs-pe (v0.1). *Zenodo*, March 24, 2025. doi:10.5281/zenodo.15078463. https://zenodo.org/records/15078463
+
+[20] Maier W, Bray S, van den Beek M, Bouvier D, Coraor N, Miladi M, Singh B, De Argila JR, Baker D, Roach N, Gladman S, Coppens F, Martin DP, Lonie A, Grüning B, Kosakovsky Pond SL, Nekrutenko A. Ready-to-use public infrastructure for global SARS-CoV-2 monitoring. *Nat Biotechnol.* 2021;39(10):1178–1179. https://pubmed.ncbi.nlm.nih.gov/34588690/
+
+[21] Mei H, Arbeithuber B, Cremona MA, DeGiorgio M, Nekrutenko A. A high-resolution view of adaptive event dynamics in a plasmid. *Genome Biol Evol.* 2019;11(10):3022–3034. https://pubmed.ncbi.nlm.nih.gov/31539047/
