@@ -123,6 +123,8 @@ flowchart LR
 
 We wanted to ask free models to perform variant calling using these data in several ways: with no plan, and guided by several plans of increasing granularity. The plans are briefly described in Table 4 below and listed in their full form in the Supplement section.
 
+Each model is run under one of two conditions, which we call **tracks**. In **Track A**, the model receives a written plan (one of the rows of Table 4 with a non-empty *File* column) together with the tool inventory and writes `run.sh` from the plan. In **Track B**, the model receives the problem statement and the tool inventory only — no plan — and writes `run.sh` from scratch. Track B exists to bound how much of the implementer's behaviour comes from the model's prior training versus from the supplied recipe; every other plan in Table 4 is a Track A condition.
+
 **Table 4.** Plan variants used in this study. Plans of increasing granularity, plus two "no-plan" controls. File sizes are bytes; full text for each plan file is in the Supplement.
 
 | Plan | File | Size | Short summary | Hypothesis tested |
