@@ -216,6 +216,53 @@ def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
         plt.close()
         print(f"[fig1_per_platform] wrote {out_path}")
 
+    # Combined 2x2 figure with identical axes per panel — all 26 models
+    # × all 8 plan variants on each panel; grey = untested.
+    panels = [
+        ("jetson", "A"), ("5080",  "B"),
+        ("m4",     "C"), ("a5000", "D"),
+    ]
+    fig, axes = plt.subplots(2, 2, figsize=(14, 13), sharex=True, sharey=True)
+    cmap = mpl.cm.RdYlGn
+    cmap.set_bad(color="#dddddd")
+
+    last_im = None
+    for ax, (hw, letter) in zip(axes.flat, panels):
+        sub = full[full["hardware"] == hw]
+        pivot = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="mean")
+        cnt   = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="count")
+        # Reindex BOTH axes so every panel is identical shape and order
+        pivot = pivot.reindex(index=all_models, columns=PLAN_COLS_FULL)
+        cnt   = cnt.reindex(index=all_models, columns=PLAN_COLS_FULL)
+        n_present = pivot.notna().any(axis=1).sum()
+        last_im = ax.imshow(np.ma.masked_invalid(pivot.values), aspect="auto",
+                            cmap=cmap, vmin=0, vmax=1)
+        ax.set_xticks(range(len(PLAN_COLS_FULL)))
+        ax.set_xticklabels(PLAN_COLS_FULL, rotation=30, ha="right", fontsize=10)
+        ax.set_yticks(range(len(all_models)))
+        ax.set_yticklabels([pretty(m) for m in all_models], fontsize=9)
+        for i in range(pivot.shape[0]):
+            for j in range(pivot.shape[1]):
+                v = pivot.values[i, j]
+                if pd.isna(v):
+                    continue
+                ax.text(j, i, f"{v:.2f}",
+                        ha="center", va="center", fontsize=7.5,
+                        color="black" if 0.25 < v < 0.85 else "white")
+        ax.set_title(f"({letter}) {PLATFORM_LABEL[hw]} — "
+                     f"{n_present}/{len(all_models)} models tested",
+                     fontsize=11)
+
+    cb = fig.colorbar(last_im, ax=axes.ravel().tolist(),
+                      fraction=0.025, pad=0.02)
+    cb.set_label("mean M3 (Jaccard)", fontsize=10)
+    fig.suptitle("Headline matrix per hardware platform "
+                 "(grey = untested combination)", fontsize=13, y=1.00)
+    out_combined = out_dir / "fig1_headline_heatmap_per_platform.png"
+    plt.savefig(out_combined, dpi=130, bbox_inches="tight")
+    plt.close()
+    print(f"[fig1_per_platform] wrote {out_combined}")
+
 
 # ────────────────────────────────────────────────────────────────────────────
 # Figure 2 — the v1 cliff and its single-line repair
