@@ -152,7 +152,9 @@ def fig1_heatmap(df: pd.DataFrame, out: Path):
 
 def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
     """One heatmap per hardware platform, using results.csv data plus
-    error_matrix baseline cells. Makes per-platform coverage gaps visible."""
+    error_matrix baseline cells. All four panels share the same y-axis
+    (union of all models tested on any platform, in the same order) so
+    the per-platform coverage gaps line up row-for-row."""
     PLAN_COLS_FULL = PLAN_COLS + ["v2_defensive"]
     PLATFORM_LABEL = {
         "jetson": "NVIDIA Jetson AGX Orin",
@@ -165,6 +167,11 @@ def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
     full = pd.concat([df[["model","plan_col","hardware","M3"]], em[["model","plan_col","hardware","M3"]]],
                      ignore_index=True)
 
+    # Shared y-axis: union of all models tested on ANY platform, sorted
+    # Anthropic-first, then alphabetical.
+    all_models = sorted(full["model"].unique().tolist(),
+                        key=lambda m: (0 if m in ANTHROPIC else 1, m))
+
     for hw in ["jetson", "5080", "m4", "a5000"]:
         sub = full[full["hardware"] == hw]
         if sub.empty:
@@ -172,22 +179,23 @@ def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
             continue
         pivot = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="mean")
         cnt   = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="count")
+        # Reindex to the union model list — missing rows become NaN (grey)
+        pivot = pivot.reindex(index=all_models)
+        cnt   = cnt.reindex(index=all_models)
         cols  = [c for c in PLAN_COLS_FULL if c in pivot.columns]
         pivot = pivot[cols]
         cnt   = cnt[cols]
-        rows  = model_order(pivot.index)
-        pivot = pivot.loc[rows]
-        cnt   = cnt.loc[rows]
 
-        fig, ax = plt.subplots(figsize=(max(5, 1.2*len(cols)+2), max(3, 0.45*len(rows)+1.5)))
+        n_present = pivot.notna().any(axis=1).sum()
+        fig, ax = plt.subplots(figsize=(max(5, 1.2*len(cols)+2), max(3, 0.45*len(all_models)+1.5)))
         cmap = mpl.cm.RdYlGn
         cmap.set_bad(color="#dddddd")
         im = ax.imshow(np.ma.masked_invalid(pivot.values), aspect="auto",
                        cmap=cmap, vmin=0, vmax=1)
         ax.set_xticks(range(len(cols)))
         ax.set_xticklabels(cols)
-        ax.set_yticks(range(len(rows)))
-        ax.set_yticklabels([pretty(m) for m in rows], fontsize=8)
+        ax.set_yticks(range(len(all_models)))
+        ax.set_yticklabels([pretty(m) for m in all_models], fontsize=8)
         for i in range(pivot.shape[0]):
             for j in range(pivot.shape[1]):
                 v = pivot.values[i, j]
@@ -201,7 +209,7 @@ def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
         cb.set_label("mean M3 (Jaccard)")
         ax.set_xlabel("Plan variant (lean → detailed; B = no plan)")
         ax.set_title(f"{PLATFORM_LABEL[hw]}\n"
-                     f"({len(rows)} models × {len(cols)} plan variants; grey = untested)")
+                     f"({n_present} of {len(all_models)} models tested × {len(cols)} plan variants; grey = untested)")
         plt.tight_layout()
         out_path = out_dir / f"fig1_headline_heatmap_{hw}.png"
         plt.savefig(out_path, dpi=130, bbox_inches="tight")
