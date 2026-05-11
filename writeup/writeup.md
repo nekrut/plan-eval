@@ -73,6 +73,8 @@ We selected five different computers listed in Table 3. It is a combination rang
 
 System RAM listed for the two Linux desktops reflects the build configuration; for inference workloads the relevant memory is the GPU VRAM (last column). For the Jetson and the MacBook, RAM is unified between CPU and GPU and the model can use up to roughly the listed RAM minus the operating-system reservation.
 
+The model lineup tested on each platform reflects what the hardware can host. A model's GPU-memory footprint scales with its parameter count: at the 4-bit quantization used for all local runs here, roughly 0.5 GB per billion parameters. The 70-billion-parameter `llama3.3:70b` (≈40 GB) fits only on the 2× A5000 (48 GB total VRAM); 24–27 B models such as `gemma3:27b` and `mistral-small3.2:24b` (≈15–18 GB) do not fit on the RTX 5080 (16 GB) but run on the A5000, the M4 Pro, and the Jetson; smaller models (≤14 B) run everywhere. We therefore tested each platform with the largest model class it can host. Five models — `granite4`, `qwen3.6:27b`, and the three Anthropic API models (`claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5`) — were run on all three local platforms as anchors for cross-platform comparison; the remaining models on each platform characterize that platform's largest viable lineup. Running every model on every platform (25 models × 4 platforms × 36 error patterns × 3 seeds ≈ 10,800 runs at observed median wall time ~50 s per cell on commodity GPUs) was not feasible within the project's GPU-time budget.
+
 ### Data
 
 We selected a small dataset [17] derived from our previous work on the analysis of mutational patterns in human mitochondria [18]. It contains four paired-end Illumina samples derived from blood and cheek tissues of a mother–child pair. It contains two fixed changes and a low-frequency variant in the child's cheek sample — a heteroplasmy example.
@@ -133,8 +135,6 @@ We wanted to ask free models to perform variant calling using these data in seve
 | **v1g** | `plan/PLAN_v1g.md` | 4.2 KB | v1 + a Galaxy-IUC-mechanical `lofreq` snippet (extracted from `tools-iuc@39e7456`) | Can a tool registry replace a human plan author? |
 | **v2 (detailed)** | `plan/PLAN.md` | 4.6 KB | Every step gives the exact command line plus Gotchas block | Reference detailed plan |
 | **v2_defensive** | `plan/PLAN_v2_defensive.md` | 6.5 KB | v2 + `try()` helper, output validation after every step, retry-once, per-sample isolation, structured failure log | Does explicit error-handling prose make implementer scripts defensive against runtime tool failures? |
-
-
 
 ### Error simulation
 
