@@ -509,7 +509,7 @@ def collect_inject_runs(runs_dir: Path):
     (lets us pick up cross-platform results contributed via PR — e.g. an
     M4 run that only landed the JSONL log, not the per-run dirs)."""
     rows = []
-    seen_run_ids = set()
+    seen_keys = set()  # (run_id, hardware) — Anthropic run_ids repeat across hardware platforms
 
     # Primary source: per-run dirs (have full meta.json + score.json)
     for d in runs_dir.glob("*_track-A_seed-*"):
@@ -534,15 +534,16 @@ def collect_inject_runs(runs_dir: Path):
             "diagnose": eh.get("m_diagnose"),
             "M3":      s.get("m3_jaccard"),
         })
-        seen_run_ids.add(meta.get("run_id"))
+        seen_keys.add((meta.get("run_id"), "jetson"))
 
     # Augment from JSONL summary logs (covers cross-platform PRs)
     for jsonl in BENCH.glob("error_matrix_*.jsonl"):
-        # Hardware tag from filename suffix
+        # Hardware tag from filename — match the platform anywhere in the
+        # stem so suffixes like _m4_r2 or _a5000_addendum are recognised.
         name = jsonl.stem
-        if name.endswith("_m4"):
+        if "_m4" in name:
             hw = "m4"
-        elif name.endswith("_a5000"):
+        elif "_a5000" in name:
             hw = "a5000"
         else:
             hw = "jetson"
@@ -552,7 +553,7 @@ def collect_inject_runs(runs_dir: Path):
             r = json.loads(line)
             if "error" in r:
                 continue
-            if r.get("run_id") in seen_run_ids:
+            if (r.get("run_id"), hw) in seen_keys:
                 continue
             cell = r.get("cell", "")
             parts = cell.split("/")
@@ -583,7 +584,7 @@ def collect_inject_runs(runs_dir: Path):
                 "M3":      r.get("M3"),
             })
             if r.get("run_id"):
-                seen_run_ids.add(r["run_id"])
+                seen_keys.add((r["run_id"], hw))
     return pd.DataFrame(rows)
 
 
@@ -647,16 +648,148 @@ def fig6_error_handling(out: Path, runs_dir: Path = BENCH / "runs_inject"):
 
 
 # ────────────────────────────────────────────────────────────────────────────
+# Manuscript figures (rewritten narrative): 5080 implementer gradient and
+# qwen3.6:27b cross-platform error injection.
+# ────────────────────────────────────────────────────────────────────────────
+
+# The six "latest open-weight" implementers tested on RTX 5080 with the
+# full plan gradient (Track B → v0.5 → v1 → v1g → v1.25 → v1.5 → v2).
+LINEUP_5080 = [
+    "qwen3.6_27b",
+    "qwen3.6_35b-a3b",
+    "gemma4_26b",
+    "gemma4_e4b",
+    "glm-4.7-flash",
+    "gpt-oss_20b",
+]
+
+
+def fig_5080_implementer_gradient(df: pd.DataFrame, out: Path):
+    """Headline figure: 6 open-weight implementers × 7 plan variants on RTX 5080.
+    Cells are mean M3 across 3 seeds; grey = untested."""
+    sub = df[(df["hardware"] == "5080") & (df["model"].isin(LINEUP_5080))]
+    pivot = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="mean")
+    cnt   = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="count")
+    cols  = [c for c in PLAN_COLS if c in pivot.columns]
+    pivot = pivot.reindex(index=LINEUP_5080, columns=cols)
+    cnt   = cnt.reindex(index=LINEUP_5080, columns=cols)
+
+    fig, ax = plt.subplots(figsize=(1.4*len(cols)+2, 0.55*len(LINEUP_5080)+2))
+    cmap = mpl.cm.RdYlGn
+    cmap.set_bad(color="#dddddd")
+    im = ax.imshow(np.ma.masked_invalid(pivot.values), aspect="auto",
+                   cmap=cmap, vmin=0, vmax=1)
+    ax.set_xticks(range(len(cols)))
+    ax.set_xticklabels(cols, fontsize=11)
+    ax.set_yticks(range(len(LINEUP_5080)))
+    ax.set_yticklabels([pretty(m) for m in LINEUP_5080], fontsize=10)
+    for i in range(pivot.shape[0]):
+        for j in range(pivot.shape[1]):
+            v = pivot.values[i, j]
+            n = cnt.values[i, j]
+            if pd.isna(v):
+                continue
+            ax.text(j, i, f"{v:.2f}\n(n={int(n)})",
+                    ha="center", va="center", fontsize=8.5,
+                    color="black" if 0.25 < v < 0.85 else "white")
+    cb = plt.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
+    cb.set_label("mean M3 (Jaccard)", fontsize=10)
+    ax.set_xlabel("Plan variant (lean → detailed; B = no plan)", fontsize=11)
+    ax.set_title("Six latest open-weight implementers × seven Opus-authored plans on RTX 5080",
+                 fontsize=11)
+    plt.tight_layout()
+    plt.savefig(out, dpi=130, bbox_inches="tight")
+    plt.close()
+    print(f"[fig_5080_implementer_gradient] wrote {out}")
+
+
+def fig_qwen3p6_27b_error_per_platform(out: Path,
+                                       runs_dir: Path = BENCH / "runs_inject"):
+    """qwen3.6:27b vs claude-opus-4-7 across Jetson, M4, A5000 on v2 and
+    v2_defensive plans. Two heatmap rows per panel (model x plan), one
+    panel per hardware platform."""
+    df_inject = collect_inject_runs(runs_dir)
+    if df_inject.empty:
+        print(f"[fig_qwen3p6_27b_error_per_platform] no runs in {runs_dir} — skipping")
+        return
+    df_inject = df_inject[df_inject["plan"].isin(["v2", "v2_defensive"])]
+    df_inject = df_inject[df_inject["model"].isin(["qwen3.6_27b", "claude-opus-4-7"])]
+
+    # M4 r2 supersedes M4 r1 (the r1 batch had a wrapper bug)
+    df_inject = df_inject.copy()
+    # The collect_inject_runs function tags hardware as "m4" for both r1 and r2.
+    # We prefer the r2 numbers since they were taken after the wrapper fix.
+    # Use unique (model, plan, pattern, target, seed, hardware) — keep last.
+    df_inject = df_inject.drop_duplicates(
+        subset=["model","plan","pattern","target","seed","hardware"], keep="last")
+
+    platforms = ["jetson", "m4", "a5000"]
+    plat_label = {"jetson": "NVIDIA Jetson AGX Orin",
+                  "m4":     "MacBook Pro M4 Pro",
+                  "a5000":  "2× RTX A5000 workstation"}
+    models = ["claude-opus-4-7", "qwen3.6_27b"]
+    plans  = ["v2", "v2_defensive"]
+    patterns = sorted(df_inject["pattern"].unique())
+    targets  = sorted(df_inject["target"].unique())
+    cells    = [(p, t) for p in patterns for t in targets
+                if not df_inject[(df_inject["pattern"]==p) & (df_inject["target"]==t)].empty]
+
+    fig, axes = plt.subplots(len(platforms), len(plans),
+                             figsize=(max(7, 0.6*len(cells)+2), 1.3*len(platforms)*len(models)+1.5),
+                             sharex=True, sharey=True)
+    cmap = mpl.colors.ListedColormap([HANDLE_COLOR[h] for h in HANDLE_ORDER])
+
+    for row, hw in enumerate(platforms):
+        for col, plan in enumerate(plans):
+            ax = axes[row, col]
+            sub = df_inject[(df_inject["hardware"] == hw) & (df_inject["plan"] == plan)]
+            grid = np.full((len(models), len(cells)), -1, dtype=int)
+            for i, m in enumerate(models):
+                for j, (p, t) in enumerate(cells):
+                    ms = sub[(sub["model"]==m) & (sub["pattern"]==p) & (sub["target"]==t)]
+                    if len(ms) == 0:
+                        continue
+                    modal = _modal_handle(ms["handle"])
+                    if modal in HANDLE_ORDER:
+                        grid[i, j] = HANDLE_ORDER.index(modal)
+            masked = np.ma.masked_less(grid, 0)
+            ax.imshow(masked, aspect="auto", cmap=cmap, vmin=0, vmax=len(HANDLE_ORDER)-1)
+            ax.set_yticks(range(len(models)))
+            ax.set_yticklabels([pretty(m) for m in models], fontsize=8)
+            if row == 0:
+                ax.set_title(plan, fontsize=10)
+            if col == 0:
+                ax.set_ylabel(plat_label[hw], fontsize=9)
+            if row == len(platforms) - 1:
+                ax.set_xticks(range(len(cells)))
+                ax.set_xticklabels([f"{p}\n@{t}" for p, t in cells],
+                                   rotation=30, ha="right", fontsize=7)
+
+    handles = [plt.Rectangle((0,0),1,1, color=HANDLE_COLOR[h]) for h in HANDLE_ORDER]
+    fig.legend(handles, HANDLE_ORDER, loc="lower center", ncol=len(HANDLE_ORDER),
+               fontsize=8, bbox_to_anchor=(0.5, -0.04),
+               title="modal m_handle across 3 seeds")
+    fig.suptitle("qwen3.6:27b matches claude-opus-4-7 across platforms on the error matrix",
+                 fontsize=11, y=1.005)
+    plt.tight_layout()
+    plt.savefig(out, dpi=130, bbox_inches="tight")
+    plt.close()
+    print(f"[fig_qwen3p6_27b_error_per_platform] wrote {out}")
+
+
+# ────────────────────────────────────────────────────────────────────────────
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--fig", type=int, choices=[1, 2, 3, 4, 5, 6])
     ap.add_argument("--fig1-per-platform", action="store_true",
                     help="generate one heatmap per hardware platform (Jetson, 5080, M4, A5000)")
+    ap.add_argument("--manuscript", action="store_true",
+                    help="generate the new manuscript figures (5080 implementer gradient + qwen3.6:27b cross-platform error injection)")
     args = ap.parse_args()
 
-    if not args.all and args.fig is None and not args.fig1_per_platform:
-        ap.error("specify --all, --fig N, or --fig1-per-platform")
+    if not args.all and args.fig is None and not args.fig1_per_platform and not args.manuscript:
+        ap.error("specify --all, --fig N, --fig1-per-platform, or --manuscript")
 
     df = load_data()
     funcs = {
@@ -675,6 +808,9 @@ def main():
         print("done")
     elif args.fig1_per_platform:
         fig1_per_platform(df, FIGS)
+    elif args.manuscript:
+        fig_5080_implementer_gradient(df, FIGS / "ms_fig2_5080_gradient.png")
+        fig_qwen3p6_27b_error_per_platform(FIGS / "ms_fig4_qwen3p6_27b_error.png")
     else:
         funcs[args.fig]()
         print(f"wrote figures/fig{args.fig}_*.png")

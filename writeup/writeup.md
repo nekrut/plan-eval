@@ -6,7 +6,7 @@ Frontier models from Anthropic, OpenAI, and Google write quality working code fo
 
 Several groups have already asked what large language models (LLMs) can do for bioinformatics, but the questions they pose differ from ours. The earliest evaluations measured single-shot recall on genomics question-and-answer sets: GeneGPT [22] gave a closed model live access to NCBI web APIs and reported strong scores on the GeneTuring benchmark, and the 2025 GeneTuring re-run [23] put 1,600 questions to sixteen model configurations spanning closed frontiers (GPT-4o, Claude 3.5, Gemini) and small biomedical models (BioGPT, BioMedLM). A second strand swapped trivia for code on isolated puzzles. BioCoder [24] graded 2,269 short bioinformatics functions against unit tests and ran an open-versus-closed bake-off, but with code-completion models (InCoder, SantaCoder, StarCoder, CodeGen) that pre-date current open-weight chat models (publicly released model weights that anyone can download and run locally). BioLLMBench [25] scored GPT-4, Gemini and LLaMA on 24 tasks and found LLaMA often failed to emit runnable code, while an out-of-the-box study of 104 Rosalind problems [26] put GPT-3.5 ahead of GPT-4o and Llama-3-70B and compared all three to human solvers. More recent work moves from snippets to whole pipelines and to agentic systems (LLMs that plan, call tools, and revise their own output in a loop): BixBench [27] scores closed models on 50+ Dockerised computational-biology scenarios at roughly 17 % open-answer accuracy; BioMaster [28] wraps a Plan/Task/Debug/Check loop around retrieval-augmented generation (RAG, where the model is fed relevant documentation at query time) for RNA-seq, ChIP-seq, scRNA-seq and Hi-C; BioAgents [29] fine-tunes small open-weight models for local execution and claims expert-level performance on conceptual tasks; and two workflow-language studies generate Galaxy and Nextflow pipelines with closed models plus DeepSeek-V3 [30] or rerank Galaxy workflows with Mistral-7B against GPT-4o [31].
 
-We differ from this body of work in four ways. First, every prior end-to-end evaluation either tests closed frontier models alone [22, 23, 27, 28, 30] or pits one or two older open-weight models against them [24, 25, 26, 31]; none place the current Anthropic, OpenAI, Google and Meta frontiers next to the open-weight models a lab can actually run today (Qwen3.6-27B, Llama 3.3 70B, Mistral, gpt-oss). Second, accuracy is almost always measured as a string match on a Q-and-A item or a unit test on an isolated function, not as whether a full pipeline runs to a VCF on real FASTQ input. Third, when open-weight models are tested at all, the hardware is left implicit; we report the same task on a Jetson AGX Orin, an RTX 5080 desktop, two Apple-silicon MacBooks and a 2× RTX A5000 workstation, so a reader can map model choice to the box on their bench. Fourth, no prior study separates the recipe (the natural-language plan a frontier model writes once) from the implementer (the local model that turns that recipe into bash on every run), which is the split that lets a lab pay for cloud inference once and then work offline. Together these gaps motivate the design of the present study.
+We differ from this body of work in four ways. First, no prior study separates the **recipe** (the natural-language plan a frontier model writes once) from the **implementer** (the local model that turns that recipe into bash on every run); this is the split that lets a lab pay for cloud inference once and then work offline, and the experimental architecture we test here. Second, accuracy is almost always measured as a string match on a Q-and-A item or a unit test on an isolated function, not as whether a full pipeline runs to a VCF on real FASTQ input. Third, when open-weight models are tested at all, the hardware is left implicit; we report the same task on a Jetson AGX Orin, an RTX 5080 desktop, two Apple-silicon MacBooks and a 2× RTX A5000 workstation, so a reader can map model choice to the box on their bench. Fourth, every prior end-to-end evaluation either tests closed frontier models alone [22, 23, 27, 28, 30] or pits one or two older open-weight models against them [24, 25, 26, 31]; we instead test the latest 2026-release open-weight models against the same task. Together these gaps motivate the design of the present study: `claude-opus-4-7` writes a series of plans of increasing detail; six 2026-release open-weight models implement those plans on a desktop GPU; the strongest implementer is then cross-platform validated on three additional machines and stress-tested with a programmatic error-injection harness.
 
 To decide which open models to use we first need to survey the landscape of available models. For 2026 this landscape is summarized in Table 1 below. 
 
@@ -73,7 +73,7 @@ We selected five different computers listed in Table 3. It is a combination rang
 
 System RAM listed for the two Linux desktops reflects the build configuration; for inference workloads the relevant memory is the GPU VRAM (last column). For the Jetson and the MacBook, RAM is unified between CPU and GPU and the model can use up to roughly the listed RAM minus the operating-system reservation.
 
-The model lineup tested on each platform reflects what the hardware can host. A model's GPU-memory footprint scales with its parameter count: at the 4-bit quantization used for all local runs here, roughly 0.5 GB per billion parameters. The 70-billion-parameter `llama3.3:70b` (≈40 GB) fits only on the 2× A5000 (48 GB total VRAM); 24–27 B models such as `gemma3:27b` and `mistral-small3.2:24b` (≈15–18 GB) do not fit on the RTX 5080 (16 GB) but run on the A5000, the M4 Pro, and the Jetson; smaller models (≤14 B) run everywhere. We therefore tested each platform with the largest model class it can host. Five models — `granite4`, `qwen3.6:27b`, and the three Anthropic API models (`claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5`) — were run on all three local platforms as anchors for cross-platform comparison; the remaining models on each platform characterize that platform's largest viable lineup. 
+A model's GPU-memory footprint scales with its parameter count: at the 4-bit quantization used for all local runs here, roughly 0.5 GB per billion parameters. The plan-gradient sweep that anchors this manuscript runs on the **RTX 5080 desktop** with six 2026-release open-weight implementers — `gemma4:26b`, `gemma4:e4b`, `glm-4.7-flash`, `gpt-oss:20b`, `qwen3.6:27b`, and `qwen3.6:35b-a3b` — chosen so the family covers small dense (4 B effective), mid-size dense (26–27 B), and small-active sparse-MoE architectures within or just above the 5080's 16 GB VRAM ceiling at 4-bit. The strongest implementer (`qwen3.6:27b`, 17 GB at 4-bit) is then cross-platform validated on the Jetson AGX Orin (64 GB unified memory), MacBook Pro M4 Pro (48 GB unified memory), and 2× RTX A5000 (48 GB total VRAM) — all three host the model comfortably. The Anthropic API models (`claude-opus-4-7` as plan author throughout, plus `claude-sonnet-4-6` and `claude-haiku-4-5` as confirmation implementers) run remotely and are independent of host GPU.
 
 ### Data
 
@@ -121,7 +121,7 @@ flowchart LR
 
 ### Plans
 
-We wanted to ask free models to perform variant calling using these data in several ways: with no plan, and guided by several plans of increasing granularity. The plans are briefly described in Table 4 below and listed in their full form in the Supplement section.
+We wanted to ask free models to perform variant calling using these data in several ways: with no plan, and guided by several plans of increasing granularity. The plans are briefly described in Table 4 below and listed in their full form in the Supplement section. Every plan was authored by `claude-opus-4-7` — the planner role in the recipe-implementer split. Opus wrote v1 (the lean reference); v2 (a hyper-detailed recipe written in response to v1's poor implementer performance, reported in Results); v1.25 and v1.5 (controls that localize what part of v2 is doing the work); v1g (a robustness check authored mechanically from a public Galaxy tool registry rather than by Opus); v0.5 (a no-recipe condition with only the tool order); and v2_defensive (v2 plus an error-handling skeleton).
 
 Each model is run under one of two conditions, which we call **tracks**. In **Track A**, the model receives a written plan (one of the rows of Table 4 with a non-empty *File* column) together with the tool inventory and writes `run.sh` from the plan. In **Track B**, the model receives the problem statement and the tool inventory only — no plan — and writes `run.sh` from scratch. Track B exists to bound how much of the implementer's behaviour comes from the model's prior training versus from the supplied recipe; every other plan in Table 4 is a Track A condition.
 
@@ -178,82 +178,55 @@ For the error-injection cells (described under *Error simulation*) we add the th
 
 ## Results
 
-### Response time per model and platform
+### Six open-weight implementers reach frontier accuracy on the most detailed Opus-authored plan
 
-The five-model anchor set — `granite4`, `qwen3.6:27b`, and the three Anthropic API models — ran on all three local platforms, allowing direct comparison of generation time across hardware (Table 7). For the local `ollama` models, where wall time is dominated by token generation, the 2× A5000 workstation runs three to six times faster than either the Jetson or the M4 Pro; on `qwen3.6:27b` the A5000 took 54 s per cell, the M4 Pro 45 s, and the Jetson 219 s. For the Anthropic API rows the wall time is no longer a function of LLM speed — Anthropic's servers handle generation in under three seconds — but of how long the host CPU then takes to run `bash`, `bwa`, `samtools`, and `lofreq` under the error-injection harness. By that side-channel measure the M4 Pro's CPU is roughly five times faster than the Jetson's at executing the bioinformatics tools themselves; the A5000 host CPU sits between.
+We ran six 2026-release open-weight implementers on the RTX 5080 against every plan in Table 4 (Track A and Track B), three seeds per cell, scoring M3 — the share of called variants matching the truth set within a 0.02 allele-frequency window (Methods, *Scoring*). On the v2 plan, the most detailed Opus-authored recipe, five of the six implementers reach M3 = 1.000 across all three seeds (`qwen3.6:27b`, `qwen3.6:35b-a3b`, `gemma4:26b`, `gemma4:e4b`, `glm-4.7-flash`); the sixth, `gpt-oss:20b`, reaches mean M3 = 0.67, a budget effect — its built-in reasoning mode consumes most of the output token allowance before the script is finished. The recipe-implementer split is operational on commodity hardware: a frontier-tier author (Opus) writes the recipe once; a 17 GB open-weight implementer reproduces frontier accuracy at zero per-call cost on a desktop GPU.
 
-**Table 7.** Median wall-clock time per error-injection cell, in seconds. Bracketed range is the inter-quartile range (Q1–Q3); n is the number of cells aggregated. API rows (top) measure host-CPU script execution; local rows (bottom) measure LLM generation.
+### Plan detail is the binding constraint; the cliff and its single-line repair
 
-| Model | Jetson AGX Orin | MacBook Pro M4 Pro | 2× RTX A5000 |
-|---|---:|---:|---:|
-| `claude-opus-4-7` (API) | 81.5 [20.9–124.5] (n=78) | 14.4 [10.2–83.9] (n=156) | 27.0 [16.8–33.0] (n=78) |
-| `claude-sonnet-4-6` (API) | 140.9 [20.4–376.3] (n=78) | 3.3 [3.0–12.7] (n=124) | 85.1 [16.6–354.9] (n=78) |
-| `claude-haiku-4-5` (API) | 107.6 [56.7–149.7] (n=78) | 3.5 [3.2–3.7] (n=78) | 103.0 [58.8–134.9] (n=78) |
-| `granite4` (local) | 25.3 [21.1–27.7] (n=78) | 24.4 [16.8–28.9] (n=78) | 8.5 [6.6–12.0] (n=78) |
-| `qwen3.6:27b` (local) | 219.2 [105.5–226.5] (n=78) | 44.8 [1.6–167.5] (n=156) | 54.1 [29.6–59.6] (n=78) |
+We constructed plans of increasing detail to localize what an implementer needs from the recipe (Figure 2). At the lean end, `claude-opus-4-7` first wrote v1: a numbered bullet list naming each tool and its key flags but no exact command lines. v1 produces a clean cliff: `qwen3.6:27b` and `glm-4.7-flash` reach M3 = 1.000, but the four other implementers crash at M3 ≈ 0. The detailed v2 recipe, written in response, recovers all six implementers (subject to the `gpt-oss:20b` budget effect noted above). To isolate which part of v2 is doing the work, we authored two intermediate plans: **v1.25** = v1 plus the single literal `lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{s}.vcf results/{s}.bam` invocation, and **v1.5** = v2 with every prose paragraph and *Gotchas* block stripped, code fences only. v1.25 reproduces the v2 jump for every dense ≥ 26 B implementer (`gemma4:26b`, `qwen3.6:27b`, `qwen3.6:35b-a3b`); v1.5 does not. The active ingredient is the literal command syntax, not the surrounding explanation. Track B (no plan) and v0.5 (no plan plus the tool order `bwa → samtools → lofreq → bcftools → awk`) confirm the floor: every open-weight implementer scores M3 ≈ 0 in both no-recipe conditions; supplying tool order without flags or arguments does not move the cliff.
 
-Even on the slowest combination — `qwen3.6:27b` on the Jetson — every generation completed in under five minutes on average; on the A5000 the same model returns in under a minute. None of the platforms is too slow to be useful in a working lab. Whether the speed difference comes with an accuracy difference is the question of the next subsection.
+![Figure 2. Mean M3 across three seeds for six open-weight implementers × seven Opus-authored plan variants, on the RTX 5080. Columns are ordered by plan detail (left = no plan, right = most detailed). Anthropic API plan-author rows are not shown here because Anthropic models execute on Anthropic's hardware; they appear in the cross-platform error-injection panel below.](../figures/ms_fig2_5080_gradient.png)
 
-### A detailed recipe lifts almost every open-weight model to frontier accuracy
+A robustness control rules out the alternative explanation that the v2 effect is specific to Opus's writing style: **v1g** is v1 plus the `lofreq call-parallel` snippet extracted *mechanically* from the Galaxy IUC tool registry (`tools-iuc@39e7456`), a hand-curated public corpus of bioinformatics tool wrappers. v1g produces a similar implementer lift to v1.25 — the load-bearing element is the command syntax, regardless of whether a frontier model or a tool registry is the source.
 
-We scored every model on every recipe variant against the same four-sample mtDNA dataset using M3, the share of called variants that match the truth set within a 0.05 allele-frequency window (Methods, *Scoring*). On the v2 plan — the most detailed recipe, which spells out tool flags, `bgzip` deletion semantics, and the exact `lofreq call-parallel --pp-threads 4 -f data/ref/chrM.fa -o results/{s}.vcf results/{s}.bam` invocation — 13 of 14 free open-weight models on the Jetson scored M3 = 1.000 (Figure 2). The single exception, `nemotron-3-nano`, emitted a code-ordering bug rather than a recipe-comprehension failure. On the RTX 5080 sweep every one of the 11 models tested also scored M3 = 1.000 on v2. The three Anthropic models scored M3 = 1.000 on both v1 and v2.
+### `qwen3.6:27b` is the only fully-open Apache-2.0 implementer that does not trip on the cliff
 
-![Figure 2. Mean M3 score for 25 model × 7 recipe combinations. Each cell is the average of three seeds; color-coded from M3 = 0 (white) to M3 = 1.000 (deep blue). The v2 column dominates the colour scale — the recipe is the lever that brings open-weight models up to frontier accuracy.](../figures/fig1_headline_heatmap.png)
+Within the six-implementer lineup, two pass v1 with M3 = 1.000: `qwen3.6:27b` (Apache 2.0, Alibaba; 17 GB at 4-bit) and `glm-4.7-flash` (Z.ai; comparable size). `qwen3.6:27b` is the cleaner choice for a working lab: an Apache-2.0 license with no field-of-use restrictions, a single-file `ollama pull qwen3.6:27b` deployment, and a memory footprint that fits the 24 GB VRAM tier on Table 2 with room. We therefore selected `qwen3.6:27b` as the protagonist for the cross-platform validation that follows.
 
-The reading is straightforward: when the recipe is detailed enough, model size and parent lab matter less than whether the implementer can faithfully transcribe a deterministic specification into bash. A 27-billion-parameter dense model and a 30-billion-parameter MoE both reach frontier accuracy on v2, as do an 8-billion-parameter Qwen and a 4-billion-effective-parameter Gemma. The recipe-implementer split that motivates this study — write the recipe once on a frontier model, run it many times on a free local model — is operational on commodity hardware as soon as the recipe is sufficient.
+### Cross-platform: same accuracy, different wall time
 
-### A single command line carries most of the score lift
+`qwen3.6:27b` was tested on the three remaining platforms — Jetson AGX Orin, MacBook Pro M4 Pro, and 2× RTX A5000 — under the v2 plan. Mean M3 = 1.000 on every platform on every seed. Wall-clock generation time differs sharply (Table 7): the 2× A5000 returns in under half a minute, the M4 Pro and Jetson take 1.5 to 2 minutes, and the RTX 5080 takes about 5 minutes — the 5080 row reflects the model partially spilling out of its 16 GB VRAM into system RAM, which Ollama handles automatically but slowly. None of the wall times is too slow for a working lab; pick the cheapest box that fits the model in dedicated or unified memory and the M3 score is unchanged.
 
-The v2 plan is roughly 1,500 bytes longer than v1, but a single line — the literal `lofreq call-parallel` invocation with the BAM as a positional argument — accounts for nearly all of the score difference (Figure 3). On the RTX 5080 sweep, 9 of the 11 models fail v1 with M3 = 0 and pass v2 with M3 = 1.000. We constructed two intermediate recipes to localize the lift: v1.25 = v1 plus the single `lofreq` line; v1.5 = v2 with all explanatory prose stripped, leaving only the command snippets. v1.25 reproduces the v2 lift on every dense model ≥ 27 B; v1.5 does not. The byte that matters is the command syntax itself, not the surrounding explanation.
+**Table 7.** `qwen3.6:27b` on the v2 plan: median wall-clock time per generation (seconds), inter-quartile range in brackets. M3 is 1.000 on every cell across every platform.
 
-![Figure 3. M3 on the RTX 5080 sweep across the v1 → v1.25 → v1.5 → v2 progression. v1.25 (v1 plus the `lofreq` line) recovers the v2 score; v1.5 (v2 minus the prose) does not — the command syntax is the active ingredient.](../figures/fig2_v1_cliff_repair.png)
+| Platform | VRAM/UMA | Median wall time (s) | IQR (Q1–Q3) | n |
+|---|---|---:|---:|---:|
+| 2× RTX A5000 | 48 GB total VRAM (fits) | 29 | [24–31] | 36 |
+| MacBook Pro M4 Pro | 48 GB unified (fits) | 92 | [91–136] | 36 |
+| NVIDIA Jetson AGX Orin | 64 GB unified (fits) | 105 | [98–107] | 36 |
+| RTX 5080 desktop | 16 GB VRAM (spills to RAM) | 302 | [288–322] | 6 |
 
-The Galaxy-IUC-derived v1g recipe, generated mechanically from the IUC tool wrappers as a robustness check that recipe quality is not author-specific, produces the same v2 jump for every model where the IUC extraction yielded a clean snippet for the load-bearing step (Methods, *Plans*). Recipe quality, not author identity, sets the implementer ceiling.
+### Defensive scripting under error injection: `qwen3.6:27b` matches Opus on every platform
 
-### Without a recipe, open-weight models collapse
+To probe whether `qwen3.6:27b` handles the *robustness* case as well as the happy path, we ran the 36-cell error-injection matrix (12 PATH-shim cells × 3 seeds; Methods, *Error simulation*) on `qwen3.6:27b` and `claude-opus-4-7` on three platforms (Jetson, M4 Pro, 2× A5000), under both the v2 baseline plan and the v2_defensive plan that adds a `try() { ... }` helper, per-step output validation, and a structured `failures.log` (Methods, *Plans*). Both models behave **identically** at the cell level on every platform tested (Figure 3, Table 8). On the v2 baseline, both produce 15 recover / 0 partial / 6 propagate / 15 crash; on v2_defensive, both produce 21 recover / 15 partial / 0 propagate / 0 crash — the defensive prose drains every crash into a structurally-recovered partial — and both score mean M3 = 0.625 on the matrix. A 17 GB open-weight implementer matches a frontier-API plan author cell-for-cell and score-for-score on the error matrix.
 
-We tested a no-recipe condition (Track B: tool inventory only, no plan) to bound how much of the implementer's behaviour comes from the model's prior training versus from the supplied recipe. Every open-weight model collapsed: median M3 = 0.000 across all 11 models tested, with no model breaking 0.10 on any seed (Figure 4). The three Anthropic models recovered: Opus and Sonnet held M3 = 0.94, Haiku 0.67. A control variant (v0.5) that supplied only the *order* of tools — `bwa → samtools → lofreq → bcftools → awk` — without their flags or arguments did not move the open-weight floor. The recipe is not an optional optimisation; it is the mechanism that turns the cheap implementer into a useful one.
+![Figure 3. Per-cell error-handling outcome (recover / partial / propagate / crash) for `claude-opus-4-7` and `qwen3.6:27b` across the 12-cell PATH-shim error matrix, on three hardware platforms. Left column = v2 baseline plan; right column = v2_defensive plan. Rows within each panel are the two models. Cells are color-coded by the modal `m_handle` outcome across three seeds.](../figures/ms_fig4_qwen3p6_27b_error.png)
 
-![Figure 4. Slope plot of M3 from Track B (no plan) → v1 (lean plan) → v2 (detailed plan) on the RTX 5080. Open-weight lines start at zero and stay there until v2; the three Anthropic models start above 0.6 and stay there.](../figures/fig3_plan_value.png)
+**Table 8.** Per-cell behaviour signature and mean M3 for `qwen3.6:27b` and `claude-opus-4-7` on the 36-cell error matrix (12 patterns × 3 seeds), across Jetson, M4 Pro, and 2× A5000. Both plans, both models, all three platforms summarised.
 
-The separation aligns the four claims of our Introduction with the experimental record. The recipe-implementer split is real; the recipe is the binding constraint on the implementer side; and the implementer side scales down to free local models without quality loss provided the recipe is sufficient.
+| Model | Plan | Platform | recover | partial | propagate | crash | mean M3 |
+|---|---|---|---:|---:|---:|---:|---:|
+| `claude-opus-4-7` | v2          | Jetson, M4, A5000 (identical) | 15 | 0 | 6 | 15 | 0.333 |
+| `claude-opus-4-7` | v2_defensive | Jetson, A5000, M4 r2 (identical) | 21 | 15 | 0 | 0 | 0.625 |
+| `qwen3.6:27b`     | v2          | Jetson, M4 r2, A5000 (identical) | 15 | 0 | 6 | 15 | 0.333 |
+| `qwen3.6:27b`     | v2_defensive | Jetson, M4 r2, A5000 (identical) | 21 | 15 | 0 | 0 | 0.625 |
 
-### Hardware does not limit M3 quality on the detailed recipe
+The error-injection result closes the loop on the recipe-implementer architecture: under both the happy-path plan and a defensive plan, a free, locally-runnable Apache-2.0 implementer handles the same workload as the frontier API author at the same accuracy.
 
-The five-anchor model set was scored not only on response time (Table 7) but on M3 across all three local platforms. Within the v2 Track A condition, the M3 distributions are statistically indistinguishable: every anchor model scored 1.000 on every seed on every platform (Figure 5, panel A). The only setting that moved M3 in this study was Jetson power mode — at full power 13 of 14 anchor and platform-native models passed v2, while at the locked 30 W profile only 9 of 14 did (panel B). Power mode is the one hardware knob with a measurable accuracy cost, and even there the gap closes when the budget is large enough.
+### Coda: Sonnet and Haiku confirm the implementer role for the full Anthropic family
 
-![Figure 5. Hardware comparison for v2 Track A. Panel A: log generation time vs M3 for each (model, hardware) pair — wall time differs by an order of magnitude, M3 does not. Panel B: Jetson 30 W vs full-power split — power mode is the only hardware setting that affects M3.](../figures/fig5_hardware.png)
-
-Combined with the per-platform timing in Table 7, the implication for a working lab is direct. Pick the cheapest box on Table 3 that fits the parameter class on Table 2 for the model you want to run, and accept the wall-time penalty as the only cost. Nothing about the M3 score depends on which CUDA generation or which UMA architecture sits under the inference engine.
-
-### Defensive scripting separates real recovery from structural mimicry
-
-The v2_defensive plan adds a `try() { ... }` helper, per-step output validation, and a `failures.log` TSV; the bash skeleton is mechanical (Methods, *Plans* and *Error simulation*). To probe whether models implement the skeleton or merely echo it, we ran the 36-cell error matrix (12 PATH-shim patterns × 3 seeds) against each model on each platform. On the v2 baseline plan every model produces the same per-cell signature: 15 cells recover, 0 partial, 6 propagate, 15 crash (Table 8) — independent of model size, lab, or platform. v2_defensive surfaces a three-way split.
-
-**Table 8.** Per-cell behaviour signatures on the v2 baseline and v2_defensive plans (n = 36 cells per row). Counts come from `m_handle`, `m_recover`, and `m_diagnose` (Methods, *Scoring*). Bold rows mark the frontier-by-count-only group: identical count signatures to the true frontier, but with mean M3 of 0.125–0.167 versus 0.583–0.625.
-
-| Model (platform) | recover | partial | propagate | crash | mean M3 |
-|---|---:|---:|---:|---:|---:|
-| `claude-opus-4-7` / v2 (Jetson, A5000) | 15 | 0 | 6 | 15 | 0.625 |
-| `claude-opus-4-7` / v2_defensive | 21 | 15 | 0 | 0 | 0.625 |
-| `claude-sonnet-4-6` / v2_defensive | 21 | 14 | 0 | 1 | 0.583 |
-| `claude-haiku-4-5` / v2_defensive | 21 | 15 | 0 | 0 | 0.625 |
-| `qwen3.6:27b` / v2_defensive (Jetson, A5000) | 21 | 15 | 0 | 0 | 0.625 |
-| `qwen3:14b` / v2_defensive (M4) | 21 | 15 | 0 | 0 | 0.583 |
-| **`qwen3-coder:30b` / v2_defensive (M4)** | **21** | **15** | **0** | **0** | **0.167** |
-| **`mistral-small3.2:24b` / v2_defensive (A5000)** | **21** | **15** | **0** | **0** | **0.125** |
-| **`llama3.3:70b-q3_K_M` / v2_defensive (A5000)** | **21** | **15** | **0** | **0** | **0.125** |
-| **`llama3.3:70b-q4_K_M` / v2_defensive (A5000)** | **21** | **15** | **0** | **0** | **0.125** |
-| `qwen3.6:35b` / v2_defensive | 7 | 29 | 0 | 0 | 0.218 |
-| `qwen3:32b` / v2_defensive (A5000) | 0 | 0 | 0 | 36 | 0.000 |
-| `gemma3:27b` / v2_defensive (A5000) | 0 | 8 | 0 | 28 | 0.000 |
-| `granite4` / v2_defensive (Jetson, M4) | 0 | 0 | 0 | 36 | 0.000 |
-
-Three groups separate. **Frontier-by-quality** — the three Anthropic models, `qwen3.6:27b`, and `qwen3:14b` on M4 — produces the count signature 21/14–15/0/0–1 and mean M3 of 0.583–0.625. **Frontier-by-count-only** — `qwen3-coder:30b` on M4, `mistral-small3.2:24b`, and both `llama3.3:70b` quantizations on A5000 — produces an identical 21/15/0/0 count signature, but mean M3 of 0.125–0.167. Every cell parses, runs `try`, and writes a `failures.log` entry; the retried command does not yield a working artefact. **Defensive prose makes things worse** for `qwen3:32b`, `gemma3:27b`, and `granite4`: adding the boilerplate causes regression to between 18 and 36 of 36 crashing cells, below where the lean v2 placed them.
-
-![Figure 6. Per-cell error-handling outcomes (recover / partial / propagate / crash) by model and plan, across Jetson, M4, and A5000. The v2 row is uniform across models; v2_defensive splits into the three groups described above.](../figures/fig6_error_handling.png)
-
-The split closes the loop on the recipe-implementer architecture. A capable open-weight implementer (Qwen 27 B dense on Jetson and A5000, Qwen 14 B on M4) handles defensive bash with the same accuracy as the frontier API. Many other models write the right *shape* of code without producing the right *output* — a count-only metric like number-of-`try`-blocks would pass them; the M3 score does not. And on the smallest-and-quantized end, defensive prose can push a model below where the lean recipe placed it, a mode `granite4` and `qwen3:32b` exemplify on every platform tested.
+We also ran `claude-sonnet-4-6` and `claude-haiku-4-5` against the same error matrix on the Jetson and 2× A5000 platforms. Both produce the same v2_defensive frontier signature as Opus and `qwen3.6:27b` (Sonnet: 21 recover / 14 partial / 0 propagate / 1 crash on Jetson, 21/15/0/0 on A5000, mean M3 = 0.583–0.625; Haiku: 21/15/0/0 on both, mean M3 = 0.625). The implementer role generalizes across the Anthropic family. Cross-platform timing for Anthropic models is not informative for hardware-throughput claims — the LLM call is remote — so we report Sonnet and Haiku as confirmation of the implementer role, not as a hardware comparison.
 
 ## References
 
@@ -323,17 +296,6 @@ The split closes the loop on the recipe-implementer architecture. A capable open
 ---
 
 ## Supplement
-
-### Supplementary Figure 1 — Per-platform coverage of the headline matrix
-
-The four panels decompose Figure 2 by hardware platform. Each panel is the same 26-model × 8-plan-variant matrix; populated cells show the mean M3 score for that (model, platform, plan) combination, grey cells mark combinations that were never run. The shared axes make per-platform coverage gaps line up row-for-row and column-for-column — visualising which evidence supports each cross-platform claim in the Results section.
-
-- **Panel A — NVIDIA Jetson AGX Orin (18/26 models).** The initial v2 sweep covered 17 free open-weight models and 3 Anthropic API models (one v2 column dense with green at M3 = 1.000; `nemotron-3-nano` is the single red cell). v1 covered 4 models; v2_defensive covered 6.
-- **Panel B — RTX 5080 desktop (14/26 models).** The plan-variant sweep ran here at full resolution: B → v0.5 → v1 → v1g → v1.25 → v1.5 → v2. The v1 → v1.25 transition recovers most of the v2 score for every dense ≥ 27 B model — the cliff and its single-line repair, also shown in Figure 3.
-- **Panel C — MacBook Pro M4 Pro (7/26 models).** v2 and v2_defensive only; the M4 was used exclusively for the error-injection matrix.
-- **Panel D — 2× RTX A5000 workstation (12/26 models).** v2 and v2_defensive only. The v2_defensive column makes the Group 2 (frontier-by-count-only) split from Table 8 visible: `mistral-small3.2:24b`, both `llama3.3:70b` quantizations, `qwen3:32b`, `granite-code:34b`, and `gemma3:27b` collapse from M3 = 1.000 on v2 to M3 ≤ 0.33 on v2_defensive while their `try()` count signature looks frontier-tier.
-
-![Supplementary Figure 1. Per-platform headline matrix decomposition. Panels A-D share identical axes (26 models × 8 plan variants); grey cells mark untested combinations.](../figures/fig1_headline_heatmap_per_platform.png)
 
 ### Plan files
 
