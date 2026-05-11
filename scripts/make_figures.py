@@ -68,6 +68,47 @@ def model_order(models):
     return sorted(models, key=lambda m: (0 if m in ANTHROPIC else 1, m))
 
 
+def load_em_baseline_M3() -> pd.DataFrame:
+    """Pull v2 + v2_defensive baseline (none-injection) cells from the
+    error_matrix_*.jsonl files, return as a DataFrame with the same columns
+    used by the headline heatmap (model, plan_col, hardware, M3).
+    These are the cells where the PATH-shim was not active, so M3 reflects
+    pure model-on-recipe performance — directly comparable to results.csv."""
+    rows = []
+    for jsonl in BENCH.glob("error_matrix_*.jsonl"):
+        name = jsonl.stem
+        if "_m4" in name:    hw = "m4"
+        elif "_a5000" in name: hw = "a5000"
+        else:                  hw = "jetson"
+        for line in jsonl.read_text().splitlines():
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            cell = r.get("cell", "")
+            parts = cell.split("/")
+            if len(parts) < 4:
+                continue
+            model_raw, plan, pattern_at_target, _seed = parts
+            if "@" not in pattern_at_target:
+                continue
+            pattern, _ = pattern_at_target.split("@", 1)
+            if pattern != "none":
+                continue
+            if plan not in ("v2", "v2_defensive"):
+                continue
+            m3 = r.get("M3")
+            if m3 is None:
+                continue
+            rows.append({
+                "model":    model_raw.replace(":", "_"),
+                "plan_col": plan,
+                "hardware": hw,
+                "track":    "A",
+                "M3":       m3,
+            })
+    return pd.DataFrame(rows)
+
+
 # ────────────────────────────────────────────────────────────────────────────
 # Figure 1 — headline matrix heatmap
 # ────────────────────────────────────────────────────────────────────────────
@@ -107,6 +148,65 @@ def fig1_heatmap(df: pd.DataFrame, out: Path):
     plt.tight_layout()
     plt.savefig(out, dpi=130, bbox_inches="tight")
     plt.close()
+
+
+def fig1_per_platform(df: pd.DataFrame, out_dir: Path):
+    """One heatmap per hardware platform, using results.csv data plus
+    error_matrix baseline cells. Makes per-platform coverage gaps visible."""
+    PLAN_COLS_FULL = PLAN_COLS + ["v2_defensive"]
+    PLATFORM_LABEL = {
+        "jetson": "NVIDIA Jetson AGX Orin",
+        "5080":   "RTX 5080 desktop",
+        "m4":     "MacBook Pro M4 Pro",
+        "a5000":  "2x RTX A5000 workstation",
+    }
+
+    em = load_em_baseline_M3()
+    full = pd.concat([df[["model","plan_col","hardware","M3"]], em[["model","plan_col","hardware","M3"]]],
+                     ignore_index=True)
+
+    for hw in ["jetson", "5080", "m4", "a5000"]:
+        sub = full[full["hardware"] == hw]
+        if sub.empty:
+            print(f"[fig1_per_platform] {hw}: no data — skipping")
+            continue
+        pivot = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="mean")
+        cnt   = sub.pivot_table(index="model", columns="plan_col", values="M3", aggfunc="count")
+        cols  = [c for c in PLAN_COLS_FULL if c in pivot.columns]
+        pivot = pivot[cols]
+        cnt   = cnt[cols]
+        rows  = model_order(pivot.index)
+        pivot = pivot.loc[rows]
+        cnt   = cnt.loc[rows]
+
+        fig, ax = plt.subplots(figsize=(max(5, 1.2*len(cols)+2), max(3, 0.45*len(rows)+1.5)))
+        cmap = mpl.cm.RdYlGn
+        cmap.set_bad(color="#dddddd")
+        im = ax.imshow(np.ma.masked_invalid(pivot.values), aspect="auto",
+                       cmap=cmap, vmin=0, vmax=1)
+        ax.set_xticks(range(len(cols)))
+        ax.set_xticklabels(cols)
+        ax.set_yticks(range(len(rows)))
+        ax.set_yticklabels([pretty(m) for m in rows], fontsize=8)
+        for i in range(pivot.shape[0]):
+            for j in range(pivot.shape[1]):
+                v = pivot.values[i, j]
+                n = cnt.values[i, j]
+                if pd.isna(v):
+                    continue
+                ax.text(j, i, f"{v:.2f}\n(n={int(n)})",
+                        ha="center", va="center", fontsize=6.5,
+                        color="black" if 0.25 < v < 0.85 else "white")
+        cb = plt.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
+        cb.set_label("mean M3 (Jaccard)")
+        ax.set_xlabel("Plan variant (lean → detailed; B = no plan)")
+        ax.set_title(f"{PLATFORM_LABEL[hw]}\n"
+                     f"({len(rows)} models × {len(cols)} plan variants; grey = untested)")
+        plt.tight_layout()
+        out_path = out_dir / f"fig1_headline_heatmap_{hw}.png"
+        plt.savefig(out_path, dpi=130, bbox_inches="tight")
+        plt.close()
+        print(f"[fig1_per_platform] wrote {out_path}")
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -496,10 +596,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--fig", type=int, choices=[1, 2, 3, 4, 5, 6])
+    ap.add_argument("--fig1-per-platform", action="store_true",
+                    help="generate one heatmap per hardware platform (Jetson, 5080, M4, A5000)")
     args = ap.parse_args()
 
-    if not args.all and args.fig is None:
-        ap.error("specify --all or --fig N")
+    if not args.all and args.fig is None and not args.fig1_per_platform:
+        ap.error("specify --all, --fig N, or --fig1-per-platform")
 
     df = load_data()
     funcs = {
@@ -514,7 +616,10 @@ def main():
         for i in (1, 2, 3, 4, 5, 6):
             print(f"[fig{i}] generating…")
             funcs[i]()
+        fig1_per_platform(df, FIGS)
         print("done")
+    elif args.fig1_per_platform:
+        fig1_per_platform(df, FIGS)
     else:
         funcs[args.fig]()
         print(f"wrote figures/fig{args.fig}_*.png")

@@ -324,6 +324,28 @@ The split closes the loop on the recipe-implementer architecture. A capable open
 
 ## Supplement
 
+### Supplementary Figure 1 — Per-platform coverage of the headline matrix
+
+The four panels below decompose Figure 2 by hardware platform. Each panel is the same model × plan-variant heatmap as Figure 2, restricted to the runs that were performed on that one platform; grey cells mark combinations that were never run. The panels make the per-platform coverage explicit and visualise where the cross-platform claims of the Results section rest on which evidence.
+
+**Panel A — NVIDIA Jetson AGX Orin.** The initial sweep against the v2 plan covered 17 free open-weight models (one column dense with green at M3 = 1.000, with `nemotron-3-nano` as the single red cell); the v1 spot-check covered 4 models; v2_defensive covered the 6 models from the error-injection matrix.
+
+![Supplementary Figure 1A. Jetson per-platform headline matrix.](../figures/fig1_headline_heatmap_jetson.png)
+
+**Panel B — RTX 5080 desktop.** The plan-variant sweep ran here at full resolution: B → v0.5 → v1 → v1g → v1.25 → v1.5 → v2. The v1 → v1.25 transition recovers most of the v2 score for every dense ≥ 27 B model — the cliff and its single-line repair, also shown in Figure 3.
+
+![Supplementary Figure 1B. RTX 5080 per-platform headline matrix.](../figures/fig1_headline_heatmap_5080.png)
+
+**Panel C — MacBook Pro M4 Pro.** Covers 7 models on v2 and v2_defensive only; the M4 was used exclusively for the error-injection matrix.
+
+![Supplementary Figure 1C. M4 Pro per-platform headline matrix.](../figures/fig1_headline_heatmap_m4.png)
+
+**Panel D — 2× RTX A5000 workstation.** Covers 12 models on v2 and v2_defensive only. The v2_defensive column makes the Group 2 (frontier-by-count-only) split from Table 8 visible: `mistral-small3.2:24b`, both `llama3.3:70b` quantizations, `qwen3:32b`, `granite-code:34b`, and `gemma3:27b` collapse from M3 = 1.000 on v2 to M3 ≤ 0.33 on v2_defensive while their `try()` count signature looks frontier-tier.
+
+![Supplementary Figure 1D. A5000 per-platform headline matrix.](../figures/fig1_headline_heatmap_a5000.png)
+
+### Plan files
+
 The full text of each plan file referenced in Table 4. Each plan is reproduced verbatim from `plan/` in the repository and shown inside a fenced Markdown block to preserve its original heading hierarchy and code formatting.
 
 ### Plan v1 (lean) — `plan/PLAN_v1.md`
