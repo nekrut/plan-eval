@@ -1,0 +1,51 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_7e59db",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 8.269267082214355,
+    "wall_seconds_execution": 0.616431713104248,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 1078,
+      "prompt_eval_duration_ns": 9181930,
+      "eval_duration_ns": 7169271935,
+      "total_duration_ns": 8256770956
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "failures_log_populated"
+    ],
+    "exit_code": 2,
+    "inject_pattern": "missing_lib_error",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_7e59db/run.sh line 34:\nif ! try __ref__ bwa_index '[[ -s '\"$REF\".bwt ]]' -- bwa index \"$REF\"; then\n                                                ^-- SC1078 (warning): Did you forget to close this single quoted string?\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_7e59db/run.sh line 75:\n  if ! try \"$s\" vcf_tabix '[[ -s '\"${OUT}/${s}\".vcf.gz.tbi ]]' -- tabix -p vcf \"${OUT}/${s}.vcf.gz\"; then\n                                                             ^-- SC1078 (warning): D",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

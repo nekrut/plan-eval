@@ -1,0 +1,14 @@
+{
+  "run_id": "granite-code_34b_think-off_track-A_seed-44_fa7335",
+  "model": "granite-code:34b",
+  "track": "A",
+  "seed": 44,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 15.849677324295044,
+  "duration_ms_generation": 15849,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "slow_tool",
+  "inject_target": "lofreq"
+}

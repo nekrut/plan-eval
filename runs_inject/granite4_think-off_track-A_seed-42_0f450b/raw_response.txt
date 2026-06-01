@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF=data/ref/chrM.fa
+OUT=results
+FAIL_LOG="${OUT}/failures.log"
+SUCCESS_LOG="${OUT}/success.log"
+
+mkdir -p "$OUT"
+
+# Helper function to retry commands with validation
+try() {
+  local sample="$1"; shift
+  local step="$2"; shift
+  local validate="$2"; shift
+  if [[ "$1" == "--" ]]; then

@@ -1,0 +1,49 @@
+{
+  "run_id": "qwen3_32b_think-off_track-A_seed-42_3564fa",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 53.37009859085083,
+    "wall_seconds_execution": 0.26503539085388184,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3017,
+      "eval_count": 1379,
+      "prompt_eval_duration_ns": 39049211,
+      "eval_duration_ns": 52727012874,
+      "total_duration_ns": 53361582916
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 2,
+    "inject_pattern": "slow_tool",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/qwen3_32b_think-off_track-A_seed-42_3564fa/run.sh line 43:\n  if [[ -f \"$OUT/$s.bam\" && samtools quickcheck \"$OUT/$s.bam\" ]]; then\n     ^-- SC1073 (error): Couldn't parse this test expression. Fix to allow more checks.\n                                     ^-- SC1072 (error): Expected test to end here (don't wrap commands in []/[[]]). Fix any mentioned problems and try again.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC1072 -- Expected test to end here (don't ...\n  https://www.shellcheck.net/wiki/SC1073 -- Couldn't parse this test ex",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

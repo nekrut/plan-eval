@@ -1,0 +1,51 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_a801a2",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 7.657065153121948,
+    "wall_seconds_execution": 0.2648787498474121,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 993,
+      "prompt_eval_duration_ns": 9209683,
+      "eval_duration_ns": 6638983237,
+      "total_duration_ns": 7645104157
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 0,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [
+      "failures_log_populated"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "slow_tool",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_a801a2/run.sh line 78:\nif (( OK == TOTAL )); then\n^-- SC1046 (error): Couldn't find 'fi' for this 'if'.\n^-- SC1073 (error): Couldn't parse this if expression. Fix to allow more checks.\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_a801a2/run.sh line 83:\n  if (( OK > 0 )); then echo \"[run.sh] $OK/Total samples completed; $TOTAL-OK failures: $FAILED\" >&2 else echo \"[run.sh] $OK/Total samples completed; ALL failures: $FAILED\" >&2 fi\n                                             ",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

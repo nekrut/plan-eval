@@ -1,0 +1,194 @@
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.125 CPU sec, 0.032 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.040 sec; CPU: 0.135 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+lofreq: transient I/O error (eval-injected, call #1)
+INFO [2026-04-30 19:53:49,564]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-bl.bam
+
+INFO [2026-04-30 19:53:49,577]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+INFO [2026-04-30 19:53:50,783]: Executing lofreq filter -i /tmp/lofreq2_call_parallel05n2aimb/concat.vcf.gz -o results/M117-bl.vcf --snvqual-thresh 48 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.150 CPU sec, 0.038 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-ch\tSM:M117-ch\tLB:M117-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.047 sec; CPU: 0.159 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-30 19:53:51,161]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-ch.bam
+
+INFO [2026-04-30 19:53:51,177]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+INFO [2026-04-30 19:53:52,531]: Executing lofreq filter -i /tmp/lofreq2_call_parallelgh3y0c5c/concat.vcf.gz -o results/M117-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.119 CPU sec, 0.030 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-bl\tSM:M117C1-bl\tLB:M117C1-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.038 sec; CPU: 0.127 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-30 19:53:52,901]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-bl.bam
+
+INFO [2026-04-30 19:53:52,918]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+INFO [2026-04-30 19:53:54,303]: Executing lofreq filter -i /tmp/lofreq2_call_parallel5fa01qp1/concat.vcf.gz -o results/M117C1-bl.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[E::bns_fetch_seq] begin=32938, mid=32960, end=16569, len=16369, seq=0x7b01100018d0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32820, mid=32901, end=16569, len=16251, seq=0x7b0100002540, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32820, mid=32966, end=16569, len=16251, seq=0x7b00f80019f0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32940, mid=32961, end=16569, len=16371, seq=0x7b00fc0018d0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32824, mid=32961, end=16569, len=16255, seq=0x7b0100006c10, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b00f8006930, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32999, mid=33000, end=16569, len=16430, seq=0x7b00f8006930, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32980, mid=32987, end=16569, len=16411, seq=0x7b0110006060, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32777, mid=32937, end=16569, len=16208, seq=0x7b0100006c10, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32808, mid=32895, end=16569, len=16239, seq=0x7b00f8007240, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32962, mid=32987, end=16569, len=16393, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b00fc0062d0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32896, mid=32939, end=16569, len=16327, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32985, mid=32987, end=16569, len=16416, seq=0x7b00f800b690, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32861, mid=32939, end=16569, len=16292, seq=0x7b0110006970, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32832, mid=32907, end=16569, len=16263, seq=0x7b00f800b690, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32858, mid=32925, end=16569, len=16289, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32910, mid=32946, end=16569, len=16341, seq=0x7b00f800b690, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33051, mid=33052, end=16569, len=16482, seq=0x7b00f800b690, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32822, mid=32902, end=16569, len=16253, seq=0x7b00f800b690, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32858, mid=32925, end=16569, len=16289, seq=0x7b00fc0062d0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32920, mid=32951, end=16569, len=16351, seq=0x7b011000bb40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32894, mid=32938, end=16569, len=16325, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32898, mid=32940, end=16569, len=16329, seq=0x7b00f800fae0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32812, mid=32897, end=16569, len=16243, seq=0x7b011000bb40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32960, mid=32987, end=16569, len=16391, seq=0x7b010000b0c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b00f800fae0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b010000b9f0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32851, mid=32925, end=16569, len=16282, seq=0x7b00f800fae0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b00fc006c00, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32838, mid=32910, end=16569, len=16269, seq=0x7b011000bb40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32884, mid=32933, end=16569, len=16315, seq=0x7b00f800fae0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32715, mid=32888, end=16569, len=16146, seq=0x7b010000fd40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b00f800fae0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32924, mid=32953, end=16569, len=16355, seq=0x7b010000fd40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32852, mid=32925, end=16569, len=16283, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32999, mid=33000, end=16569, len=16430, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b011000bb40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33013, mid=33014, end=16569, len=16444, seq=0x7b010000fd40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32999, mid=33000, end=16569, len=16430, seq=0x7b00fc00af90, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32832, mid=32907, end=16569, len=16263, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32812, mid=32897, end=16569, len=16243, seq=0x7b010000fd40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32832, mid=32907, end=16569, len=16263, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32818, mid=32900, end=16569, len=16249, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33017, mid=33018, end=16569, len=16448, seq=0x7b010000fd40, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32936, mid=32959, end=16569, len=16367, seq=0x7b00fc00af90, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32892, mid=32937, end=16569, len=16323, seq=0x7b011000c2e0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32930, mid=32956, end=16569, len=16361, seq=0x7b0100010640, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33018, mid=33019, end=16569, len=16449, seq=0x7b0110010610, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32808, mid=32895, end=16569, len=16239, seq=0x7b00fc00af90, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32898, mid=32940, end=16569, len=16329, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32980, mid=32987, end=16569, len=16411, seq=0x7b00fc00af90, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32906, mid=32944, end=16569, len=16337, seq=0x7b00f8013d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32822, mid=32902, end=16569, len=16253, seq=0x7b0110010610, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32838, mid=32911, end=16569, len=16269, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32987, mid=32988, end=16569, len=16418, seq=0x7b0110010610, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32822, mid=32902, end=16569, len=16253, seq=0x7b00fc00b850, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32872, mid=32927, end=16569, len=16303, seq=0x7b00f80145e0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32866, mid=32924, end=16569, len=16297, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32781, mid=32925, end=16569, len=16212, seq=0x7b00fc00b850, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32852, mid=32917, end=16569, len=16283, seq=0x7b0110010610, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32906, mid=32944, end=16569, len=16337, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32832, mid=32912, end=16569, len=16263, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32992, mid=32993, end=16569, len=16423, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32896, mid=32939, end=16569, len=16327, seq=0x7b00fc010d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32936, mid=32959, end=16569, len=16367, seq=0x7b0110010d70, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32822, mid=32902, end=16569, len=16253, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33011, mid=33012, end=16569, len=16442, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33025, mid=33031, end=16569, len=16456, seq=0x7b00fc010d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32893, mid=32944, end=16569, len=16324, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32924, mid=32953, end=16569, len=16355, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32894, mid=32938, end=16569, len=16325, seq=0x7b00fc010d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33005, mid=33006, end=16569, len=16436, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32810, mid=32896, end=16569, len=16241, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32850, mid=32916, end=16569, len=16281, seq=0x7b0100014d60, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32950, mid=32966, end=16569, len=16381, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32832, mid=32907, end=16569, len=16263, seq=0x7b00fc010d20, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32950, mid=32992, end=16569, len=16381, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=33018, mid=33019, end=16569, len=16449, seq=0x7b0100015650, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32936, mid=32959, end=16569, len=16367, seq=0x7b00fc010e70, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32880, mid=32931, end=16569, len=16311, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32816, mid=32899, end=16569, len=16247, seq=0x7b0100019830, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32872, mid=32927, end=16569, len=16303, seq=0x7b00fc015020, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32874, mid=32928, end=16569, len=16305, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32906, mid=32944, end=16569, len=16337, seq=0x7b00f80189a0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32936, mid=32959, end=16569, len=16367, seq=0x7b0100019830, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32888, mid=32935, end=16569, len=16319, seq=0x7b01100150c0, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32822, mid=32902, end=16569, len=16253, seq=0x7b00fc015020, rid=0, far_beg=0, far_end=16569
+[E::bns_fetch_seq] begin=32938, mid=32960, end=16569, len=16369, seq=0x7b0100019830, rid=0, far_beg=0, far_end=16569
+[W::hts_set_opt] Cannot change block size for this format
+samtools sort: failed to read header from "-"
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.128 CPU sec, 0.032 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-ch\tSM:M117C1-ch\tLB:M117C1-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.038 sec; CPU: 0.134 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+INFO [2026-04-30 19:53:55,912]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-ch.bam
+
+INFO [2026-04-30 19:53:55,923]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 768
+Number of indel tests performed: 0
+INFO [2026-04-30 19:53:57,158]: Executing lofreq filter -i /tmp/lofreq2_call_parallel69pyh1at/concat.vcf.gz -o results/M117C1-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+[run.sh] 4/4 samples completed; no failures

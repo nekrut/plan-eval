@@ -1,0 +1,228 @@
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa index data/ref/chrM.fa
+[main] Real time: 0.343 sec; CPU: 0.013 sec
+run.sh: line 22: $']] -- bwa index "$REF"; then\n  echo "[run.sh] reference index failed" >&2; exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+run.sh: line 23: $']] -- bwa index "$REF"; then\n  echo "[run.sh] reference index failed" >&2; exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.130 CPU sec, 0.033 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.044 sec; CPU: 0.142 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.125 CPU sec, 0.032 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.041 sec; CPU: 0.135 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+INFO [2026-04-30 19:47:44,007]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-bl.bam
+
+INFO [2026-04-30 19:47:44,019]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 591
+Number of indel tests performed: 0
+INFO [2026-04-30 19:47:45,342]: Executing lofreq filter -i /tmp/lofreq2_call_parallel29lc0_wb/concat.vcf.gz -o results/M117-bl.vcf --snvqual-thresh 48 --indelqual-thresh 20
+
+CRITICAL [2026-04-30 19:48:15,436]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+CRITICAL [2026-04-30 19:48:45,529]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+[bgzip] No such file or directory: results/M117-bl.vcf
+[bgzip] No such file or directory: results/M117-bl.vcf
+[tabix] the index file exists. Please use '-f' to overwrite.
+[tabix] the index file exists. Please use '-f' to overwrite.
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.153 CPU sec, 0.039 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-ch\tSM:M117-ch\tLB:M117-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.047 sec; CPU: 0.162 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (479047 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (178, 202, 230)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (74, 334)
+[M::mem_pestat] mean and std.dev: (196.68, 37.18)
+[M::mem_pestat] low and high boundaries for proper pairs: (22, 386)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.145 CPU sec, 0.037 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-ch\tSM:M117-ch\tLB:M117-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-ch_1.fq.gz data/raw/M117-ch_2.fq.gz
+[main] Real time: 0.043 sec; CPU: 0.152 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+INFO [2026-04-30 19:49:16,172]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117-ch.bam
+
+INFO [2026-04-30 19:49:16,191]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 801
+Number of indel tests performed: 0
+INFO [2026-04-30 19:49:17,493]: Executing lofreq filter -i /tmp/lofreq2_call_parallelrpu_65n5/concat.vcf.gz -o results/M117-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+CRITICAL [2026-04-30 19:49:47,587]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+CRITICAL [2026-04-30 19:50:17,687]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+[bgzip] No such file or directory: results/M117-ch.vcf
+[bgzip] No such file or directory: results/M117-ch.vcf
+[tabix] the index file exists. Please use '-f' to overwrite.
+[tabix] the index file exists. Please use '-f' to overwrite.
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.140 CPU sec, 0.035 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-bl\tSM:M117C1-bl\tLB:M117C1-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.044 sec; CPU: 0.149 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (439380 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 178, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (171.01, 42.49)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.135 CPU sec, 0.034 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-bl\tSM:M117C1-bl\tLB:M117C1-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-bl_1.fq.gz data/raw/M117C1-bl_2.fq.gz
+[main] Real time: 0.045 sec; CPU: 0.147 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+INFO [2026-04-30 19:50:48,346]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-bl.bam
+
+INFO [2026-04-30 19:50:48,363]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 711
+Number of indel tests performed: 0
+INFO [2026-04-30 19:50:49,698]: Executing lofreq filter -i /tmp/lofreq2_call_parallelul8zdibv/concat.vcf.gz -o results/M117C1-bl.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+CRITICAL [2026-04-30 19:51:19,790]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+CRITICAL [2026-04-30 19:51:49,888]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+[bgzip] No such file or directory: results/M117C1-bl.vcf
+[bgzip] No such file or directory: results/M117C1-bl.vcf
+[tabix] the index file exists. Please use '-f' to overwrite.
+[tabix] the index file exists. Please use '-f' to overwrite.
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.155 CPU sec, 0.039 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-ch\tSM:M117C1-ch\tLB:M117C1-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.048 sec; CPU: 0.165 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (476079 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (173, 199, 227)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (65, 335)
+[M::mem_pestat] mean and std.dev: (192.27, 38.15)
+[M::mem_pestat] low and high boundaries for proper pairs: (11, 389)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.155 CPU sec, 0.039 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117C1-ch\tSM:M117C1-ch\tLB:M117C1-ch\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117C1-ch_1.fq.gz data/raw/M117C1-ch_2.fq.gz
+[main] Real time: 0.050 sec; CPU: 0.167 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+INFO [2026-04-30 19:52:20,519]: Using 4 threads with following basic args: lofreq call -f data/ref/chrM.fa results/M117C1-ch.bam
+
+INFO [2026-04-30 19:52:20,539]: Adding 9 commands to mp-pool
+Checking the headers and starting positions of 9 files
+Number of substitution tests performed: 768
+Number of indel tests performed: 0
+INFO [2026-04-30 19:52:21,724]: Executing lofreq filter -i /tmp/lofreq2_call_parallelfrt3fax8/concat.vcf.gz -o results/M117C1-ch.vcf --snvqual-thresh 49 --indelqual-thresh 20
+
+CRITICAL [2026-04-30 19:52:51,813]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+CRITICAL [2026-04-30 19:53:21,891]: Parallel wrapper requires --pp-threads [int] as arg (number of threads)
+[bgzip] No such file or directory: results/M117C1-ch.vcf
+[bgzip] No such file or directory: results/M117C1-ch.vcf
+[tabix] the index file exists. Please use '-f' to overwrite.
+[tabix] the index file exists. Please use '-f' to overwrite.
+run.sh: line 87: M117: unbound variable

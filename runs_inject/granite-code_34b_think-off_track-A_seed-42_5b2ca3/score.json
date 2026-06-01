@@ -1,0 +1,49 @@
+{
+  "run_id": "granite-code_34b_think-off_track-A_seed-42_5b2ca3",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 2,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 33.44070649147034,
+    "wall_seconds_execution": 1.0675458908081055,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3225,
+      "eval_count": 972,
+      "prompt_eval_duration_ns": 37911533,
+      "eval_duration_ns": 32784211966,
+      "total_duration_ns": 33427651887
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 2,
+    "inject_pattern": "stderr_warning_storm",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite-code_34b_think-off_track-A_seed-42_5b2ca3/run.sh line 29:\n    | samtools sort -@ 4 -o results/${s}.bam - }\n                                               ^-- SC1083 (warning): This } is literal. Check expression (missing ;/\\n?) or quote it.\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite-code_34b_think-off_track-A_seed-42_5b2ca3/run.sh line 34:\n  elif [[ -f results/\"$s\".vcf && bcftools view -h results/\"$s\".vcf > /dev/null ]]; then\n       ^-- SC1073 (error): Couldn't parse this test expression. Fix to allow more checks.\n          ",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

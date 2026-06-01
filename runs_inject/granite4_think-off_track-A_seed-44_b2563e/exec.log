@@ -1,0 +1,52 @@
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.00 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa index data/ref/chrM.fa
+[main] Real time: 0.334 sec; CPU: 0.011 sec
+run.sh: line 22: $']] -- bwa index "$REF"; then\n  echo "[run.sh] reference index failed" >&2; exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+run.sh: line 23: $']] -- bwa index "$REF"; then\n  echo "[run.sh] reference index failed" >&2; exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.125 CPU sec, 0.032 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.046 sec; CPU: 0.140 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 2000 sequences (441623 bp)...
+[M::mem_pestat] # candidate unique pairs for (FF, FR, RF, RR): (0, 1000, 0, 0)
+[M::mem_pestat] skip orientation FF as there are not enough pairs
+[M::mem_pestat] analyzing insert size distribution for orientation FR...
+[M::mem_pestat] (25, 50, 75) percentile: (137, 181, 202)
+[M::mem_pestat] low and high boundaries for computing mean and std.dev: (7, 332)
+[M::mem_pestat] mean and std.dev: (173.12, 43.22)
+[M::mem_pestat] low and high boundaries for proper pairs: (1, 397)
+[M::mem_pestat] skip orientation RF as there are not enough pairs
+[M::mem_pestat] skip orientation RR as there are not enough pairs
+[M::mem_process_seqs] Processed 2000 reads in 0.121 CPU sec, 0.031 real sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa mem -t 4 -R @RG\tID:M117-bl\tSM:M117-bl\tLB:M117-bl\tPL:ILLUMINA data/ref/chrM.fa data/raw/M117-bl_1.fq.gz data/raw/M117-bl_2.fq.gz
+[main] Real time: 0.037 sec; CPU: 0.128 sec
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+run.sh: eval: line 22: unexpected EOF while looking for matching `"'
+run.sh: eval: line 23: unexpected argument to conditional unary operator
+run.sh: eval: line 23: unexpected EOF while looking for matching `"'
+run.sh: eval: line 24: unexpected argument to conditional unary operator
+lofreq: transient I/O error (eval-injected, call #1)

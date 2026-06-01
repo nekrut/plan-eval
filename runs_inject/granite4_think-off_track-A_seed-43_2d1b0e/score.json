@@ -1,0 +1,51 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-43_2d1b0e",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 7.5337302684783936,
+    "wall_seconds_execution": 0.2651991844177246,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 983,
+      "prompt_eval_duration_ns": 9096758,
+      "eval_duration_ns": 6542595904,
+      "total_duration_ns": 7521961612
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "failures_log_populated"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "missing_lib_error",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-43_2d1b0e/run.sh line 46:\n     -- align_one; then\n     ^-- SC2215 (warning): This flag is used as a command name. Bad line break or missing [ .. ]?\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-43_2d1b0e/run.sh line 64:\n  bgzip() { bgzip -f \"$1\"; }\n            ^---^ SC2264 (error): This function unconditionally re-invokes itself. Missing 'command'?\n\nDid you mean: \n  bgzip() { command bgzip -f \"$1\"; }\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

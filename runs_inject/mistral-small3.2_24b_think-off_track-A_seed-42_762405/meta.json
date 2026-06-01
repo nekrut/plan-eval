@@ -1,0 +1,14 @@
+{
+  "run_id": "mistral-small3.2_24b_think-off_track-A_seed-42_762405",
+  "model": "mistral-small3.2:24b",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 32.83952236175537,
+  "duration_ms_generation": 32839,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN_v2_defensive.md",
+  "plan_name": "PLAN_v2_defensive",
+  "inject_pattern": "missing_lib_error",
+  "inject_target": "lofreq"
+}

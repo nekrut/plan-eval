@@ -1,0 +1,52 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-44_999b96",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 7.991818904876709,
+    "wall_seconds_execution": 8.725425243377686,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 1023,
+      "prompt_eval_duration_ns": 9145223,
+      "eval_duration_ns": 6911407713,
+      "total_duration_ns": 7977447986
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "failures_log_populated",
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 255,
+    "inject_pattern": "silent_truncation",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-44_999b96/run.sh line 10:\nSUCCESS_LOG=\"${OUT}/success.log\"\n^---------^ SC2034 (warning): SUCCESS_LOG appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- SUCCESS_LOG appears unused. Verif...\n",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

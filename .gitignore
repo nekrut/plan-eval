@@ -42,6 +42,9 @@ __pycache__/
 *.pyc
 .DS_Store
 
+# Smoke-test runs (re-derivable)
+runs_smoke_a5000/
+
 # Local matrix log (re-derivable)
 matrix_log.json
 matrix_5080.log

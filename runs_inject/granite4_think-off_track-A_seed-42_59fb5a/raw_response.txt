@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF=data/ref/chrM.fa
+OUT=results
+FAIL_LOG="${OUT}/failures.log"
+SUCCESS_LOG="${OUT}/success.log"
+
+mkdir -p "$OUT"
+
+# Idempotency tracking
+SURVIVORS=()
+declare -i OK=0
+
+# Defensive try wrapper
+try() {
+  local sample="$1" step="$2" validate="$3"; shift 3
+  [[ "$1" == "--" ]] && shift
+  

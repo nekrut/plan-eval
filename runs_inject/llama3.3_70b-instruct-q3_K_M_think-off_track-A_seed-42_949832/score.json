@@ -1,0 +1,51 @@
+{
+  "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-42_949832",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 85.95660758018494,
+    "wall_seconds_execution": 0.3653256893157959,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2911,
+      "eval_count": 1056,
+      "prompt_eval_duration_ns": 83161034,
+      "eval_duration_ns": 84503892150,
+      "total_duration_ns": 85947523720
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "failures_log_populated"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "missing_lib_error",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

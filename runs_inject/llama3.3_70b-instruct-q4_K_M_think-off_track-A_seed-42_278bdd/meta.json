@@ -1,0 +1,14 @@
+{
+  "run_id": "llama3.3_70b-instruct-q4_K_M_think-off_track-A_seed-42_278bdd",
+  "model": "llama3.3:70b-instruct-q4_K_M",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 68.05299401283264,
+  "duration_ms_generation": 68052,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "wrong_format_output",
+  "inject_target": "lofreq"
+}

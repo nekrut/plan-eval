@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Constants
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF=data/ref/chrM.fa
+OUT=results
+FAILURES="${OUT}/failures.log"
+SURVIVORS=()
+mkdir -p "$OUT"
+
+# Defensive try function (retries once on failure)
+try() {
+  local sample="$1"; shift
+  local step="$1"; shift
+  local validate="$1"; shift # validation command string
+  if [[ "$1" == "--" ]]

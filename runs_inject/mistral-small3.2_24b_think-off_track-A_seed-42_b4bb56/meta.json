@@ -1,0 +1,14 @@
+{
+  "run_id": "mistral-small3.2_24b_think-off_track-A_seed-42_b4bb56",
+  "model": "mistral-small3.2:24b",
+  "track": "A",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 11.54351544380188,
+  "duration_ms_generation": 11543,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "one_sample_fails",
+  "inject_target": "bwa"
+}

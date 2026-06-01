@@ -1,0 +1,14 @@
+{
+  "run_id": "qwen3_32b_think-off_track-A_seed-43_b33cd5",
+  "model": "qwen3:32b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 20.572035551071167,
+  "duration_ms_generation": 20572,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "one_sample_fails",
+  "inject_target": "lofreq"
+}

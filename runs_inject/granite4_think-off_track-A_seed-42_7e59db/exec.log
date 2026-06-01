@@ -1,0 +1,12 @@
+[bwa_index] Pack FASTA... 0.00 sec
+[bwa_index] Construct BWT for the packed sequence...
+[bwa_index] 0.01 seconds elapse.
+[bwa_index] Update BWT... 0.00 sec
+[bwa_index] Pack forward-only FASTA... 0.00 sec
+[bwa_index] Construct SA from BWT and Occ... 0.00 sec
+[main] Version: 0.7.18-r1243-dirty
+[main] CMD: /home/anton/miniforge3/envs/bench/bin/bwa index data/ref/chrM.fa
+[main] Real time: 0.299 sec; CPU: 0.014 sec
+run.sh: line 22: $']] -- bwa index "$REF"; then\n  printf %st%st%sn "__ref__" "bwa_index" "command_or_validation_failed" >> "$FAIL_LOG"\n  exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+run.sh: line 23: $']] -- bwa index "$REF"; then\n  printf %st%st%sn "__ref__" "bwa_index" "command_or_validation_failed" >> "$FAIL_LOG"\n  exit 1\nfi\n\nsamtools faidx "$REF"\nif ! try __ref__ faidx [[': command not found
+run.sh: line 95: unexpected EOF while looking for matching `''

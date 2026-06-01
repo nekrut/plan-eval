@@ -1,0 +1,51 @@
+{
+  "run_id": "mistral-small3.2_24b_think-off_track-A_seed-43_f968f4",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 11.388977527618408,
+    "wall_seconds_execution": 6.727080345153809,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2401,
+      "eval_count": 445,
+      "prompt_eval_duration_ns": 26051582,
+      "eval_duration_ns": 11083899933,
+      "total_duration_ns": 11380230782
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 255,
+    "inject_pattern": "silent_truncation",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "run_id": "granite-code_34b_think-off_track-A_seed-43_34b496",
+  "model": "granite-code:34b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 16.379011631011963,
+  "duration_ms_generation": 16379,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "stderr_warning_storm",
+  "inject_target": "bwa"
+}

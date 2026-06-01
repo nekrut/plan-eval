@@ -1,0 +1,54 @@
+{
+  "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-42_c7233d",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 84.64752173423767,
+    "wall_seconds_execution": 7.285710096359253,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2911,
+      "eval_count": 1056,
+      "prompt_eval_duration_ns": 100962301,
+      "eval_duration_ns": 83181902659,
+      "total_duration_ns": 84638596522
+    }
+  },
+  "error_handling": {
+    "m_handle": "recover",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [
+      "M117-bl",
+      "M117-ch",
+      "M117C1-bl",
+      "M117C1-ch"
+    ],
+    "n_valid": 4,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "wrong_format_output",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

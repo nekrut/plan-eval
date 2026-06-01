@@ -1,0 +1,51 @@
+{
+  "run_id": "qwen3_32b_think-off_track-A_seed-43_317f95",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 255,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 20.558418035507202,
+    "wall_seconds_execution": 7.073585271835327,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2362,
+      "eval_count": 546,
+      "prompt_eval_duration_ns": 39081764,
+      "eval_duration_ns": 20230766282,
+      "total_duration_ns": 20550144271
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 1,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [
+      "sample_failure_mentioned"
+    ],
+    "exit_code": 255,
+    "inject_pattern": "silent_truncation",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

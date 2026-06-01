@@ -1,0 +1,49 @@
+{
+  "run_id": "gemma3_27b_think-off_track-A_seed-43_2a9576",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 44.68112277984619,
+    "wall_seconds_execution": 2.2286839485168457,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3207,
+      "eval_count": 1216,
+      "prompt_eval_duration_ns": 3218381139,
+      "eval_duration_ns": 40451555304,
+      "total_duration_ns": 44672635486
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 3,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "one_sample_fails",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/gemma3_27b_think-off_track-A_seed-43_2a9576/run.sh line 67:\nfirst_failures=$(awk -F'\\t' '!seen[$1]++{print $1\" failed at \"$2}' \"$OUT/failures.log\")\n^------------^ SC2034 (warning): first_failures appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- first_failures appears unused. Ve...\n",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

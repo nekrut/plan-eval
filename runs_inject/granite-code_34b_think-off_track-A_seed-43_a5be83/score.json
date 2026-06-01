@@ -1,0 +1,49 @@
+{
+  "run_id": "granite-code_34b_think-off_track-A_seed-43_a5be83",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 34.13591432571411,
+    "wall_seconds_execution": 0.31574583053588867,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3225,
+      "eval_count": 995,
+      "prompt_eval_duration_ns": 37796222,
+      "eval_duration_ns": 33483961254,
+      "total_duration_ns": 34126907387
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "flake_first_call",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite-code_34b_think-off_track-A_seed-43_a5be83/run.sh line 3:\nTHREADS=4\n^-----^ SC2034 (warning): THREADS appears unused. Verify use (or export if used externally).\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite-code_34b_think-off_track-A_seed-43_a5be83/run.sh line 5:\nREF=data/ref/chrM.fa\n^-^ SC2034 (warning): REF appears unused. Verify use (or export if used externally).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2034 -- REF appears unused. Verify use (o...\n",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "usage": {
+    "prompt_eval_count": 2401,
+    "eval_count": 445,
+    "prompt_eval_duration_ns": 25955993,
+    "eval_duration_ns": 10899476965,
+    "total_duration_ns": 11203482980
+  },
+  "cost_usd": 0.0
+}

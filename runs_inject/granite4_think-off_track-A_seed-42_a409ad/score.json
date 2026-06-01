@@ -1,0 +1,49 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_a409ad",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 3.2194206714630127,
+    "wall_seconds_execution": 0.31490445137023926,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2255,
+      "eval_count": 431,
+      "prompt_eval_duration_ns": 9394651,
+      "eval_duration_ns": 2726128820,
+      "total_duration_ns": 3210208117
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 1,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "missing_lib_error",
+    "inject_target": "bwa"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_a409ad/run.sh line 18:\n    \"$ref_dir\"/chrM.fa \"$data/raw/${sample}_1.fq.gz\" \"$data/raw/${sample}_2.fq.gz\" |\n                        ^---^ SC2154 (warning): data is referenced but not assigned.\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2154 -- data is referenced but not assign...\n",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

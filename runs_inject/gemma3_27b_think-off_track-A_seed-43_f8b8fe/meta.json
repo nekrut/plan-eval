@@ -1,0 +1,14 @@
+{
+  "run_id": "gemma3_27b_think-off_track-A_seed-43_f8b8fe",
+  "model": "gemma3:27b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 19.97972846031189,
+  "duration_ms_generation": 19979,
+  "plan_path": "/media/anton/data/git/plan-eval/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "slow_tool",
+  "inject_target": "lofreq"
+}

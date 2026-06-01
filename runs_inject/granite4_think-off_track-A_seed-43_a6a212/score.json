@@ -1,0 +1,49 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-43_a6a212",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 5.944640874862671,
+    "wall_seconds_execution": 0.6667096614837646,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 788,
+      "prompt_eval_duration_ns": 8950925,
+      "eval_duration_ns": 5128003728,
+      "total_duration_ns": 5936027659
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "slow_tool",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-43_a6a212/run.sh line 21:\n  if eval \"$validate\" && eval \"$sample $@\"; then return 0; else\n                                       ^-- SC2145 (error): Argument mixes string and array. Use * or separate argument.\n                                       ^-- SC2294 (warning): eval negates the benefit of arrays. Drop eval to preserve whitespace/symbols (or eval as string).\n\nFor more information:\n  https://www.shellcheck.net/wiki/SC2145 -- Argument mixes string and array. ...\n  https://www.shellcheck.net/wiki/SC2294 -- eva",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

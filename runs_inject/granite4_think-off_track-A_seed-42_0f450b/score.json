@@ -1,0 +1,50 @@
+{
+  "run_id": "granite4_think-off_track-A_seed-42_0f450b",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 6.336118698120117,
+    "wall_seconds_execution": 0.5661208629608154,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 2909,
+      "eval_count": 775,
+      "prompt_eval_duration_ns": 423318397,
+      "eval_duration_ns": 5117702430,
+      "total_duration_ns": 6323544853
+    }
+  },
+  "error_handling": {
+    "m_handle": "partial",
+    "m_recover": 0,
+    "m_diagnose": 1,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [
+      "failures_log_populated"
+    ],
+    "exit_code": 1,
+    "inject_pattern": "none",
+    "inject_target": null
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_0f450b/run.sh line 20:\n  for attempt in {1..2}; do\n  ^-^ SC2034 (warning): attempt appears unused. Verify use (or export if used externally).\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_0f450b/run.sh line 30:\n> \"$FAIL_LOG\"\n^-----------^ SC2188 (warning): This redirection doesn't have a command. Move to its command (or use 'true' as no-op).\n\n\nIn /media/anton/data/git/plan-eval/runs_inject/granite4_think-off_track-A_seed-42_0f450b/run.sh line 49:\n    \"$REF\" \"${data}/raw/${s}",
+    "idempotent": null
+  }
+}

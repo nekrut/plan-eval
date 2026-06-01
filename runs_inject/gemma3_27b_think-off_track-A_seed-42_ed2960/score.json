@@ -1,0 +1,49 @@
+{
+  "run_id": "gemma3_27b_think-off_track-A_seed-42_ed2960",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 45.03709173202515,
+    "wall_seconds_execution": 2.1801915168762207,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 3207,
+      "eval_count": 1228,
+      "prompt_eval_duration_ns": 3207072625,
+      "eval_duration_ns": 40783383156,
+      "total_duration_ns": 45028503056
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 1,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 0,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "silent_truncation",
+    "inject_target": "lofreq"
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": true,
+    "shellcheck_output": "",
+    "idempotent": null,
+    "idempotent_stderr": "skipped (error injection active)"
+  }
+}

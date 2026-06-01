@@ -1,0 +1,5 @@
+run.sh: eval: line 19: unexpected EOF while looking for `]]'
+run.sh: eval: line 20: syntax error: unexpected end of file
+run.sh: eval: line 20: unexpected EOF while looking for `]]'
+run.sh: eval: line 21: syntax error: unexpected end of file
+run.sh: line 59: VCF: unbound variable
