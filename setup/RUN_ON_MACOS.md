@@ -2,6 +2,32 @@
 
 This file is a self-contained recipe for an agent (or a person) starting fresh on a MacBook Air M4 with 24 GB unified RAM. The goal: replicate the error-handling experiment (`README.md` §2.6) on Apple silicon, so the existing Jetson + RTX 5080 result picks up a third hardware platform.
 
+## Quick reproduction: `gemma4:12b` capability result (§2.1)
+
+If you just want to confirm the one finding — `gemma4:12b` scores **M3 = 1.000** on the v2 plan (committed in `3d64220` on the Jetson) — there is a turnkey script. It runs the 3-seed capability sweep for one model, prints the score next to the Jetson baseline, and does **not** modify `results.csv`.
+
+```bash
+# one-time setup (same as the full recipe below, ~20 min):
+git clone https://github.com/nekrut/plan-eval && cd plan-eval
+brew install git curl ollama && ollama serve &      # ollama must be >= 0.30, else gemma4:12b 412s — `brew upgrade ollama`
+bash setup/install.sh                                # conda env `bench` (bwa/samtools/lofreq, native arm64)
+bash setup/fetch_data.sh
+bash ground_truth/canonical.sh
+
+# the reproduction (pull ~7.6 GB + 3 runs, ~10 min on an M4):
+bash setup/reproduce_gemma4_m4.sh
+```
+
+Expected tail:
+
+```
+  gemma4:12b     M1=3/3  M3_mean=1.000   (Jetson: 1.000)  MATCH
+```
+
+`gemma4:12b` is 7.6 GB at Q4; with the harness's pinned `num_ctx=16384` the KV cache is small, so the footprint is ~10–12 GB — comfortable in 24 GB. No `claude` login is needed (open-weight only). To also reproduce the `lfm2.5:8b` think-leak floor (M3 = 0.000 — it emits its `<think>` block as the script body on any hardware), pass both: `bash setup/reproduce_gemma4_m4.sh gemma4:12b lfm2.5:8b`.
+
+The rest of this file is the full §2.6 error-handling matrix recipe (5 models, overnight).
+
 The experiment matrix from §2.6 is 5 models × 7 injection patterns × 1–2 target tools × 2 recipe variants × 3 seeds = ≈ 390 cells per model class. We'll run 3 Anthropic models + 4 fitting open-weight models, in parallel, overnight.
 
 ## Prerequisites (one-time, ~10 min)
