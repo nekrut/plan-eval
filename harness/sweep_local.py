@@ -50,6 +50,10 @@ MODELS = [
     # Small controls
     ("glm4:9b",                                5.5, "small"),
     ("granite4",                               2.1, "small"),
+    # Added 2026-06-06: new models released since this lineup that fit the
+    # Jetson's 64 GB unified RAM (see README §2.1). Sizes from ollama registry.
+    ("gemma4:12b",                             7.6, "generalist"),
+    ("lfm2.5:8b",                              5.2, "small"),
 ]
 
 

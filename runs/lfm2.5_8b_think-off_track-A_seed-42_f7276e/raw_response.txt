@@ -1,0 +1,6 @@
+<think>
+We need to produce a bash script that implements the described workflow. The constraints: first line #!/usr/bin/env bash, second line set -euo pipefail. Use only tools from inventory (bwa, samtools, bcftools, tabix, etc). No absolute paths outside current directory. Assume data/raw and data/ref exist. Output under results/. Must be idempotent.
+
+We need to write a script that does:
+
+- Defin

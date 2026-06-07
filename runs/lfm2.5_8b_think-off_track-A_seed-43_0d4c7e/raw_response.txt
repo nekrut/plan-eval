@@ -1,0 +1,4 @@
+<think>
+We need to produce a bash script that implements the described workflow. Must be idempotent, use only tools listed (bwa, samtools, bcftools, tabix, etc). The script must have shebang and set -euo pipefail as first two lines.
+
+We need to ensure no absolute paths outside current working directory. All paths relative to cwd. The data/raw and data/ref directories are under the current director

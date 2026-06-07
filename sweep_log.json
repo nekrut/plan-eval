@@ -1,143 +1,54 @@
 [
   {
-    "model": "glm-4.7-flash",
+    "model": "gemma4:12b",
     "seeds": [
       {
         "seed": 42,
-        "run_id": "glm-4.7-flash_think-off_track-A_seed-42_59052d",
+        "run_id": "gemma4_12b_think-off_track-A_seed-42_05498d",
         "M1": 1,
         "M3": 1.0,
-        "wall_s": 40.87743639945984
+        "wall_s": 71.47246193885803
       },
       {
         "seed": 43,
-        "run_id": "glm-4.7-flash_think-off_track-A_seed-43_b40d1a",
+        "run_id": "gemma4_12b_think-off_track-A_seed-43_349fa1",
         "M1": 1,
         "M3": 1.0,
-        "wall_s": 23.926294088363647
+        "wall_s": 54.63496494293213
       },
       {
         "seed": 44,
-        "run_id": "glm-4.7-flash_think-off_track-A_seed-44_2fe0ef",
+        "run_id": "gemma4_12b_think-off_track-A_seed-44_5ea51b",
         "M1": 1,
         "M3": 1.0,
-        "wall_s": 23.965678215026855
+        "wall_s": 54.48580980300903
       }
-    ],
-    "power_mode": "MAXN"
+    ]
   },
   {
-    "model": "gpt-oss:20b",
+    "model": "lfm2.5:8b",
     "seeds": [
       {
         "seed": 42,
-        "run_id": "gpt-oss_20b_think-off_track-A_seed-42_550025",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 171.62963914871216
-      },
-      {
-        "seed": 43,
-        "run_id": "gpt-oss_20b_think-off_track-A_seed-43_1d2121",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 197.71786522865295
-      },
-      {
-        "seed": 44,
-        "run_id": "gpt-oss_20b_think-off_track-A_seed-44_aa1027",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 258.44134068489075
-      }
-    ],
-    "power_mode": "MAXN"
-  },
-  {
-    "model": "olmo-3.1:32b",
-    "seeds": [],
-    "power_mode": "MAXN",
-    "note": "all seeds exceeded 900s gen timeout"
-  },
-  {
-    "model": "nemotron-3-nano",
-    "seeds": [
-      {
-        "seed": 42,
-        "run_id": "nemotron-3-nano_think-off_track-A_seed-42_c01438",
+        "run_id": "lfm2.5_8b_think-off_track-A_seed-42_f7276e",
         "M1": 0,
         "M3": 0.0,
-        "wall_s": 31.712740659713745
+        "wall_s": 136.41279816627502
       },
       {
         "seed": 43,
-        "run_id": "nemotron-3-nano_think-off_track-A_seed-43_8c7a57",
+        "run_id": "lfm2.5_8b_think-off_track-A_seed-43_0d4c7e",
         "M1": 0,
         "M3": 0.0,
-        "wall_s": 17.151099681854248
+        "wall_s": 62.470906257629395
       },
       {
         "seed": 44,
-        "run_id": "nemotron-3-nano_think-off_track-A_seed-44_8fffe4",
+        "run_id": "lfm2.5_8b_think-off_track-A_seed-44_f8b5b0",
         "M1": 0,
         "M3": 0.0,
-        "wall_s": 17.069564819335938
+        "wall_s": 96.94391918182373
       }
-    ],
-    "power_mode": "MAXN"
-  },
-  {
-    "model": "llama3.3:70b-instruct-q3_K_M",
-    "seeds": [
-      {
-        "seed": 42,
-        "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-42_e36f66",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 359.51026225090027
-      },
-      {
-        "seed": 43,
-        "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-43_6f91e8",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 203.4509105682373
-      },
-      {
-        "seed": 44,
-        "run_id": "llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-44_1774d9",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 201.33831238746643
-      }
-    ],
-    "power_mode": "MAXN"
-  },
-  {
-    "model": "granite4",
-    "seeds": [
-      {
-        "seed": 42,
-        "run_id": "granite4_think-off_track-A_seed-42_25e484",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 20.047505140304565
-      },
-      {
-        "seed": 43,
-        "run_id": "granite4_think-off_track-A_seed-43_2f15f6",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 11.032362699508667
-      },
-      {
-        "seed": 44,
-        "run_id": "granite4_think-off_track-A_seed-44_bf70f1",
-        "M1": 1,
-        "M3": 1.0,
-        "wall_s": 14.640495538711548
-      }
-    ],
-    "power_mode": "MAXN"
+    ]
   }
 ]

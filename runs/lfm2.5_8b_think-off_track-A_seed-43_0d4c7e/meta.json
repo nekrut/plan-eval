@@ -1,0 +1,14 @@
+{
+  "run_id": "lfm2.5_8b_think-off_track-A_seed-43_0d4c7e",
+  "model": "lfm2.5:8b",
+  "track": "A",
+  "seed": 43,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 59.455286741256714,
+  "duration_ms_generation": 59455,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "none",
+  "inject_target": null
+}

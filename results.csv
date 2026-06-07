@@ -17,6 +17,9 @@ devstral-small-2_24b_think-off_track-A_seed-44_67a724,current,devstral-small-2_2
 gemma3_27b_think-off_track-A_seed-42_5bb157,current,gemma3_27b,off,A,42,1,1,1.0,0,0.0,270.4,10.3
 gemma3_27b_think-off_track-A_seed-43_0f4ff3,current,gemma3_27b,off,A,43,1,1,1.0,0,0.0,253.0,10.7
 gemma3_27b_think-off_track-A_seed-44_f089d0,current,gemma3_27b,off,A,44,1,1,1.0,0,0.0,254.4,10.5
+gemma4_12b_think-off_track-A_seed-42_05498d,current,gemma4_12b,off,A,42,1,1,1.0,1,0.0,59.1,8.3
+gemma4_12b_think-off_track-A_seed-43_349fa1,current,gemma4_12b,off,A,43,1,1,1.0,1,0.0,44.0,8.2
+gemma4_12b_think-off_track-A_seed-44_5ea51b,current,gemma4_12b,off,A,44,1,1,1.0,1,0.0,43.9,8.2
 glm-4.7-flash_think-off_track-A_seed-42_59052d,current,glm-4.7-flash,off,A,42,1,1,1.0,1,0.0,40.9,8.4
 glm-4.7-flash_think-off_track-A_seed-43_b40d1a,current,glm-4.7-flash,off,A,43,1,1,1.0,0,0.0,23.9,8.4
 glm-4.7-flash_think-off_track-A_seed-44_2fe0ef,current,glm-4.7-flash,off,A,44,1,1,1.0,0,0.0,24.0,8.8
@@ -33,6 +36,9 @@ granite-code_34b_think-off_track-A_seed-44_98a87a,current,granite-code_34b,off,A
 granite4_think-off_track-A_seed-42_25e484,current,granite4,off,A,42,1,1,1.0,1,0.0,20.0,8.4
 granite4_think-off_track-A_seed-43_2f15f6,current,granite4,off,A,43,1,1,1.0,1,0.0,11.0,8.5
 granite4_think-off_track-A_seed-44_bf70f1,current,granite4,off,A,44,1,1,1.0,1,0.0,14.6,8.7
+lfm2.5_8b_think-off_track-A_seed-42_f7276e,current,lfm2.5_8b,off,A,42,0,0,0.0,0,0.0,133.4,0.6
+lfm2.5_8b_think-off_track-A_seed-43_0d4c7e,current,lfm2.5_8b,off,A,43,0,0,0.0,0,0.0,59.5,0.6
+lfm2.5_8b_think-off_track-A_seed-44_f8b5b0,current,lfm2.5_8b,off,A,44,0,0,0.0,0,0.0,94.0,0.6
 llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-42_e36f66,current,llama3.3_70b-instruct-q3_K_M,off,A,42,1,1,1.0,1,0.0,359.5,9.6
 llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-43_6f91e8,current,llama3.3_70b-instruct-q3_K_M,off,A,43,1,1,1.0,1,0.0,203.5,8.4
 llama3.3_70b-instruct-q3_K_M_think-off_track-A_seed-44_1774d9,current,llama3.3_70b-instruct-q3_K_M,off,A,44,1,1,1.0,1,0.0,201.3,8.5
