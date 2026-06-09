@@ -1,6 +1,6 @@
 # plan-eval — can a cheap model run a strong model's bioinformatics recipe?
 
-Opus 4.7 wrote a recipe for variant-calling on four mtDNA samples. We gave that recipe to 25 models — three Anthropic tiers plus 22 free open-weight ones — and asked each to turn it into a bash script. We ran the scripts on real data and checked their variant calls against a published answer key. Hardware: Jetson AGX Orin and RTX 5080. Three seeds per cell, several recipe styles, with-recipe and no-recipe runs, plus seven kinds of deliberate tool failure. **793 scored runs.**
+Opus 4.7 wrote a recipe for variant-calling on four mtDNA samples. We gave that recipe to 27 models — three Anthropic tiers plus 24 free open-weight ones — and asked each to turn it into a bash script. We ran the scripts on real data and checked their variant calls against a published answer key. Hardware: Jetson AGX Orin and RTX 5080. Three seeds per cell, several recipe styles, with-recipe and no-recipe runs, plus seven kinds of deliberate tool failure. **799 scored runs.**
 
 ## Abstract
 
@@ -8,7 +8,7 @@ The question: can a small model take a recipe from a strong model and produce a 
 
 Four findings.
 
-**Detail beats model size.** The brief recipe (v1, ~1,200 words of prose) gives M3 ≈ 0 for most local models. The detailed recipe (v2, every command spelled out) gives M3 = 1.000 for 13 of 14 free local models on Jetson at full power. The fastest is `granite4` — 2.1 GB on disk, 15 seconds per run. Anthropic models score 1.000 on both.
+**Detail beats model size.** The brief recipe (v1, ~1,200 words of prose) gives M3 ≈ 0 for most local models. The detailed recipe (v2, every command spelled out) gives M3 = 1.000 for 14 of 16 free local models on Jetson at full power — `gemma4:12b` joins the perfect scorers (1.000, ~49 s/run); the two misses are `nemotron-3-nano` and `lfm2.5:8b`, the latter a think-mode leak that emits its `<think>` reasoning as the script body. The fastest is `granite4` — 2.1 GB on disk, 15 seconds per run. Anthropic models score 1.000 on both.
 
 **The jump is one line.** Adding one literal `lofreq` command to v1 (call that v1.25) brings every dense model ≥ 27 B parameters from M3 ≈ 0 back to 1.000. The limit is not model size but how exotic the tool's command syntax is. Lofreq takes the BAM as a positional argument, not behind a flag; v1's prose did not say so.
 
@@ -55,7 +55,7 @@ Splitting like this lets us measure two things separately. The recipe's quality 
 
 ![Figure 1. Mean M3 by model × plan variant.](figures/fig1_headline_heatmap.png)
 
-Figure 1 shows mean M3 for each model and each recipe variant, both hardware platforms pooled. Rows are 25 models, columns are seven recipe variants from no-recipe (left) to most detailed (right). Cells are colored by score: green is 1.000, red is 0.
+Figure 1 shows mean M3 for each model and each recipe variant, both hardware platforms pooled. Rows are 27 models, columns are seven recipe variants from no-recipe (left) to most detailed (right). Cells are colored by score: green is 1.000, red is 0.
 
 The v2 column is uniformly green. The no-recipe column is red except for the three Anthropic rows. Most non-Anthropic rows jump from red on v1 to green on v2.
 
@@ -223,6 +223,7 @@ n=36 = 12 (pattern, tool) cells × 3 seeds; baseline (no-injection) cells exclud
 | `qwen3.6:35b-a3b` (MoE) | 1.00±0.00 (n=3) | 0.00±0.00 (n=3) | 0.00±0.00 (n=3) | 127 | 100% |
 | `gemma3:27b` | 1.00±0.00 (n=3) | — | — | 259 | 0% |
 | `gemma4:26b` | 1.00±0.00 (n=3) | 0.33±0.58 (n=3) | 0.33±0.58 (n=3) | 121 | 100% |
+| `gemma4:12b` | 1.00±0.00 (n=3) | — | — | 49 | 100% |
 | `gemma4:e4b` | 1.00±0.00 (n=3) | 0.00±0.00 (n=3) | 0.00±0.00 (n=3) | 9 | 100% |
 | `mistral-small3.2:24b` | 1.00±0.00 (n=3) | — | — | 170 | 100% |
 | `devstral-small-2:24b` | 1.00±0.00 (n=3) | — | — | 163 | 0% |
@@ -234,6 +235,7 @@ n=36 = 12 (pattern, tool) cells × 3 seeds; baseline (no-injection) cells exclud
 | `gpt-oss:20b` (MoE) | 0.67±0.58 (n=3) | 0.00±0.00 (n=2) | 0.00 (n=1) | 174 | 83% |
 | `llama3.3:70b-instruct-q3_K_M` | 1.00±0.00 (n=3) | — | — | 255 | 100% |
 | `nemotron-3-nano` (24 B) | 0.00±0.00 (n=3) | — | — | 22 | 0% |
+| `lfm2.5:8b` | 0.00±0.00 (n=3) | — | — | 96 | 0% |
 | `olmo-3.1:32b` | timeout (n=3, ≥900 s) | — | — | — | — |
 
 Mean v2 generation seconds are computed over seeds 42/43/44 of the (model × v2) cell on whichever hardware the model was tested. M5 pass is the fraction of v2 Track A runs satisfying all five script-quality flags (§4). Where a model is untested at a given (plan, track) cell the entry is "—". M3 standard deviations are computed over the n seeds in each cell; cells with `±0.58` reflect the inevitable n=3 std of a {0, 0, 1} or {1, 1, 0} pattern.
