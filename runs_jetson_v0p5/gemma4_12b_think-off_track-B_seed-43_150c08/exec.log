@@ -1,0 +1,2 @@
+[E::bwa_idx_load_from_disk] fail to locate the index files
+[main_samview] fail to read the header from "-".

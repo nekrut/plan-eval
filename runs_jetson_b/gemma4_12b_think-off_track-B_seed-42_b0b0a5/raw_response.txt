@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+REF="data/ref/chrM.fa"
+RESULTS_DIR="results"
+
+mkdir -p "$RESULTS_DIR"
+
+# Index reference if not indexed
+if [ ! -f "${REF}._1.bam" ] && [ ! -f "${REF}.bt" ]; then
+    # Check for existing index or just create it
+    if ! samtools index "$REF" > /dev/null 2>&1; then
+        samtools faidx "$REF"
+    fi
+fi
+
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M11

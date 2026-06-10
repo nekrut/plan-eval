@@ -1,7 +1,0 @@
-<think>
-We need to produce a bash script that implements the described workflow. The constraints: first line #!/usr/bin/env bash, second line set -euo pipefail. Use only tools listed in inventory (bwa, samtools, bcftools, tabix, etc). No extra paths outside current directory. Output under results/. Must be idempotent.
-
-We need to write a script that does:
-
-- Define THREADS=4 and SAMPLES array.
-- C

@@ -1,0 +1,48 @@
+{
+  "run_id": "gemma4_12b_think-off_track-A_seed-42_bbdc00",
+  "m1_executes": 0,
+  "m1_detail": {
+    "exit_code": 1,
+    "timed_out": false
+  },
+  "m2_schema": 0,
+  "m2_detail": {
+    "reason": "M1 failed"
+  },
+  "m3_jaccard": 0.0,
+  "m3_detail": {
+    "reason": "M1 failed"
+  },
+  "m4": {
+    "wall_seconds_generation": 101.39773917198181,
+    "wall_seconds_execution": 0.8700888156890869,
+    "cost_usd": 0.0,
+    "usage": {
+      "prompt_eval_count": 1919,
+      "eval_count": 1048,
+      "prompt_eval_duration_ns": 4086363000,
+      "eval_duration_ns": 86390649000,
+      "total_duration_ns": 101388450140
+    }
+  },
+  "error_handling": {
+    "m_handle": "crash",
+    "m_recover": 0,
+    "m_diagnose": 0,
+    "samples_with_valid_vcf": [],
+    "n_valid": 0,
+    "target_n_for_pattern": 4,
+    "diagnose_signals": [],
+    "exit_code": 1,
+    "inject_pattern": "none",
+    "inject_target": null
+  },
+  "m5_quality": 0,
+  "m5_detail": {
+    "set_euo_pipefail": true,
+    "no_home_anton": true,
+    "shellcheck_clean": false,
+    "shellcheck_output": "\nIn /home/anton/bench/runs_v1/gemma4_12b_think-off_track-A_seed-42_bbdc00/run.sh line 61:\n            if [ \"$(1000*$(date +%s))\" -gt \"$(1000*$(date -r \"$RESULTS_DIR/${SAMPLE}.vcf.gz\" +%s))\" ]; then # This is not quite right, let's use a loop check\n                    ^--------------^ SC2211 (warning): This is a glob used as a command name. Was it supposed to be in ${..}, array, or is it missing quoting?\n                         ^---------^ SC2046 (warning): Quote this to prevent word splitting.\n                                              ^-- SC2211 (warning): This is a glob used as a command",
+    "idempotent": null
+  }
+}

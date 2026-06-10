@@ -31,6 +31,13 @@ PLAN_MAP = {
     "5080_v1p5":  ("v1.5",  "5080"),
     "5080_v0p5":  ("v0.5",  "5080"),
     "5080_v1g":   ("v1g",   "5080"),
+    # Jetson recipe-variant stages (added 2026-06-09 for gemma4:12b — the full
+    # Figure-1 row run on the Jetson, mirroring the 5080 sweep in matrix_5080.py).
+    "jetson_v1p25": ("v1.25", "jetson"),
+    "jetson_v1p5":  ("v1.5",  "jetson"),
+    "jetson_v1g":   ("v1g",   "jetson"),
+    "jetson_v0p5":  ("v0.5",  "jetson"),
+    "jetson_b":     ("v2",    "jetson"),   # Track-B (no-plan) runs collapse to the "B" column
 }
 
 # Plan-detail order, lean → detailed; "B" prepended for the no-plan column.

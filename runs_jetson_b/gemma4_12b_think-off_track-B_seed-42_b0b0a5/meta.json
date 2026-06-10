@@ -1,0 +1,14 @@
+{
+  "run_id": "gemma4_12b_think-off_track-B_seed-42_b0b0a5",
+  "model": "gemma4:12b",
+  "track": "B",
+  "seed": 42,
+  "think": "off",
+  "provider": "ollama",
+  "wall_seconds_generation": 66.81102228164673,
+  "duration_ms_generation": 66811,
+  "plan_path": "/home/anton/bench/plan/PLAN.md",
+  "plan_name": "PLAN",
+  "inject_pattern": "none",
+  "inject_target": null
+}

@@ -50,3 +50,19 @@ matrix_5080_log.json
 # Intermediate-conditions matrix log
 matrix_intermediates.log
 matrix_v1g.log
+
+# Jetson recipe-variant stage runs (added 2026-06-09) — same policy as runs/:
+# commit metadata, not the re-derivable data symlink / results outputs.
+runs_jetson_v1p25/*/data
+runs_jetson_v1p25/*/results/
+runs_jetson_v1p5/*/data
+runs_jetson_v1p5/*/results/
+runs_jetson_v1g/*/data
+runs_jetson_v1g/*/results/
+runs_jetson_v0p5/*/data
+runs_jetson_v0p5/*/results/
+runs_jetson_b/*/data
+runs_jetson_b/*/results/
+# Apply the same exclusion to runs_v1 (older dirs already committed results; new ones won't)
+runs_v1/*/data
+runs_v1/*/results/

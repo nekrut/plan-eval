@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p results
+
+REF="data/ref/chrM.fa"
+THREADS=4
+
+# Index reference if not already indexed
+if [ ! -f "${REF}._1.bam" ] && [ ! -f "${REF}.bt" ]; then
+    # Note: bwa index requires .1.bam or similar, but standard is .amb, .ann, .pac, .sa
+    # Since we use bwa mem and samtools, we need the standard indices.
+    bwa index "$REF"
+fi
+
+# Create a dummy index for

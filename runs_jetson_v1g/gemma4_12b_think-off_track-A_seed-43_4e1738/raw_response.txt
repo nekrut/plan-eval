@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+REF_FA="data/ref/chrM.fa"
+RESULTS_DIR="results"
+
+mkdir -p "$RESULTS_DIR"
+
+# 2. Reference indexing
+if [ ! -f "data/ref/chrM.fa.fai" ]; then
+    samtools faidx "$REF_FA"
+fi
+
+if [ ! -f "data/ref/chrM.fa.amb" ]; then
+    bwa index "$REF_FA"
+fi
+
+# Process samples
+for SAMPLE in "${SAMPLES[@]}"; do
+    

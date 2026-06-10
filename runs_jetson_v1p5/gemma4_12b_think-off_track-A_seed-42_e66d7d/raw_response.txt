@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THREADS=4
+SAMPLES=("M117-bl" "M117-ch" "M117C1-bl" "M117C1-ch")
+
+mkdir -p results
+
+# Reference indexing
+if [ ! -f data/ref/chrM.fa.1.hg19.json ] && [ ! -f data/ref/chrM.fa.1.fasta ]; then
+    # Check if bwa index exists (bwa index creates .amb, ._1._1.bam etc or just .fa.1.something)
+    # Standard bwa index for a single file is usually .fa.1.hg19.json or sim
